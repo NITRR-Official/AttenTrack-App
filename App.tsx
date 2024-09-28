@@ -18,8 +18,8 @@ export default function App() {
 
   return (
     // (k) ? <AppNavigation3 /> : <AppNavigation />
-    // <AppNavigation/>
+    <AppNavigation/>
       // <AppNavigation2 />
-      <AppNavigation3 />
+      // <AppNavigation3 />
   );
 }
