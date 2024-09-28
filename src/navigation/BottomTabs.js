@@ -26,6 +26,7 @@ import Profile from '../screens/teacher/Profile';
 // components
 import HomeIcon from '../components/HomeIcon.js';
 import ProfileIcon from '../components/ProfileIcon.js';
+import ReportIcon from '../components/ReportIcon.js';
 
 // size
 const { width, height } = Dimensions.get("window");
@@ -157,7 +158,7 @@ export default function BottomTabs() {
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                     }}>
-                                    <ProfileIcon color={focused ? '#01818C' : '#455A64'} />
+                                    <ReportIcon color={focused ? '#01818C' : '#455A64'} />
                                     <Text
                                         style={{
                                             fontFamily: 'Roboto',

@@ -1,10 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import ReportIcon from '../../components/ReportIcon'
 
 const Home = () => {
   return (
-    <View>
-      <Text>Home</Text>
+    <View styles={{backgroundColor: 'red', color: 'red'}} >
+      <Text>Homjkjdfddfdkjke</Text>
+
+    <ReportIcon color={'#01818C'} />
     </View>
   )
 }
