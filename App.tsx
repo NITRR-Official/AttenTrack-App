@@ -8,13 +8,13 @@ import AppNavigation3 from './src/navigation/index3';
 
 export default function App() {
 
-  const [k, setk] = React.useState(true);
+  // const [k, setk] = React.useState(true);
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      setk(false);
-    }, 5000);
-  }, []);
+  // React.useEffect(() => {
+  //   setTimeout(() => {
+  //     setk(false);
+  //   }, 5000);
+  // }, []);
 
   return (
     // (k) ? <AppNavigation3 /> : <AppNavigation />
