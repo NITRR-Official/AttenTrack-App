@@ -1,5 +1,4 @@
 // This is For Teachers
-
 import {
   View,
   Text,

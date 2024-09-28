@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const report = () => {
+const Report = () => {
   return (
     <View>
       <Text>report</Text>
@@ -9,6 +9,6 @@ const report = () => {
   )
 }
 
-export default report
+export default Report
 
 const styles = StyleSheet.create({})

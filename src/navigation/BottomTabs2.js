@@ -1,4 +1,4 @@
-// @This is For Teachers
+// @This is For Students
 
 import * as React from 'react';
 import {
@@ -18,9 +18,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 
 // Screens
-import Home from '../screens/teacher/Home';
-import Report from '../screens/teacher/Report';
-import Profile from '../screens/teacher/Profile';
+import Home from '../screens/student/Home';
+import Report from '../screens/student/Report';
+import Profile from '../screens/student/Profile';
 
 
 // components
