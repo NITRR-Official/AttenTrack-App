@@ -2,10 +2,10 @@ import * as React from "react";
 import Svg, { Path } from "react-native-svg";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
-const ReportIcon = ({ color }) => (
+const ReportIcon = ({ color, size }) => (
     <Svg
-    width={wp(8)}
-    height={wp(8)}
+    width={wp(size)}
+    height={wp(size)}
     viewBox="0 0 243 308"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
