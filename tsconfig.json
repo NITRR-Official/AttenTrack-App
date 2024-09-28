@@ -1,3 +1,6 @@
 {
+  "compilerOptions": {
+    "jsx": "react" // or "react-native" for React Native projects
+  },
   "extends": "@react-native/typescript-config/tsconfig.json"
 }
