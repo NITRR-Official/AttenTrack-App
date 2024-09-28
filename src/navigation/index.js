@@ -1,3 +1,5 @@
+// This is For Teachers
+
 import {
   View,
   Text,
@@ -7,13 +9,14 @@ import {
   BackHandler,
 } from "react-native";
 
-
+// navigation import
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from "@react-navigation/native";
+
 const Stack = createNativeStackNavigator();
 
-
-import React from 'react'
+// Bottom Tabs
+import BottomTabs from './BottomTabs'
 
 
 
@@ -29,8 +32,16 @@ export default function AppNavigation() {
   return (
 
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={Home} />
+      <Stack.Navigator
+        screenOptions={{
+          contentStyle: {
+            backgroundColor: "#FFF",
+          },
+          headerShown: false,
+        }}
+        initialRouteName={BottomTabs}
+      >
+        <Stack.Screen name="BottomTabs" component={BottomTabs} />
       </Stack.Navigator>
     </NavigationContainer>
 
