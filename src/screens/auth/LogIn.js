@@ -2,19 +2,24 @@ import { KeyboardAvoidingView, ScrollView, Text, TextInput, TouchableOpacity, Vi
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
 import SignUp from './SignUp';
-import Icon from 'react-native-vector-icons/FontAwesome';
+
+import { useAuth } from '../../utils/auth';
 
 
 const LogIn = () => {
+
   const [isStudent, setIsStudent] = React.useState(true);
   const [email, setEmail] = React.useState('');
   const [rollNumber, setRollNumber] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [department, setDepartment] = React.useState('');
   const [isSignUp, setIsSignUp] = React.useState(false);
+
+  const { setIndex } = useAuth();
+
   return (
     <>
-          <KeyboardAvoidingView>
+      <KeyboardAvoidingView>
       <ScrollView >
        {isSignUp ? (
         <SignUp setIsSignUp={setIsSignUp}/>  // Show the SignUp component if isSignUp is true
@@ -74,7 +79,7 @@ const LogIn = () => {
         <Text className="text-sm">Remember me</Text>
         <Text className="text-[#01818C] underline">Forgot Password?</Text>
       </View>
-      <TouchableOpacity className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Login</Text></TouchableOpacity>
+      <TouchableOpacity onPress={()=>setIndex(isStudent?2:1)} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Login</Text></TouchableOpacity>
       </View>
       </>
       )}

@@ -4,39 +4,19 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { BookOpenIcon, CpuChipIcon, PlusCircleIcon, XMarkIcon } from 'react-native-heroicons/outline';
+import { BookOpenIcon, CpuChipIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { theme } from '../../theme';
 import { ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { ProgressBar, RadioButton } from 'react-native-paper';
-
-const studentsData = [
-  {
-    rollNumber: 21116028,
-    name: "D Anuj Kumar",
-    attendance: true,
-  },
-  {
-    rollNumber: 21116040,
-    name: "Harsh Dewangan",
-    attendance: true,
-  },
-  {
-    rollNumber: 21116008,
-    name: "Aniket Kumar",
-    attendance: false,
-  },
-  {
-    rollNumber: 21116070,
-    name: "Mohit Doraiburu",
-    attendance: false,
-  },
-]
+import { studentsData } from './studentsData';
 
 const Sheet = () => {
   const navigation = useNavigation();
 
   const [student, setStudent] = useState(studentsData);
+  const [presentCount, setPresentCount] = useState(0);  // Count for present students
+  const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
 
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
@@ -63,18 +43,60 @@ const Sheet = () => {
     };
   }, [modalVisible2]);
 
+    // Calculate present and absent students
+    const calculateAttendance = () => {
+      const present = student.filter(item => item.attendance).length;
+      const absent = student.length - present;
+      setPresentCount(present);
+      setAbsentCount(absent);
+    };
+
+  // Function to mark all students as present
+  const markAllPresent = () => {
+    setStudent(prevStudents =>
+      prevStudents.map(student => ({ ...student, attendance: true }))
+    );
+  };
+
+  // Function to mark all students as absent
+  const markAllAbsent = () => {
+    setStudent(prevStudents =>
+      prevStudents.map(student => ({ ...student, attendance: false }))
+    );
+  };
+
+  // Function to generate a random 6-digit OTP
+  const generateRandomOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // Generate a number between 100000 and 999999
+  };
+
+  // Inside your component
+  const [otp, setOtp] = useState(generateRandomOTP()); // Initialize the OTP
+
+  // Update the OTP when the modal is opened
+  useEffect(() => {
+    if (modalVisible1) {
+      setOtp(generateRandomOTP());
+    }
+  }, [modalVisible1]);
+
+  // Calculate the attendance when the component mounts or student list changes
+  useEffect(() => {
+    calculateAttendance();
+  }, [student]);
+
   return (
-    <SafeAreaView style={{ flex: 1, alignItems: 'center' }} >
-      <View className="w-full flex flex-row justify-between items-center p-4">
+    <SafeAreaView style={{  alignItems: 'center' }} >
+      <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
         </TouchableOpacity>
         <TouchableOpacity style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-5" >
-          <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >Save</Text>
+          <Text style={{ color: '#fff', fontSize: wp(3.5), fontWeight: '700' }} >Save</Text>
         </TouchableOpacity>
       </View>
 
-      <View className="w-[95%] bg-[#01808c2e] p-2 px-5 rounded-md border-[#01808c7a] border-2 m-4 flex flex-row justify-between items-end">
+      <View className="w-[95%] bg-[#01808c2e] p-2 px-5 rounded-md border-[#01808c7a] border-2 m-4 mb-3 flex flex-row justify-between items-end">
         <View>
           <View className="flex flex-row"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} /><Text className="text-2xl text-[#01808cb9] font-medium ml-1">VLSI</Text></View>
           <Text className="text-gray-600">Chitrakant Sahu</Text>
@@ -82,7 +104,7 @@ const Sheet = () => {
         <TouchableOpacity
           onPress={() => setModalVisible1(true)}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
-          <PlusCircleIcon size={wp(10)} color="white" />
+          <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[15px] font-medium">Take Attendance</Text>
         </TouchableOpacity>
 
@@ -126,7 +148,7 @@ const Sheet = () => {
               <TouchableWithoutFeedback>
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text className="text-lg font-bold">OTP : 123456</Text>
+                  <Text className="text-lg font-bold">OTP : {otp}</Text>
                   <View className="w-full">
                     <Text className="pb-3">Time Remaining: {Math.max(Math.floor((1 - progress) * time), 0)} seconds</Text>
                     <ProgressBar progress={1 - progress} color={'#01818C'} />
@@ -143,20 +165,39 @@ const Sheet = () => {
         </Modal>
       </View>
 
+      {/* Add buttons for marking all present/absent */}
+      <View className="flex flex-row justify-between w-full mb-3 px-3">
+        <TouchableOpacity
+          onPress={markAllPresent}
+          className="flex-1 bg-[#258a4ac4] py-2 rounded-md mr-4 items-center">
+          <Text className="text-white font-semibold">Mark All Present</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={markAllAbsent}
+          className="flex-1 bg-[#c41111c4] py-2 rounded-md ml-4 items-center">
+          <Text className="text-white font-semibold">Mark All Absent</Text>
+        </TouchableOpacity>
+      </View>
 
+       {/* Display present and absent count */}
+       <View className="w-full flex flex-row justify-between px-4 mb-2">
+        <Text className="text-sm ">Total Students : {presentCount + absentCount}</Text>
+        <View><Text className="text-sm text-right">Present : {presentCount}</Text>
+        <Text className="text-sm text-right">Absent : {absentCount}</Text></View>
+      </View>
 
+      <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
+        <View className="flex flex-row justify-between">
+          <Text className="w-1/4">Roll Number</Text>
+          <Text className="w-1/2 text-center">Name</Text>
+          <Text className="w-1/4 text-right">Attendance</Text>
+        </View>
+      </View>
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
         style={{ backgroundColor: '#fff', height: hp(100) }}
       >
-        <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
-          <View className="flex flex-row justify-between">
-            <Text className="w-1/4">Roll Number</Text>
-            <Text className="w-1/2 text-center">Name</Text>
-            <Text className="w-1/4 text-right">Attendance</Text>
-          </View>
-        </View>
         <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
 
           {student.map((item, id) => (
@@ -165,17 +206,16 @@ const Sheet = () => {
               <Text className="w-1/2">{item.name}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
-                  thumbColor={item.attendance ? '#258a4a' : '#c41111'}
+                  thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
                   onValueChange={() => {
                     setStudent(prevStudents =>
-                      prevStudents.map((student, idx) => 
+                      prevStudents.map((student, idx) =>
                         id === idx
                           ? { ...student, attendance: !student.attendance }
                           : student
                       )
                     );
                   }}
-                
                   value={item.attendance} />
                 <Text className={`text-${item.attendance ? '[#258a4a]' : '[#c41111]'} font-semibold`}>{item.attendance ? 'P' : 'A'}</Text>
               </View>
@@ -185,14 +225,12 @@ const Sheet = () => {
         </View>
 
       </ScrollView>
-
-
     </SafeAreaView>
   )
 }
 
-export default Sheet
+export default Sheet;
 
 const styles = StyleSheet.create({
-
+  // Add any custom styles if needed
 });

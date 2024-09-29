@@ -28,26 +28,21 @@ import * as React from 'react';
 import { useNavigation } from "@react-navigation/native";
 
 
-const Home = () => {
+const ReportHome = () => {
 
   const navigation = useNavigation();
 
   return (
     <SafeAreaView>
-      <StatusBar
+             <StatusBar
         backgroundColor={theme.maincolor}
         barStyle={"light-content"}
         hidden={false}
       />
 
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(10), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
-        <Text style={{ color: 'white', fontSize: wp(6), fontWeight:700 }} >Classes</Text>
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CreateClass')}>
-          <PlusCircleIcon size={wp(10)} color="#fff" />
-        </TouchableOpacity>
-      </View>
+        <Text style={{ color: 'white', fontSize: wp(6), fontWeight:700 }} >Monthly Attendance Report</Text>
+        </View>
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -56,7 +51,7 @@ const Home = () => {
 
         <TouchableOpacity
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Sheet')}
+          onPress={() => navigation.navigate('Report')}
         >
           <CpuChipIcon size={wp(10)} color="#01808cb9" />
           <Text
@@ -71,7 +66,7 @@ const Home = () => {
 
         <TouchableOpacity
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Sheet')}
+          onPress={() => navigation.navigate('Report')}
         >
           <PhoneIcon size={wp(10)} color="#01808cb9" />
           <Text
@@ -86,7 +81,7 @@ const Home = () => {
 
         <TouchableOpacity
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Sheet')}
+          onPress={() => navigation.navigate('Report')}
         >
           <ComputerDesktopIcon size={wp(10)} color="#01808cb9" />
           <Text
@@ -107,6 +102,6 @@ const Home = () => {
   )
 }
 
-export default Home
+export default ReportHome
 
 const styles = StyleSheet.create({})

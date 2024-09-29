@@ -78,7 +78,7 @@ const SignUp = (props) => {
         />
       </View>
       </View>
-      <TouchableOpacity className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Sign Up</Text></TouchableOpacity>
+      <TouchableOpacity onPress={()=>setIndex(isStudent?2:1)} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Sign Up</Text></TouchableOpacity>
     </View>
   );
 };
