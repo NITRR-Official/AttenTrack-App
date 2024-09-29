@@ -31,7 +31,7 @@ export default function AppNavigation3() {
           },
           headerShown: false,
         }}
-        initialRouteName={Login}
+        initialRouteName={SignUp}
 
       >
         <Stack.Screen name="LogIn" component={Login} />
