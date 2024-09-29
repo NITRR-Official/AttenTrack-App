@@ -100,7 +100,7 @@ export default function BottomTabs() {
                                             fontSize: wp(3),
                                             color: focused ? '#01818C' : '#455A64',
                                         }}>
-                                        About Us
+                                        Profile
                                     </Text>
                                 </View>
                                 //  </TouchableOpacity>
@@ -166,7 +166,7 @@ export default function BottomTabs() {
                                             fontSize: wp(3),
                                             color: focused ? '#01818C' : '#455A64',
                                         }}>
-                                        About Us
+                                        Report
                                     </Text>
                                 </View>
                                 //  </TouchableOpacity>

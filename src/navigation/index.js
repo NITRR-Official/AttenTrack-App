@@ -16,6 +16,7 @@ const Stack = createNativeStackNavigator();
 
 // Bottom Tabs
 import BottomTabs from './BottomTabs'
+import CreateClass from "../screens/teacher/CreateClass";
 
 
 
@@ -34,13 +35,14 @@ export default function AppNavigation() {
       <Stack.Navigator
         screenOptions={{
           contentStyle: {
-            backgroundColor: "#FFF",
+            backgroundColor: "#fff",
           },
           headerShown: false,
         }}
         initialRouteName={BottomTabs}
       >
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen name="CreateClass" component={CreateClass} />
       </Stack.Navigator>
     </NavigationContainer>
 
