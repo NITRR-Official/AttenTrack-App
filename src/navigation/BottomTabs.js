@@ -27,6 +27,7 @@ import Profile from '../screens/teacher/Profile';
 import HomeIcon from '../components/HomeIcon.js';
 import ProfileIcon from '../components/ProfileIcon.js';
 import ReportIcon from '../components/ReportIcon.js';
+import Sheet from '../screens/teacher/Sheet.js';
 
 // size
 const { width, height } = Dimensions.get("window");

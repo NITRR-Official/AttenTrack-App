@@ -2,6 +2,7 @@ import * as React from 'react';
 import AppNavigation from './src/navigation';
 import AppNavigation2 from './src/navigation/index2';
 import AppNavigation3 from './src/navigation/index3';
+import { PaperProvider } from 'react-native-paper';
 // import {AuthProvider} from './src/utils/auth';
 
 
@@ -17,9 +18,11 @@ export default function App() {
   // }, []);
 
   return (
-    // (k) ? <AppNavigation3 /> : <AppNavigation />
+    <PaperProvider>
+    {/* (k) ? <AppNavigation3 /> : <AppNavigation /> */}
     <AppNavigation/>
-      // <AppNavigation2 />
-      // <AppNavigation3 />
+     {/* <AppNavigation2 /> */}
+      {/* <AppNavigation3 /> */}
+      </PaperProvider>
   );
 }

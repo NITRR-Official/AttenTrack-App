@@ -25,8 +25,6 @@ import * as React from 'react';
 import { useNavigation } from "@react-navigation/native";
 
 
-
-
 const Home = () => {
 
   const navigation = useNavigation();
@@ -47,12 +45,57 @@ const Home = () => {
           <PlusCircleIcon size={wp(10)} color="#fff" />
         </TouchableOpacity>
       </View>
-
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
         style={{ backgroundColor: '#fff', height: hp(100) }}
       >
+
+        <TouchableOpacity
+          className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
+          onPress={() => navigation.navigate('Sheet')}
+        >
+          <PlusCircleIcon size={wp(10)} color="#01808cb9" />
+          <Text
+            className="ml-2 text-lg font-medium text-gray-600 flex-shrink"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            VLSI (2025 BATCH)
+          </Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity
+          className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
+          onPress={() => navigation.navigate('Sheet')}
+        >
+          <PlusCircleIcon size={wp(10)} color="#01808cb9" />
+          <Text
+            className="ml-2 text-lg font-medium text-gray-600 flex-shrink"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            Analog Communication (2026 BATCH)
+          </Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity
+          className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
+          onPress={() => navigation.navigate('Sheet')}
+        >
+          <PlusCircleIcon size={wp(10)} color="#01808cb9" />
+          <Text
+            className="ml-2 text-lg font-medium text-gray-600 flex-shrink"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            Operating System (2026 BATCH)
+          </Text>
+        </TouchableOpacity>
+
+
 
       </ScrollView>
 

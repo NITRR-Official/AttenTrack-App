@@ -13,22 +13,24 @@ import {
     ScrollView,
 } from 'react-native';
 import { XMarkIcon } from 'react-native-heroicons/outline';
+import { useNavigation } from "@react-navigation/native";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { theme } from '../../theme';
 const CreateClass = () => {
+    const navigation = useNavigation();
     return (
         <SafeAreaView style={{ flex: 1, alignItems: 'center' }} >
-            <View style={{ backgroundColor: '#fff', width: wp(100), height: hp(6), display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: wp(8) }} >
-                <TouchableOpacity>
-                    <XMarkIcon size={wp(8)} color={theme.maincolor} />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: theme.maincolor, width: wp(14), height: wp(8), borderRadius: wp(2), justifyContent: 'center', alignItems: 'center' }} >
-                    <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >Save</Text>
-                </TouchableOpacity>
-            </View>
+            <View className="w-full flex flex-row justify-between items-center p-4">
+        <TouchableOpacity>
+            <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()}/>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ backgroundColor: theme.maincolor}} className="flex justify-center items-center rounded-lg p-3 px-5" >
+            <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >Save</Text>
+        </TouchableOpacity>
+    </View>
 
             <TextInput
                 placeholder="Class Name"
