@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { studentsData } from './studentsData'; // Assuming the studentsData is imported from this file
 import { theme } from '../../theme';
@@ -8,7 +8,9 @@ import {
 } from 'react-native-responsive-screen';
 import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, ProgressBar } from 'react-native-paper';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import RNFS from 'react-native-fs'; // For managing files
 
 const Report = () => {
   const [report, setReport] = useState(null);
@@ -103,6 +105,215 @@ const Report = () => {
     setReport(generatedReport);
   }, []);
 
+  // Function to convert the report to HTML for PDF generation
+  const generateHTML = () => {
+    if (!report) return '';
+
+    // Main styles for the PDF
+    let html = `
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 16px;
+          color: #333;
+        }
+        h1 {
+          text-align: center;
+          color: ${theme.maincolor};
+          font-size: 24px;
+        }
+        h2, h3 {
+          color: ${theme.maincolor};
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 16px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+        th {
+          background-color: ${theme.maincolor};
+          color: white;
+          font-weight: bold;
+        }
+        .section {
+          margin-bottom: 24px;
+        }
+        .progress-bar {
+          width: 100%;
+          background-color: #f3f3f3;
+          height: 20px;
+          border-radius: 5px;
+          margin-bottom: 16px;
+        }
+        .progress-bar-fill {
+          height: 100%;
+          background-color: ${theme.maincolor};
+          width: ${report.overallClassAttendance.toFixed(0)}%;
+          border-radius: 5px;
+        }
+        .low-attendance, .top-students, .bottom-students, .all-students {
+          margin-top: 16px;
+        }
+        .count {
+          color: #e74c3c;
+          font-weight: bold;
+        }
+      </style>
+  
+      <h1>Class Attendance Report</h1>
+  
+      <div class="section">
+        <h2>Overall Class Attendance: ${report.overallClassAttendance.toFixed(2)}%</h2>
+        <div class="progress-bar">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+  
+      <div class="section">
+        <h3>Daily Attendance Statistics:</h3>
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>Present</th>
+            <th>Absent</th>
+          </tr>`;
+
+    // Adding Daily Attendance Stats
+    report.dailyStats.forEach(dayStat => {
+      html += `
+        <tr>
+          <td>${dayStat.date}</td>
+          <td>${dayStat.presentCount}</td>
+          <td>${dayStat.absentCount}</td>
+        </tr>`;
+    });
+
+    html += `
+        </table>
+      </div>
+  
+      <div class="low-attendance section">
+        <h3>Students with Attendance Less Than 75%:</h3>
+        <p class="count">Number of students: ${report.lowAttendanceStudents.length}</p>
+        <table>
+          <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Attendance (%)</th>
+          </tr>`;
+
+    report.lowAttendanceStudents.forEach(student => {
+      html += `
+        <tr>
+          <td>${student.rollNumber}</td>
+          <td>${student.name}</td>
+          <td>${student.attendancePercentage.toFixed(2)}%</td>
+        </tr>`;
+    });
+
+    html += `
+        </table>
+      </div>
+  
+      <div class="top-students section">
+        <h3>Top 10 Students by Attendance:</h3>
+        <table>
+          <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Attendance (%)</th>
+          </tr>`;
+
+    report.top10Students.forEach(student => {
+      html += `
+        <tr>
+          <td>${student.rollNumber}</td>
+          <td>${student.name}</td>
+          <td>${student.attendancePercentage.toFixed(2)}%</td>
+        </tr>`;
+    });
+
+    html += `
+        </table>
+      </div>
+  
+      <div class="bottom-students section">
+        <h3>Bottom 10 Students by Attendance:</h3>
+        <table>
+          <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Attendance (%)</th>
+          </tr>`;
+
+    report.bottom10Students.forEach(student => {
+      html += `
+        <tr>
+          <td>${student.rollNumber}</td>
+          <td>${student.name}</td>
+          <td>${student.attendancePercentage.toFixed(2)}%</td>
+        </tr>`;
+    });
+
+    html += `
+        </table>
+      </div>
+  
+      <div class="all-students section">
+        <h3>All Students' Attendance:</h3>
+        <table>
+          <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Present</th>
+            <th>Absent</th>
+          </tr>`;
+
+    report.studentAttendanceCount.forEach(student => {
+      html += `
+        <tr>
+          <td>${student.rollNumber}</td>
+          <td>${student.name}</td>
+          <td>${student.presentDays}</td>
+          <td>${student.absentDays}</td>
+        </tr>`;
+    });
+
+    html += `
+        </table>
+      </div>`;
+
+    return html;
+  };
+
+
+  // Function to generate and download the PDF
+  const downloadReport = async () => {
+    const options = {
+      html: generateHTML(),
+      fileName: 'Class_Attendance_Report',
+      directory: 'Documents',
+    };
+
+    try {
+      const file = await RNHTMLtoPDF.convert(options);
+      const newPath = `${RNFS.DownloadDirectoryPath}/Class_Attendance_Report.pdf`;
+
+      // Move file to download directory
+      await RNFS.moveFile(file.filePath, newPath);
+
+      Alert.alert('Report Downloaded', `The report has been moved to: ${newPath}`);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to download the report.');
+    }
+  };
+
+
   if (!report) {
     return <View className="flex justify-center items-center h-screen">
       {/* <ActivityIndicator animating={true} color={'black'} /> */}
@@ -116,7 +327,7 @@ const Report = () => {
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-4" >
+        <TouchableOpacity onPress={downloadReport} style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
             <ArrowDownTrayIcon color={'white'} size={20} />
             <Text style={{ color: '#fff', fontSize: wp(3.2), fontWeight: '700', marginLeft: 5 }}>Download Report</Text>
@@ -129,6 +340,7 @@ const Report = () => {
         <View style={styles.section}>
           <Text style={styles.subHeader}>Overall Class Attendance: {report.overallClassAttendance.toFixed(2)}%</Text>
         </View>
+        <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
 
         {/* Daily Statistics */}
         <View style={styles.section}>
@@ -335,14 +547,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    width:wp(20),
+    width: wp(20),
   },
   tableHeaderText3: {
     flex: 2,
     fontWeight: 'bold',
     color: '#fff',
     textAlign: 'center',
-    width:wp(40),
+    width: wp(40),
   },
   tableRow: {
     flexDirection: 'row',
@@ -359,19 +571,19 @@ const styles = StyleSheet.create({
     flex: 3,
     textAlign: 'center',
     color: 'gray',
-    width:wp(60),
+    width: wp(60),
   },
   tableCell2: {
     flex: 1,
     textAlign: 'center',
     color: 'gray',
-    width:wp(20),
+    width: wp(20),
   },
   tableCell3: {
     flex: 1.4,
     textAlign: 'center',
     color: 'gray',
-    width:wp(30),
+    width: wp(30),
   },
 
 });
