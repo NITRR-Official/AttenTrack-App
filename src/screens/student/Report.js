@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, StatusBar } from 'react-native';
 import { ProgressBar } from 'react-native-paper';
 import { theme } from '../../theme';
 import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
-import {
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 // Mock data for demonstration purposes
 const subjectsData = [
@@ -204,22 +205,26 @@ const StudentReport = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View className="w-full flex flex-row justify-between items-center p-4">
-        <TouchableOpacity>
-          <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={downloadStudentReport} style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-4" >
+    <>
+
+<StatusBar
+        backgroundColor={theme.maincolor}
+        barStyle={"light-content"}
+        hidden={false}
+      />
+
+      <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
+        <Text style={{ color: 'white', fontSize: wp(5), fontWeight:500 }} >Students' Report</Text>
+        <TouchableOpacity onPress={downloadStudentReport} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
-            <ArrowDownTrayIcon color={'white'} size={20} />
-            <Text style={{ color: '#fff', fontSize: wp(3.2), fontWeight: '700', marginLeft: 5 }}>Download Report</Text>
+            <ArrowDownTrayIcon color={'#01818C'} size={20} />
+            <Text style={{ color: '#01818C', fontSize: wp(3.2), fontWeight: '700', marginLeft: 5 }}>Download Report</Text>
           </View>
         </TouchableOpacity>
-      </View>
+      </View> 
 
-      <View style={styles.headerSection}>
-        <Text style={styles.header}>Student Attendance Report</Text>
-      </View>
+      <ScrollView style={styles.container}>
+
 
       {attendanceReport.map((subject, index) => (
         <View key={index} style={styles.section}>
@@ -273,6 +278,7 @@ const StudentReport = () => {
       </View>
 
     </ScrollView>
+    </>
   );
 };
 

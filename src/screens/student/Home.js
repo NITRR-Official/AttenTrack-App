@@ -42,8 +42,8 @@ const Home = () => {
         hidden={false}
       />
 
-      <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(10), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
-        <Text style={{ color: 'white', fontSize: wp(6), fontWeight:700 }} >Classes</Text>
+      <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
+        <Text style={{ color: 'white', fontSize: wp(5), fontWeight:500 }} >Classes</Text>
 
         {/* <TouchableOpacity
           onPress={() => navigation.navigate('CreateClass')}>

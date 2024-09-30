@@ -1,6 +1,7 @@
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
+import { theme } from '../../theme';
 
 
 const SignUp = (props) => {
@@ -12,6 +13,13 @@ const SignUp = (props) => {
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [department, setDepartment] = React.useState('');
   return (
+    <>
+     <KeyboardAvoidingView>
+     <StatusBar
+        backgroundColor={theme.maincolor}
+        barStyle={"light-content"}
+        hidden={false}
+      />
     <View className="h-screen flex justify-center items-center gap-y-4 relative">
       <View className="h-28 w-28 bg-[#01818C] absolute top-0 left-0 rounded-br-full"></View>
       <View className="h-36 w-36 bg-[#01808c87] absolute top-0 left-0 rounded-br-full"></View>
@@ -80,6 +88,8 @@ const SignUp = (props) => {
       </View>
       <TouchableOpacity onPress={()=>setIndex(isStudent?2:1)} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Sign Up</Text></TouchableOpacity>
     </View>
+    </KeyboardAvoidingView>
+    </>
   );
 };
 

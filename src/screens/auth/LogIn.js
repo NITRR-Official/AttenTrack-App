@@ -1,9 +1,10 @@
-import { KeyboardAvoidingView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
 import SignUp from './SignUp';
 
 import { useAuth } from '../../utils/auth';
+import { theme } from '../../theme';
 
 
 const LogIn = () => {
@@ -20,6 +21,11 @@ const LogIn = () => {
   return (
     <>
       <KeyboardAvoidingView>
+      <StatusBar
+        backgroundColor={theme.maincolor}
+        barStyle={"light-content"}
+        hidden={false}
+      />
       <ScrollView >
        {isSignUp ? (
         <SignUp setIsSignUp={setIsSignUp}/>  // Show the SignUp component if isSignUp is true
