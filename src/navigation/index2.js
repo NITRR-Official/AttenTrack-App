@@ -17,6 +17,7 @@ import {
   
   // Bottom Tabs
   import BottomTabs2 from './BottomTabs2'
+import MarkAttendance from "../screens/student/MarkAttendance";
   
   
   
@@ -42,6 +43,7 @@ import {
           initialRouteName={BottomTabs2}
         >
           <Stack.Screen name="BottomTabs2" component={BottomTabs2} />
+          <Stack.Screen name="MarkAttendance" component={MarkAttendance} />
         </Stack.Navigator>
       </NavigationContainer>
   

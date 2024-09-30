@@ -291,7 +291,6 @@ const Report = () => {
     return html;
   };
 
-
   // Function to generate and download the PDF
   const downloadReport = async () => {
     const options = {
