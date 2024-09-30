@@ -9,6 +9,7 @@ import { theme } from '../../theme';
 import { ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
+import {attendanceData} from './attendanceData'
 
 const MarkAttendance = () => {
   const navigation = useNavigation();
@@ -53,6 +54,29 @@ const MarkAttendance = () => {
       clearInterval(interval);
     };
   }, [modalVisible2]);
+
+  const [presentDays, setPresentDays] = useState(0);
+  const [absentDays, setAbsentDays] = useState(0);
+
+  useEffect(() => {
+    calculateAttendance();
+  }, [attendanceData]);
+
+  const calculateAttendance = () => {
+    let present = 0;
+    let absent = 0;
+
+    attendanceData.forEach((record) => {
+      if (record.attendance) {
+        present++;
+      } else {
+        absent++;
+      }
+    });
+
+    setPresentDays(present);
+    setAbsentDays(absent);
+  };
 
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
@@ -134,6 +158,38 @@ const MarkAttendance = () => {
           </TouchableWithoutFeedback>
         </Modal>
       </View>
+
+      <View className="w-full flex flex-row justify-between px-4 mb-2">
+        <Text className="text-sm ">Total Classes Attended : {presentDays + absentDays}</Text>
+        <View><Text className="text-sm text-right">Present : {presentDays}</Text>
+        <Text className="text-sm text-right">Absent : {absentDays}</Text></View>
+      </View>
+
+      <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
+        <View className="flex flex-row justify-between">
+          <Text className="w-3/4">Date</Text>
+          <Text className="w-1/4 text-right">Attendance</Text>
+        </View>
+      </View>
+
+      <ScrollView
+        scrollEventThrottle={1}
+        contentContainerStyle={{ flexGrow: 1 }}
+        style={{ backgroundColor: '#fff', height: hp(67) }}
+      >
+        <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
+
+          {attendanceData.map((item, id) => (
+            <View className="flex flex-row justify-between" key={id}>
+              <Text className="w-3/4">{item.date}</Text>
+              <Text className="w-1/4 text-right">{item.attendance?'Present':'Absent'}</Text>
+            </View>
+          ))}
+
+        </View>
+
+      </ScrollView>
+
     </SafeAreaView>
   )
 }

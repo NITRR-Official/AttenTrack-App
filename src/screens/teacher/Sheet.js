@@ -196,7 +196,7 @@ const Sheet = () => {
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
-        style={{ backgroundColor: '#fff', height: hp(100) }}
+        style={{ backgroundColor: '#fff', height: hp(62) }}
       >
         <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
 
