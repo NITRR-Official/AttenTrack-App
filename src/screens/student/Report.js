@@ -10,6 +10,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import PieChart from 'react-native-pie-chart'
 
 // Mock data for demonstration purposes
 const subjectsData = [
@@ -204,6 +205,11 @@ const StudentReport = () => {
     }
   };
 
+  const series = [123, 321, 123, 789, 537]
+  const series2 = [300, 30]
+  const sliceColor = ['#01818C', '#01808c7a', '#01808c2e', '#01808cb9', '#01808c37']
+  const sliceColor2 = ['#258a4ac4', '#c41111c4']
+
   return (
     <>
 
@@ -224,6 +230,19 @@ const StudentReport = () => {
       </View> 
 
       <ScrollView style={styles.container}>
+
+      <View className="m-2 mt-4 rounded-md border-[#01808c7a] border-2">
+        <View className="flex flex-row w-full justify-around items-center p-4">
+          <PieChart widthAndHeight={150} series={series} sliceColor={sliceColor} />
+          <View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text>Mathematics : {series[0]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[1]}]`}></View><Text>Physics : {series[1]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text>Chemistry : {series[2]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text>Biology : {series[3]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text>English : {series[4]}</Text></View>
+          </View>
+        </View>
+      </View>
 
 
       {attendanceReport.map((subject, index) => (
