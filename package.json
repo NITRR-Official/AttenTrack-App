@@ -16,6 +16,7 @@
     "@react-navigation/stack": "^6.4.1",
     "@rneui/base": "^0.0.0-edge.2",
     "@rneui/themed": "^0.0.0-edge.2",
+    "axios": "^1.7.7",
     "metro": "^0.80.12",
     "nativewind": "^2.0.11",
     "papaparse": "^5.4.1",
