@@ -17,6 +17,8 @@ const Stack = createNativeStackNavigator();
 // Bottom Tabs
 import BottomTabs from './BottomTabs'
 import CreateClass from "../screens/teacher/CreateClass";
+import Sheet from "../screens/teacher/Sheet";
+import Report from "../screens/teacher/Report";
 
 
 
@@ -43,6 +45,8 @@ export default function AppNavigation() {
       >
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="CreateClass" component={CreateClass} />
+        <Stack.Screen name="Sheet" component={Sheet} />
+        <Stack.Screen name="Report" component={Report} />
       </Stack.Navigator>
     </NavigationContainer>
 

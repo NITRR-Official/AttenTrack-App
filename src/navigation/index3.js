@@ -16,9 +16,6 @@ const Stack = createNativeStackNavigator();
 import Login from '../screens/auth/LogIn';
 import SignUp from '../screens/auth/SignUp';
 
-
-
-
 export default function AppNavigation3() {
   return (
 

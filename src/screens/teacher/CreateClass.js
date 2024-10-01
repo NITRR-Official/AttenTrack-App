@@ -13,7 +13,10 @@ import {
     Alert,
     ScrollView,
 } from 'react-native';
-import { ArrowUpTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
+
+import { ArrowUpTrayIcon,XMarkIcon } from 'react-native-heroicons/outline';
+import { useNavigation } from "@react-navigation/native";
+
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -170,6 +173,7 @@ const CreateClass = () => {
                     <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >Save</Text>
                 </TouchableOpacity>
             </View>
+
 
             <TextInput
                 placeholder="Class Name"

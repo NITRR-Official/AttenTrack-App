@@ -1,7 +1,7 @@
 import * as React from "react";
 
 // Navigators
-import React, {createContext, useContext, useState} from 'react';
+import {createContext, useContext, useState} from 'react';
 import {ToastAndroid, Linking} from 'react-native';
 
 
@@ -10,12 +10,15 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
 
     const [student, setStudent] = useState(false);
+    const [index, setIndex] = useState(0);
 
     return (
         <AuthContext.Provider
           value={{
             student,
-            setStudent
+            setStudent,
+            index,
+            setIndex
           }}>
           {children}
         </AuthContext.Provider>

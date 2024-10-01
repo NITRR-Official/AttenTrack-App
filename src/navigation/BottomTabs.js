@@ -27,6 +27,8 @@ import Profile from '../screens/teacher/Profile';
 import HomeIcon from '../components/HomeIcon.js';
 import ProfileIcon from '../components/ProfileIcon.js';
 import ReportIcon from '../components/ReportIcon.js';
+import Sheet from '../screens/teacher/Sheet.js';
+import ReportHome from '../screens/teacher/ReportHome.js';
 
 // size
 const { width, height } = Dimensions.get("window");
@@ -147,7 +149,7 @@ export default function BottomTabs() {
                 />
                 <Tab.Screen
                     name="Report_Teacher"
-                    component={Report}
+                    component={ReportHome}
                     options={{
                         tabBarIcon: ({ focused }) => {
                             return (

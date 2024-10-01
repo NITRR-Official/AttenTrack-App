@@ -3,6 +3,7 @@ import Svg, { Path } from "react-native-svg";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ReportIcon = ({ color, size=8 }) => (
+
     <Svg
     width={wp(size)}
     height={wp(size)}
