@@ -21,13 +21,40 @@ import {
 } from "react-native-heroicons/outline";
 
 import * as React from 'react';
+import RNFS from 'react-native-fs';
 
 import { useNavigation } from "@react-navigation/native";
 
 
-
+const folderName = 'StudentsDataFolder';
+const folderPath = `${RNFS.DownloadDirectoryPath}/${folderName}`;
+const filePath = `${folderPath}/studentsData.json`;
 
 const Home = () => {
+
+
+
+  React.useEffect(() => { 
+    const readDataFromFile = async () => {
+      try {
+        const content = await RNFS.readFile(filePath, 'utf8');
+      //   setFileContent(content); // Update state with file content
+
+      const data = JSON.parse(content);
+
+        // setJsonData(data.data);
+      //   console.log('File read successfully!', content);
+        console.log('File read successfully! state fri', data);
+      } catch (error) {
+        console.log('Error reading file:', error);
+      }
+    };
+
+    readDataFromFile();
+
+  }, []);
+
+
 
   const navigation = useNavigation();
 

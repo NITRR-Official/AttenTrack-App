@@ -4,10 +4,7 @@ import AppNavigation2 from './src/navigation/index2';
 import AppNavigation3 from './src/navigation/index3';
 // import {AuthProvider} from './src/utils/auth';
 
-
-
 export default function App() {
-
   // const [k, setk] = React.useState(true);
 
   // React.useEffect(() => {
@@ -18,8 +15,8 @@ export default function App() {
 
   return (
     // (k) ? <AppNavigation3 /> : <AppNavigation />
-    <AppNavigation/>
-      // <AppNavigation2 />
-      // <AppNavigation3 />
+    <AppNavigation />
+    // <AppNavigation2 />
+    // <AppNavigation3 />
   );
 }
