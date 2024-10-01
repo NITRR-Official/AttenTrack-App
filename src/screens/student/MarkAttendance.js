@@ -17,11 +17,37 @@ const MarkAttendance = () => {
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
 
-  //state fetched from server
-  const [time, setTime] = useState(10);
-
-  //Real time state fetched from server
+  const [receivedOtp, setReceivedOtp] = useState(null);
   const [progress, setProgress] = useState(0);
+  const [time, setTime] = useState(0);
+  const [ws, setWs] = useState(null);
+
+  useEffect(() => {
+    // Set up WebSocket connection
+    const socket = new WebSocket('ws://192.168.1.175:3000');
+    setWs(socket);
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'otp') {
+        setReceivedOtp(data.otp);
+        console.log('OTP received:', data.otp);
+      }else if (data.type === 'progress_update') {
+        setProgress(data.progress);
+        setTime(data.time);
+      }
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  const handleOtpSubmit = () => {
+    if (ws) {
+      ws.send(JSON.stringify({ type: 'otp_verification', otp }));
+    }
+  };
 
   useEffect(() => {
     let interval;
@@ -125,6 +151,7 @@ const MarkAttendance = () => {
                     onPress={() => {
                       setModalVisible2(true);
                       setModalVisible1(false);
+                      handleOtpSubmit();
                     }}>
                     <Text className="text-white text-center font-medium">Submit</Text>
                   </Pressable>

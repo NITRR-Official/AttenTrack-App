@@ -10,6 +10,7 @@ import { ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { ProgressBar, RadioButton } from 'react-native-paper';
 import { studentsData } from './studentsData';
+import axios from 'axios';
 
 const Sheet = () => {
   const navigation = useNavigation();
@@ -21,27 +22,65 @@ const Sheet = () => {
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [time, setTime] = useState(10000);
+
+  const [otp, setOtp] = useState('');
+  const [time, setTime] = useState(10);
+
+  const handleSetAttendance = async () => {
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    setOtp(generatedOtp);
+  
+    try {
+      // Await the axios post request to set attendance
+      await axios.post('http://192.168.1.175:3000/setAttendance', {
+        otp: generatedOtp,
+        time: time
+      });
+      
+      console.log('OTP and time sent to server');
+    } catch (error) {
+      // Catch any errors and handle them
+      console.error('Error sending OTP and time to server:', error);
+      alert('Failed to set attendance. Please try again.');
+    }
+  };   
+
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    let interval;
-    if (modalVisible2) {
-      setProgress(0);
-      interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 1) {
-            setModalVisible2(false);
-            clearInterval(interval);
-            return 1;
-          }
-          return Math.min(prev + 1 / time, 1);
-        });
-      }, 1000);
-    }
-    return () => {
-      clearInterval(interval);
+    // Set up WebSocket connection
+    const socket = new WebSocket('ws://192.168.1.175:3000');
+    setWs(socket);
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      // Listen for attendance updates
+      if (data.type === 'attendance_update') {
+        const updatedRollNumber = data.rollNumber;
+
+        // Update the student's attendance status in real time
+        setStudent(prevStudents =>
+          prevStudents.map(student =>
+            student.rollNumber === updatedRollNumber
+              ? { ...student, attendance: true }
+              : student
+          )
+        );
+
+        console.log(student[6].attendance)
+        console.log(student[7].attendance)
+        console.log(student[8].attendance)
+
+        // Increment the present count
+        setPresentCount(prevCount => prevCount + 1);
+      }
     };
-  }, [modalVisible2]);
+
+    return () => {
+      socket.close();
+    };
+  }, []);
 
     // Calculate present and absent students
     const calculateAttendance = () => {
@@ -65,21 +104,6 @@ const Sheet = () => {
     );
   };
 
-  // Function to generate a random 6-digit OTP
-  const generateRandomOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // Generate a number between 100000 and 999999
-  };
-
-  // Inside your component
-  const [otp, setOtp] = useState(generateRandomOTP()); // Initialize the OTP
-
-  // Update the OTP when the modal is opened
-  useEffect(() => {
-    if (modalVisible1) {
-      setOtp(generateRandomOTP());
-    }
-  }, [modalVisible1]);
-
   // Calculate the attendance when the component mounts or student list changes
   useEffect(() => {
     calculateAttendance();
@@ -102,7 +126,10 @@ const Sheet = () => {
           <Text className="text-gray-600">Chitrakant Sahu</Text>
         </View>
         <TouchableOpacity
-          onPress={() => setModalVisible1(true)}
+          onPress={()=>{
+            handleSetAttendance();
+            setModalVisible1(true)
+          }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[15px] font-medium">Take Attendance</Text>
