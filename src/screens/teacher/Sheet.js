@@ -7,14 +7,14 @@ import {
 import { BookOpenIcon, CpuChipIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { theme } from '../../theme';
 import { ScrollView } from 'react-native';
-import { useNavigation } from "@react-navigation/native";
+// import { useNavigation } from "@react-navigation/native";
 import { ProgressBar, RadioButton } from 'react-native-paper';
 import { studentsData } from './studentsData';
 
-const Sheet = () => {
-  const navigation = useNavigation();
+const Sheet = ({navigation, route}) => {
+  // const navigation = useNavigation();
 
-  const [student, setStudent] = useState(studentsData);
+  // const [student, setStudent] = useState(studentsData);
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
 
@@ -22,6 +22,12 @@ const Sheet = () => {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [progress, setProgress] = useState(0);
   const [time, setTime] = useState(10000);
+
+  console.log('given route in sheet', route.params);
+
+  const student = route.params.data;
+
+  console.log('given student in sheet', student);
 
   useEffect(() => {
     let interval;
@@ -202,8 +208,8 @@ const Sheet = () => {
 
           {student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className="w-1/4">{item.rollNumber}</Text>
-              <Text className="w-1/2">{item.name}</Text>
+              <Text className="w-1/4">{item.ROLLNO}</Text>
+              <Text className="w-1/2">{item.STUDNAME}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
                   thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}

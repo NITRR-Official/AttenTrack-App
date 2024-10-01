@@ -30,7 +30,6 @@ import DocumentPicker from 'react-native-document-picker';
 import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 
-import { useNavigation } from "@react-navigation/native";
 
 
 const folderName = 'StudentsDataFolder';
@@ -39,7 +38,6 @@ const filePath = `${folderPath}/studentsData.json`;
 
 
 const CreateClass = () => {
-
 
     const navigation = useNavigation();
 
