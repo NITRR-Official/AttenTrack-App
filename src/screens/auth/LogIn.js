@@ -51,6 +51,7 @@ const LogIn = () => {
         <TextInput
           onChangeText={setEmail}
           value={email}
+          placeholderTextColor={'gray'}
           placeholder="Enter Email ID..."
           style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
         />
@@ -58,6 +59,7 @@ const LogIn = () => {
       {isStudent&&<View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
         <TextInput
           onChangeText={setRollNumber}
+          placeholderTextColor={'gray'}
           value={rollNumber}
           placeholder="Enter Roll Number..."
           style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
@@ -66,6 +68,7 @@ const LogIn = () => {
       {!isStudent&&<View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
         <TextInput
           onChangeText={setDepartment}
+          placeholderTextColor={'gray'}
           value={department}
           placeholder="Enter Department..."
           style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
@@ -74,6 +77,7 @@ const LogIn = () => {
       <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
         <TextInput
           onChangeText={setPassword}
+          placeholderTextColor={'gray'}
           value={password}
           placeholder="Enter Password..."
           style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}

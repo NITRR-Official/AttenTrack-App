@@ -12,10 +12,10 @@ import { ProgressBar, RadioButton } from 'react-native-paper';
 import { studentsData } from './studentsData';
 import axios from 'axios';
 
-const Sheet = ({navigation, route}) => {
+const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
 
-  // const [student, setStudent] = useState(studentsData);
+  const [student, setStudent] = useState(studentsData);
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
 
@@ -49,7 +49,7 @@ const Sheet = ({navigation, route}) => {
 
   console.log('given route in sheet', route.params);
 
-  const student = route.params.data;
+  // const student = route.params.data;
 
   console.log('given student in sheet', student);
 
@@ -88,13 +88,13 @@ const Sheet = ({navigation, route}) => {
     };
   }, []);
 
-    // Calculate present and absent students
-    const calculateAttendance = () => {
-      const present = student.filter(item => item.attendance).length;
-      const absent = student.length - present;
-      setPresentCount(present);
-      setAbsentCount(absent);
-    };
+  // Calculate present and absent students
+  const calculateAttendance = () => {
+    const present = student.filter(item => item.attendance).length;
+    const absent = student.length - present;
+    setPresentCount(present);
+    setAbsentCount(absent);
+  };
 
   // Function to mark all students as present
   const markAllPresent = () => {
@@ -116,7 +116,7 @@ const Sheet = ({navigation, route}) => {
   }, [student]);
 
   return (
-    <SafeAreaView style={{  alignItems: 'center' }} >
+    <SafeAreaView style={{ alignItems: 'center' }} >
       <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
@@ -212,18 +212,18 @@ const Sheet = ({navigation, route}) => {
         </TouchableOpacity>
       </View>
 
-       {/* Display present and absent count */}
-       <View className="w-full flex flex-row justify-between px-4 mb-2">
+      {/* Display present and absent count */}
+      <View className="w-full flex flex-row justify-between px-4 mb-2">
         <Text className="text-sm ">Total Students : {presentCount + absentCount}</Text>
         <View><Text className="text-sm text-right">Present : {presentCount}</Text>
-        <Text className="text-sm text-right">Absent : {absentCount}</Text></View>
+          <Text className="text-sm text-right">Absent : {absentCount}</Text></View>
       </View>
 
       <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
         <View className="flex flex-row justify-between">
-          <Text className="w-1/4">Roll Number</Text>
-          <Text className="w-1/2 text-center">Name</Text>
-          <Text className="w-1/4 text-right">Attendance</Text>
+          <Text className="w-1/4  text-[#7c7c7c] ">Roll Number</Text>
+          <Text className="w-1/2 text-[#7c7c7c] text-center">Name</Text>
+          <Text className="w-1/4 text-[#7c7c7c] text-right">Attendance</Text>
         </View>
       </View>
       <ScrollView
@@ -235,8 +235,8 @@ const Sheet = ({navigation, route}) => {
 
           {student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className="w-1/4">{item.ROLLNO}</Text>
-              <Text className="w-1/2">{item.STUDNAME}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.ROLLNO}</Text>
+              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.STUDNAME}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
                   thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
