@@ -1,4 +1,5 @@
-import { KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+import { KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native';
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
 import SignUp from './SignUp';
