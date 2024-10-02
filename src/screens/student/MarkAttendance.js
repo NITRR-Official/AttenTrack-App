@@ -24,8 +24,10 @@ const MarkAttendance = () => {
   const handleGetAttendance = async () => {
     try {
       // Await the axios post request to set attendance
-      const resp = await axios.get('https://https://attendancetrackerbackend.onrender.com/getAttendance');
+      const resp = await axios.get('http://192.168.1.175:3000/getAttendance');
       const data2 = resp.data;  // Contains currentOTP and finalTime
+      // console.log('OTP (FrontEnd): ', data2.currentOTP);
+      // console.log('Final Time (FrontEnd): ', data2.finalTime);
       setReceivedOtp(data2.currentOTP);
       setFinalTime(data2.finalTime);
     } catch (error) {
@@ -39,19 +41,22 @@ const MarkAttendance = () => {
 
   useEffect(() => {
 
-    handleGetAttendance();
-
     // Set up WebSocket connection
-    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+    socket = new WebSocket('ws://192.168.1.175:3000');
     console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       // Handle real-time time updates from the WebSocket
-      if (data.type === 'time_update') {
+      if (data.type === 'time_update2') {
+        handleGetAttendance();
+        setModalVisible1(true);
+        if(data.time<=0){
+          setModalVisible1(false);
+        }
         setTime(data.time);  // Update time based on WebSocket message
-        console.log(`Real-time time update received: ${data.time}`);
+        // console.log(`Real-time time update received 2: ${data.time}`);
       }
     };
 
@@ -143,7 +148,7 @@ const MarkAttendance = () => {
               <TouchableWithoutFeedback>
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text>Enter OTP :</Text>
+                  <Text className="text-gray-400">Enter OTP :</Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
                     <TextInput
                       onChangeText={setOtp}
@@ -184,7 +189,7 @@ const MarkAttendance = () => {
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
               <ActivityIndicator animating={true} color={'black'} />
                 <View >
-                <Text>Getting Your Current Location...</Text>
+                <Text className="text-gray-400">Getting Your Current Location...</Text>
                 </View>
                 </View>
               </TouchableWithoutFeedback>
