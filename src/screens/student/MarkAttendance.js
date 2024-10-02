@@ -24,7 +24,7 @@ const MarkAttendance = () => {
   const handleGetAttendance = async () => {
     try {
       // Await the axios post request to set attendance
-      const resp = await axios.get('http://192.168.1.175:3000/getAttendance');
+      const resp = await axios.get('https://attendancetrackerbackend.onrender.com/getAttendance');
       const data2 = resp.data;  // Contains currentOTP and finalTime
       // console.log('OTP (FrontEnd): ', data2.currentOTP);
       // console.log('Final Time (FrontEnd): ', data2.finalTime);
@@ -42,7 +42,7 @@ const MarkAttendance = () => {
   useEffect(() => {
 
     // Set up WebSocket connection
-    socket = new WebSocket('ws://192.168.1.175:3000');
+    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {
