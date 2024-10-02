@@ -194,15 +194,15 @@ const MarkAttendance = () => {
       </View>
 
       <View className="w-full flex flex-row justify-between px-4 mb-2">
-        <Text className="text-sm ">Total Classes Attended : {presentDays + absentDays}</Text>
-        <View><Text className="text-sm text-right">Present : {presentDays}</Text>
-        <Text className="text-sm text-right">Absent : {absentDays}</Text></View>
+        <Text className="text-sm  text-gray-400 ">Total Classes Attended : {presentDays + absentDays}</Text>
+        <View><Text className="text-sm text-right text-gray-400 ">Present : {presentDays}</Text>
+        <Text className="text-sm  text-gray-400 text-right">Absent : {absentDays}</Text></View>
       </View>
 
       <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
         <View className="flex flex-row justify-between">
-          <Text className="w-3/4">Date</Text>
-          <Text className="w-1/4 text-right">Attendance</Text>
+          <Text className="w-3/4 text-gray-600 ">Date</Text>
+          <Text className="w-1/4 text-gray-600 text-right">Attendance</Text>
         </View>
       </View>
 
@@ -215,8 +215,8 @@ const MarkAttendance = () => {
 
           {attendanceData.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className="w-3/4">{item.date}</Text>
-              <Text className="w-1/4 text-right">{item.attendance?'Present':'Absent'}</Text>
+              <Text className={`w-3/4 text-[${theme.maincolor}] `} >{item.date}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]  text-right`}>{item.attendance?'Present':'Absent'}</Text>
             </View>
           ))}
 

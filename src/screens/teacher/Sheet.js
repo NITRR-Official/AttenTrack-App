@@ -256,9 +256,9 @@ const Sheet = ({ navigation, route }) => {
 
       {/* Display present and absent count */}
       <View className="w-full flex flex-row justify-between px-4 mb-2">
-        <Text className="text-sm ">Total Students : {presentCount + absentCount}</Text>
-        <View><Text className="text-sm text-right">Present : {presentCount}</Text>
-          <Text className="text-sm text-right">Absent : {absentCount}</Text></View>
+        <Text className="text-sm text-gray-400 ">Total Students : {presentCount + absentCount}</Text>
+        <View><Text className="text-sm text-gray-400 text-right">Present : {presentCount}</Text>
+          <Text className="text-sm text-gray-400 text-right">Absent : {absentCount}</Text></View>
       </View>
 
       <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
@@ -282,6 +282,8 @@ const Sheet = ({ navigation, route }) => {
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
                   thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
+                  // trackColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
+                  trackColor={{ false: '#ffaaaac4', true: '#8bdca8c4' }}
                   onValueChange={() => {
                     setStudent(prevStudents =>
                       prevStudents.map((student, idx) =>
@@ -292,7 +294,7 @@ const Sheet = ({ navigation, route }) => {
                     );
                   }}
                   value={item.attendance} />
-                <Text className={`text-${item.attendance ? '[#258a4a]' : '[#c41111]'} font-semibold`}>{item.attendance ? 'P' : 'A'}</Text>
+                <Text className={`text-gray-400 font-semibold`}>{item.attendance ? 'P' : 'A'}</Text>
               </View>
             </View>
           ))}
