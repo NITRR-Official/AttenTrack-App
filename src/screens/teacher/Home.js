@@ -28,8 +28,6 @@ import RNFS from 'react-native-fs';
 
 import { useNavigation } from "@react-navigation/native";
 
-
-
 const folderName = 'StudentsDataFolder';
 const folderPath = `${RNFS.DownloadDirectoryPath}/${folderName}`;
 const filePath = `${folderPath}/studentsData.json`;
@@ -37,8 +35,6 @@ const filePath = `${folderPath}/studentsData.json`;
 const Home = () => {
 
   const [jsonData, setJsonData] = React.useState({});
-
-
 
   React.useEffect(() => {
     const readDataFromFile = async () => {
@@ -96,7 +92,8 @@ const Home = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {jsonData.className}
+            {/* {jsonData.className} */}
+            VLSI (2025 BATCH)
           </Text>
         </TouchableOpacity>
 
