@@ -155,7 +155,6 @@ const MarkAttendance = () => {
                       value={otp}
                       placeholder="Enter OTP..."
                       style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
-                      secureTextEntry={true}
                     />
                   </View>
                   <Pressable
