@@ -71,15 +71,15 @@ const Profile = () => {
         </View>
         <View className="flex flex-row justify-between p-2">
           <View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text>Mathematics : {series[0]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[1]}]`}></View><Text>Physics : {series[1]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text>Chemistry : {series[2]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text>Biology : {series[3]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text>English : {series[4]}</Text></View>
+            <View className="flex flex-row items-center "><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text className="text-gray-500" >Mathematics : {series[0]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[1]}]`}></View><Text className="text-gray-500">Physics : {series[1]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text className="text-gray-500">Chemistry : {series[2]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text className="text-gray-500">Biology : {series[3]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">English : {series[4]}</Text></View>
           </View>
           <View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text>Classes Attended : {series2[0]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text>Classes Unattended : {series2[1]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500">Classes Attended : {series2[0]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500">Classes Unattended : {series2[1]}</Text></View>
           </View>
         </View>
       </View>

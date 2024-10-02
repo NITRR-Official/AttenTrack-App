@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { studentsData } from './studentsData'; // Assuming the studentsData is imported from this file
 import { theme } from '../../theme';
@@ -316,12 +316,11 @@ const Report = () => {
   if (!report) {
     return <View className="flex justify-center items-center h-screen">
       {/* <ActivityIndicator animating={true} color={'black'} /> */}
-      <Text className="text-lg">Loading report...</Text></View>;
+      <Text className="text-lg text-gray-500 ">Loading report...</Text></View>;
   }
 
   return (
-    <ScrollView>
-
+<>
       <View className="w-full flex flex-row justify-between items-center p-4">
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
@@ -334,6 +333,8 @@ const Report = () => {
         </TouchableOpacity>
       </View>
 
+      <ScrollView>
+
       <View style={styles.container}>
         {/* Overall Class Attendance */}
         <View style={styles.section}>
@@ -341,40 +342,64 @@ const Report = () => {
         </View>
         <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
 
-        {/* Daily Statistics */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableHeaderText1}>Date</Text>
-              <Text style={styles.tableHeaderText2}>Present</Text>
-              <Text style={styles.tableHeaderText2}>Absent</Text>
-            </View>
-            {report.dailyStats.map((dayStat, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.tableCell1}>{dayStat.date}</Text>
-                <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
-                <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
+
+          {/* Daily Statistics */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.tableHeaderText1}>Date</Text>
+                <Text style={styles.tableHeaderText2}>Present</Text>
+                <Text style={styles.tableHeaderText2}>Absent</Text>
               </View>
-            ))}
+              {report.dailyStats.map((dayStat, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <Text style={styles.tableCell1}>{dayStat.date}</Text>
+                  <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
+                  <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
 
 
-        {/* Low Attendance Students */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>Students with Attendance Less Than 75%:</Text>
-          <Text style={styles.count}>
-            Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
-          </Text>
-          {report.lowAttendanceStudents.length > 0 ? (
+          {/* Low Attendance Students */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance Less Than 75%:</Text>
+            <Text style={styles.count}>
+              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
+            </Text>
+            {report.lowAttendanceStudents.length > 0 ? (
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Roll Number</Text>
+                  <Text style={styles.tableHeaderText}>Name</Text>
+                  <Text style={styles.tableHeaderText}>Attendance (%)</Text>
+                </View>
+                {report.lowAttendanceStudents.map((student, index) => (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
+                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
+            )}
+          </View>
+
+
+          {/* Top 10 Students */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Top 10 Students by Attendance:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
                 <Text style={styles.tableHeaderText}>Roll Number</Text>
                 <Text style={styles.tableHeaderText}>Name</Text>
                 <Text style={styles.tableHeaderText}>Attendance (%)</Text>
               </View>
-              {report.lowAttendanceStudents.map((student, index) => (
+              {report.top10Students.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
                   <Text style={styles.tableCell}>{student.rollNumber}</Text>
                   <Text style={styles.tableCell1}>{student.name}</Text>
@@ -382,76 +407,51 @@ const Report = () => {
                 </View>
               ))}
             </View>
-          ) : (
-            <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
-          )}
-        </View>
-
-
-        {/* Top 10 Students */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>Top 10 Students by Attendance:</Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableHeaderText}>Roll Number</Text>
-              <Text style={styles.tableHeaderText}>Name</Text>
-              <Text style={styles.tableHeaderText}>Attendance (%)</Text>
-            </View>
-            {report.top10Students.map((student, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                <Text style={styles.tableCell1}>{student.name}</Text>
-                <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
-              </View>
-            ))}
           </View>
-        </View>
 
-        {/* Bottom 10 Students */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>Bottom 10 Students by Attendance:</Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableHeaderText}>Roll Number</Text>
-              <Text style={styles.tableHeaderText}>Name</Text>
-              <Text style={styles.tableHeaderText}>Attendance (%)</Text>
-            </View>
-            {report.bottom10Students.map((student, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.tableCell3}>{student.rollNumber}</Text>
-                <Text style={styles.tableCell1}>{student.name}</Text>
-                <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+          {/* Bottom 10 Students */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Bottom 10 Students by Attendance:</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.tableHeaderText}>Roll Number</Text>
+                <Text style={styles.tableHeaderText}>Name</Text>
+                <Text style={styles.tableHeaderText}>Attendance (%)</Text>
               </View>
-            ))}
-          </View>
-        </View>
-
-
-        {/* List of All Students */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>All Students' Attendance:</Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableHeaderText3}>Roll Number</Text>
-              <Text style={styles.tableHeaderText1}>Name</Text>
-              <Text style={styles.tableHeaderText2}>Present</Text>
-              <Text style={styles.tableHeaderText2}>Absent</Text>
+              {report.bottom10Students.map((student, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <Text style={styles.tableCell3}>{student.rollNumber}</Text>
+                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+                </View>
+              ))}
             </View>
-            {report.studentAttendanceCount.map((student, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.tableCell3}>{student.rollNumber}</Text>
-                <Text style={styles.tableCell1}>{student.name}</Text>
-                <Text style={styles.tableCell2}>{student.presentDays}</Text>
-                <Text style={styles.tableCell2}>{student.absentDays}</Text>
-              </View>
-            ))}
           </View>
-        </View>
 
 
-
+          {/* List of All Students */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>All Students' Attendance:</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.tableHeaderText3}>Roll Number</Text>
+                <Text style={styles.tableHeaderText1}>Name</Text>
+                <Text style={styles.tableHeaderText2}>Present</Text>
+                <Text style={styles.tableHeaderText2}>Absent</Text>
+              </View>
+              {report.studentAttendanceCount.map((student, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <Text style={styles.tableCell3}>{student.rollNumber}</Text>
+                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell2}>{student.presentDays}</Text>
+                  <Text style={styles.tableCell2}>{student.absentDays}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 
