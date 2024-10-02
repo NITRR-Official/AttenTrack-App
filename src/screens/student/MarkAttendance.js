@@ -10,76 +10,81 @@ import { ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
 import {attendanceData} from './attendanceData'
+import axios from 'axios';
 
 const MarkAttendance = () => {
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
-
   const [receivedOtp, setReceivedOtp] = useState(null);
-  const [progress, setProgress] = useState(0);
   const [time, setTime] = useState(0);
-  const [ws, setWs] = useState(null);
+  const [finalTime, setFinalTime] = useState(1);
+
+  const handleGetAttendance = async () => {
+    try {
+      // Await the axios post request to set attendance
+      const resp = await axios.get('https://https://attendancetrackerbackend.onrender.com/getAttendance');
+      const data2 = resp.data;  // Contains currentOTP and finalTime
+      setReceivedOtp(data2.currentOTP);
+      setFinalTime(data2.finalTime);
+    } catch (error) {
+      // Catch any errors and handle them
+      console.error('Error sending OTP and time to server:', error);
+      alert('Failed to set attendance. Please try again.');
+    }
+  }; 
+
+  let socket;
 
   useEffect(() => {
+
+    handleGetAttendance();
+
     // Set up WebSocket connection
-    const socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
-    setWs(socket);
+    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+    console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === 'otp') {
-        setReceivedOtp(data.otp);
-        console.log('OTP received:', data.otp);
-      }else if (data.type === 'progress_update') {
-        setProgress(data.progress);
-        setTime(data.time);
+
+      // Handle real-time time updates from the WebSocket
+      if (data.type === 'time_update') {
+        setTime(data.time);  // Update time based on WebSocket message
+        console.log(`Real-time time update received: ${data.time}`);
       }
     };
 
+    socket.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+      alert('Error with WebSocket connection');
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
     return () => {
-      socket.close();
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
     };
   }, []);
 
   const handleOtpSubmit = () => {
-    if (ws) {
-      ws.send(JSON.stringify({ type: 'otp_verification', otp }));
+    if (receivedOtp === otp) {
+      console.log('OTP Matched');
+      // Send the OTP and roll number to the server via WebSocket
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          type: 'attendance',
+          rollNumber: 21116008,  // Include the roll number
+        }));
+      }
+    } else {
+      console.log('Incorrect OTP');
     }
   };
-
-  useEffect(() => {
-    let interval;
-    if (modalVisible1) {
-      setProgress(0);
-      interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 1) {
-            setModalVisible1(false);
-            clearInterval(interval);
-            return 1;
-          }
-          return Math.min(prev + 1 / time, 1);
-        });
-      }, 1000);
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [modalVisible1]);
-
-  useEffect(() => {
-    let interval;
-    if (modalVisible2) {
-      interval = setTimeout(() => {
-        setModalVisible2(false);
-      }, 3000);
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [modalVisible2]);
 
   const [presentDays, setPresentDays] = useState(0);
   const [absentDays, setAbsentDays] = useState(0);
@@ -118,7 +123,9 @@ const MarkAttendance = () => {
           <Text className="text-gray-600">Chitrakant Sahu</Text>
         </View>
         <TouchableOpacity
-          onPress={() => setModalVisible1(true)}
+          onPress={() => {
+            handleGetAttendance();
+            setModalVisible1(true)}}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[15px] font-medium">Mark Attendance</Text>
@@ -149,15 +156,15 @@ const MarkAttendance = () => {
                   <Pressable
                     className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
                     onPress={() => {
-                      setModalVisible2(true);
                       setModalVisible1(false);
+                      setModalVisible2(true);
                       handleOtpSubmit();
                     }}>
                     <Text className="text-white text-center font-medium">Submit</Text>
                   </Pressable>
                   <View className="w-full">
-                    <Text className="pb-3">Time Remaining: {Math.max(Math.floor((1 - progress) * time), 0)} seconds</Text>
-                    <ProgressBar progress={1 - progress} color={'#01818C'} />
+                    <Text className="pb-3">Time Remaining: {time} seconds</Text>
+                    <ProgressBar progress={time/finalTime} color={'#01818C'} />
                   </View>
                 </View>
               </TouchableWithoutFeedback>
