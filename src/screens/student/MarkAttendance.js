@@ -24,7 +24,7 @@ const MarkAttendance = () => {
 
   useEffect(() => {
     // Set up WebSocket connection
-    const socket = new WebSocket('ws://192.168.1.175:3000');
+    const socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     setWs(socket);
 
     socket.onmessage = (event) => {

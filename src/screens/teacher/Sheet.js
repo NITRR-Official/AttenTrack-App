@@ -32,7 +32,7 @@ const Sheet = ({ navigation, route }) => {
   
     try {
       // Await the axios post request to set attendance
-      await axios.post('http://192.168.1.175:3000/setAttendance', {
+      await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
         otp: generatedOtp,
         time: time
       });
@@ -47,15 +47,15 @@ const Sheet = ({ navigation, route }) => {
 
   const [ws, setWs] = useState(null);
 
-  console.log('given route in sheet', route.params);
+  // console.log('given route in sheet', route.params);
 
   // const student = route.params.data;
 
-  console.log('given student in sheet', student);
+  // console.log('given student in sheet', student);
 
   useEffect(() => {
     // Set up WebSocket connection
-    const socket = new WebSocket('ws://192.168.1.175:3000');
+    const socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     setWs(socket);
 
     socket.onmessage = (event) => {
@@ -235,8 +235,8 @@ const Sheet = ({ navigation, route }) => {
 
           {student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.ROLLNO}</Text>
-              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.STUDNAME}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.rollNumber}</Text>
+              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.name}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
                   thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
