@@ -27,7 +27,7 @@ const Sheet = ({ navigation, route }) => {
   const [finalTime, setFinalTime] = useState(0);
 
   useEffect(() => {
-    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+    socket = new WebSocket('ws://192.168.1.175:3000');
     console.log('Socket from teacher side connected!');
 
     socket.onmessage = (event) => {
@@ -69,7 +69,7 @@ const Sheet = ({ navigation, route }) => {
   
     try {
       // Await the axios post request to set attendance
-      await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
+      await axios.post('http://192.168.1.175:3000/setAttendance', {
         otp: generatedOtp,
         time: val
       });

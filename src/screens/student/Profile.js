@@ -51,7 +51,7 @@ const Profile = () => {
           <Text className="text-[#01808c] font-medium pt-2">Phone Number: <Text className="text-gray-500">{7717789081}</Text></Text>
         </View>
         <TouchableOpacity
-          onPress={() => setModalVisible1(true)}
+          // onPress={() => setModalVisible1(true)}
           className="bg-[#01808cb9] py-1 px-4 rounded-md border-[#01808c7a] border-2 flex items-center absolute top-2 right-2">
           <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[13px] font-medium">Edit</Text>
@@ -72,7 +72,7 @@ const Profile = () => {
         <View className="flex flex-row justify-between p-2">
           <View>
             <View className="flex flex-row items-center "><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text className="text-gray-500" >Mathematics : {series[0]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[1]}]`}></View><Text className="text-gray-500">Physics : {series[1]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">Physics : {series[1]}</Text></View>
             <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text className="text-gray-500">Chemistry : {series[2]}</Text></View>
             <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text className="text-gray-500">Biology : {series[3]}</Text></View>
             <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">English : {series[4]}</Text></View>

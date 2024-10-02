@@ -24,7 +24,7 @@ const MarkAttendance = () => {
   const handleGetAttendance = async () => {
     try {
       // Await the axios post request to set attendance
-      const resp = await axios.get('https://attendancetrackerbackend.onrender.com/getAttendance');
+      const resp = await axios.get('http://192.168.1.175:3000/getAttendance');
       const data2 = resp.data;  // Contains currentOTP and finalTime
       // console.log('OTP (FrontEnd): ', data2.currentOTP);
       // console.log('Final Time (FrontEnd): ', data2.finalTime);
@@ -42,7 +42,7 @@ const MarkAttendance = () => {
   useEffect(() => {
 
     // Set up WebSocket connection
-    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+    socket = new WebSocket('ws://192.168.1.175:3000');
     console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {
@@ -148,7 +148,7 @@ const MarkAttendance = () => {
               <TouchableWithoutFeedback>
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text className="text-gray-400">Enter OTP :</Text>
+                  <Text className="text-gray-500">Enter OTP :</Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
                     <TextInput
                       onChangeText={setOtp}
@@ -168,7 +168,7 @@ const MarkAttendance = () => {
                     <Text className="text-white text-center font-medium">Submit</Text>
                   </Pressable>
                   <View className="w-full">
-                    <Text className="pb-3">Time Remaining: {time} seconds</Text>
+                    <Text className="pb-3 text-gray-500">Time Remaining: {time} seconds</Text>
                     <ProgressBar progress={time/finalTime} color={'#01818C'} />
                   </View>
                 </View>
