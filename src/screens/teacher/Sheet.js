@@ -21,49 +21,22 @@ const Sheet = ({ navigation, route }) => {
 
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   const [otp, setOtp] = useState('');
-  const [time, setTime] = useState(10);
-
-  const handleSetAttendance = async () => {
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setOtp(generatedOtp);
-  
-    try {
-      // Await the axios post request to set attendance
-      await axios.post('http://192.168.1.175:3000/setAttendance', {
-        otp: generatedOtp,
-        time: time
-      });
-      
-      console.log('OTP and time sent to server');
-    } catch (error) {
-      // Catch any errors and handle them
-      console.error('Error sending OTP and time to server:', error);
-      alert('Failed to set attendance. Please try again.');
-    }
-  };   
-
-  const [ws, setWs] = useState(null);
-
-  console.log('given route in sheet', route.params);
-
-  // const student = route.params.data;
-
-  console.log('given student in sheet', student);
+  const [time, setTime] = useState(0);
+  const [finalTime, setFinalTime] = useState(0);
 
   useEffect(() => {
-    // Set up WebSocket connection
-    const socket = new WebSocket('ws://192.168.1.175:3000');
-    setWs(socket);
+    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+    console.log('Socket from teacher side connected!');
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       // Listen for attendance updates
-      if (data.type === 'attendance_update') {
+      if (data.type === 'attendance') {
         const updatedRollNumber = data.rollNumber;
+        console.log('Updated Roll Number',updatedRollNumber);
 
         // Update the student's attendance status in real time
         setStudent(prevStudents =>
@@ -83,10 +56,67 @@ const Sheet = ({ navigation, route }) => {
       }
     };
 
-    return () => {
-      socket.close();
-    };
+    // return () => {
+    //   if (socket.readyState === WebSocket.OPEN) {
+    //     socket.close();
+    //   }
+    // };
   }, []);
+
+  const handleSetAttendance = async (val) => {
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    setOtp(generatedOtp);
+  
+    try {
+      // Await the axios post request to set attendance
+      await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
+        otp: generatedOtp,
+        time: val
+      });
+      
+      console.log('OTP and time sent to server');
+    } catch (error) {
+      // Catch any errors and handle them
+      console.error('Error sending OTP and time to server:', error);
+      alert('Failed to set attendance. Please try again.');
+    }
+  };   
+
+  const handleSetAttendance2 = () => {
+    let interval;
+      
+      interval = setInterval(() => {
+        setTime(prev => {
+          if (prev <= 0) {
+            setModalVisible2(false);
+            clearInterval(interval);
+            setTime(0);
+            setFinalTime(0);
+  
+            // Send final time update to WebSocket before closing
+            console.log('Sending final time update:', 0);
+            socket.send(JSON.stringify({ type: 'time_update', time: 0 }));
+            return 0;
+          }
+          
+          // Send time updates in real-time via WebSocket
+          console.log('Sending real-time time update:', prev-1);
+          socket.send(JSON.stringify({ type: 'time_update', time: prev - 1 }));
+          
+          return prev - 1;
+        });
+      }, 1000);
+  
+    socket.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+      alert('Error with WebSocket connection');
+      clearInterval(interval);
+    };
+  
+    socket.onclose = () => {
+      console.log('WebSocket connection closed.');
+    };
+  };  
 
   // Calculate present and absent students
   const calculateAttendance = () => {
@@ -133,7 +163,6 @@ const Sheet = ({ navigation, route }) => {
         </View>
         <TouchableOpacity
           onPress={()=>{
-            handleSetAttendance();
             setModalVisible1(true)
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
@@ -154,9 +183,12 @@ const Sheet = ({ navigation, route }) => {
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
                   <RadioButton.Group onValueChange={value => {
+                    setFinalTime(parseInt(value));
                     setTime(parseInt(value));
                     setModalVisible2(true);
                     setModalVisible1(false);
+                    handleSetAttendance(parseInt(value));
+                    handleSetAttendance2();
                   }}>
                     <RadioButton.Item label="10 Seconds" value="10" />
                     <RadioButton.Item label="20 Seconds" value="20" />
@@ -175,20 +207,30 @@ const Sheet = ({ navigation, route }) => {
           visible={modalVisible2}
           onRequestClose={() => {
             setModalVisible2(!modalVisible2);
+            setTime(0);
+            setFinalTime(0);
           }}>
-          <TouchableWithoutFeedback onPress={() => setModalVisible2(false)}>
+          <TouchableWithoutFeedback onPress={() => {
+            setModalVisible2(false);
+            setTime(0);
+            setFinalTime(0);
+          }}>
             <View className="w-full flex-1 bg-[#00000050] flex justify-center">
               <TouchableWithoutFeedback>
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
                   <Text className="text-lg font-bold">OTP : {otp}</Text>
                   <View className="w-full">
-                    <Text className="pb-3">Time Remaining: {Math.max(Math.floor((1 - progress) * time), 0)} seconds</Text>
-                    <ProgressBar progress={1 - progress} color={'#01818C'} />
+                    <Text className="pb-3">Time Remaining: {time} seconds</Text>
+                    <ProgressBar progress={time/finalTime} color={'#01818C'} />
                   </View>
                   <Pressable
                     className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
-                    onPress={() => setModalVisible2(false)}>
+                    onPress={() => {
+                      setModalVisible2(false);
+                      setTime(0);
+                      setFinalTime(0);
+                    }}>
                     <Text className="text-white text-center font-medium">Cancel</Text>
                   </Pressable>
                 </View>
@@ -235,8 +277,8 @@ const Sheet = ({ navigation, route }) => {
 
           {student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.ROLLNO}</Text>
-              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.STUDNAME}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.rollNumber}</Text>
+              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.name}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
                   thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
