@@ -221,10 +221,10 @@ const StudentReport = () => {
 
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight:500 }} >Students' Report</Text>
-        <TouchableOpacity onPress={downloadStudentReport} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
+        <TouchableOpacity onPress={downloadStudentReport} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-3" >
           <View className="flex flex-row justify-center items-center">
             <ArrowDownTrayIcon color={'#01818C'} size={20} />
-            <Text style={{ color: '#01818C', fontSize: wp(3.2), fontWeight: '700', marginLeft: 5 }}>Download Report</Text>
+            <Text style={{ color: '#01818C', fontSize: wp(3.2), fontWeight: '500', marginLeft: 5 }}>Download Report</Text>
           </View>
         </TouchableOpacity>
       </View> 
@@ -234,12 +234,12 @@ const StudentReport = () => {
       <View className="m-2 mt-4 rounded-md border-[#01808c7a] border-2">
         <View className="flex flex-row w-full justify-around items-center p-4">
           <PieChart widthAndHeight={150} series={series} sliceColor={sliceColor} />
-          <View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text>Mathematics : {series[0]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[1]}]`}></View><Text>Physics : {series[1]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text>Chemistry : {series[2]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text>Biology : {series[3]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text>English : {series[4]}</Text></View>
+          <View className="flex flex-col gap-y-2">
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text className="text-gray-500">Mathematics : {series[0]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">Physics : {series[1]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text className="text-gray-500">Chemistry : {series[2]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text className="text-gray-500">Biology : {series[3]}</Text></View>
+            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">English : {series[4]}</Text></View>
           </View>
         </View>
       </View>

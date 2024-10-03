@@ -1,4 +1,4 @@
-import { Modal, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Alert, Modal, PermissionsAndroid, Platform, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
@@ -11,6 +11,8 @@ import { useNavigation } from "@react-navigation/native";
 import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
 import {attendanceData} from './attendanceData'
 import axios from 'axios';
+import GetLocation from 'react-native-get-location'
+import { calculateDistance } from './locationTracker';
 
 const MarkAttendance = () => {
   const navigation = useNavigation();
@@ -20,26 +22,25 @@ const MarkAttendance = () => {
   const [receivedOtp, setReceivedOtp] = useState(null);
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
+  const [permissionGranted, setPermissionGranted] = useState(false);
 
   const handleGetAttendance = async () => {
     try {
       // Await the axios post request to set attendance
-      const resp = await axios.get('https://https://attendancetrackerbackend.onrender.com/getAttendance');
+      const resp = await axios.get('https://attendancetrackerbackend.onrender.com/getAttendance');
       const data2 = resp.data;  // Contains currentOTP and finalTime
+      // console.log('OTP (FrontEnd): ', data2.currentOTP);
+      // console.log('Final Time (FrontEnd): ', data2.finalTime);
       setReceivedOtp(data2.currentOTP);
       setFinalTime(data2.finalTime);
     } catch (error) {
       // Catch any errors and handle them
       console.error('Error sending OTP and time to server:', error);
-      alert('Failed to set attendance. Please try again.');
+      Alert.alert('Failed to set attendance. Please try again.');
     }
   }; 
 
-  let socket;
-
   useEffect(() => {
-
-    handleGetAttendance();
 
     // Set up WebSocket connection
     socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
@@ -49,15 +50,23 @@ const MarkAttendance = () => {
       const data = JSON.parse(event.data);
 
       // Handle real-time time updates from the WebSocket
-      if (data.type === 'time_update') {
+      if (data.type === 'time_update2') {
+        handleGetAttendance();
+        if(data.time<=0){
+            setModalVisible1(false);
+        }
         setTime(data.time);  // Update time based on WebSocket message
-        console.log(`Real-time time update received: ${data.time}`);
+        // console.log(`Real-time time update received 2: ${data.time}`);
+      }
+      if(data.type === 'first_call'){
+        setOtp('');
+        setModalVisible1(true);
       }
     };
 
     socket.onerror = (error) => {
       console.error('WebSocket Error:', error);
-      alert('Error with WebSocket connection');
+      Alert.alert('Error with WebSocket connection');
     };
 
     socket.onclose = () => {
@@ -73,18 +82,80 @@ const MarkAttendance = () => {
 
   const handleOtpSubmit = () => {
     if (receivedOtp === otp) {
-      console.log('OTP Matched');
-      // Send the OTP and roll number to the server via WebSocket
-      if (socket && socket.readyState === WebSocket.OPEN) {
+      // console.log('OTP Matched');
+      ToastAndroid.show('OTP Verified !', ToastAndroid.LONG);
+      setModalVisible1(false);
+      setModalVisible2(true);
+        requestLocationPermission();
+    } else {
+      // console.log('Incorrect OTP');
+      ToastAndroid.show('Incorrect OTP !', ToastAndroid.LONG);
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    if(Platform.OS === "android"){
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Location Permission",
+          message: "This app needs access to your location",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK"
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // console.log("You can access location");
+        getCurrentLocation();  // Call your function to get the location
+      } else {
+        // console.log("Location permission denied");
+        ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
+        setTimeout(()=>{setModalVisible2(false)},2000);
+      }
+    } catch (err) {
+      console.warn(err);
+    }}
+  };
+
+  const getCurrentLocation = () => {
+    const targetLatitude = 21.24971860350971;  // target latitude
+    const targetLongitude = 81.60521936379199;  // target longitude
+    const radius = 3000;  // range
+  
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 60000,
+    })
+    .then(location => {
+      // console.log("My Location:", location);
+  
+      const distance = calculateDistance(
+        location.latitude,
+        location.longitude,
+        targetLatitude,
+        targetLongitude
+      );
+  
+      if (distance <= radius) {
         socket.send(JSON.stringify({
           type: 'attendance',
           rollNumber: 21116008,  // Include the roll number
         }));
+        ToastAndroid.show('Location Matched ! Attendance Marked as Present !', ToastAndroid.LONG);
+        setTimeout(()=>{setModalVisible2(false)},2000);
+      } else {
+        ToastAndroid.show('Location not within range', ToastAndroid.LONG);
+        setTimeout(()=>{setModalVisible2(false)},2000);
       }
-    } else {
-      console.log('Incorrect OTP');
-    }
+    })
+    .catch(error => {
+      const { code, message } = error;
+      console.warn(code, message);
+    });
   };
+
 
   const [presentDays, setPresentDays] = useState(0);
   const [absentDays, setAbsentDays] = useState(0);
@@ -124,8 +195,13 @@ const MarkAttendance = () => {
         </View>
         <TouchableOpacity
           onPress={() => {
-            handleGetAttendance();
-            setModalVisible1(true)}}
+            if(time==0){
+              ToastAndroid.show('Wait for the Teacher to Take Attendance..', ToastAndroid.LONG);
+            }else{
+              handleGetAttendance();
+              setModalVisible1(true);
+              setOtp('');
+            }}}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[15px] font-medium">Mark Attendance</Text>
@@ -143,28 +219,27 @@ const MarkAttendance = () => {
               <TouchableWithoutFeedback>
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text>Enter OTP :</Text>
+                  <Text className="text-gray-500">Enter OTP :</Text>
                   <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
                     <TextInput
                       onChangeText={setOtp}
                       value={otp}
                       placeholder="Enter OTP..."
+                      placeholderTextColor={'gray'}
+                      keyboardType='numeric'
                       style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
-                      secureTextEntry={true}
                     />
                   </View>
                   <Pressable
                     className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
                     onPress={() => {
-                      setModalVisible1(false);
-                      setModalVisible2(true);
                       handleOtpSubmit();
                     }}>
                     <Text className="text-white text-center font-medium">Submit</Text>
                   </Pressable>
                   <View className="w-full">
-                    <Text className="pb-3">Time Remaining: {time} seconds</Text>
-                    <ProgressBar progress={time/finalTime} color={'#01818C'} />
+                    <Text className="pb-3 text-gray-500">Time Remaining: {time} seconds</Text>
+                    <ProgressBar progress={time/finalTime} color={'#01818C'} backgroundColor={'black'}/>
                   </View>
                 </View>
               </TouchableWithoutFeedback>
@@ -184,7 +259,7 @@ const MarkAttendance = () => {
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
               <ActivityIndicator animating={true} color={'black'} />
                 <View >
-                <Text>Getting Your Current Location...</Text>
+                <Text className="text-gray-400">Getting Your Current Location...</Text>
                 </View>
                 </View>
               </TouchableWithoutFeedback>

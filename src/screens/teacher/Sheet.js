@@ -34,9 +34,9 @@ const Sheet = ({ navigation, route }) => {
       const data = JSON.parse(event.data);
 
       // Listen for attendance updates
-      if (data.type === 'attendance') {
+      if (data.type === 'attendance2') {
         const updatedRollNumber = data.rollNumber;
-        console.log('Updated Roll Number',updatedRollNumber);
+        // console.log('Updated Roll Number',updatedRollNumber);
 
         // Update the student's attendance status in real time
         setStudent(prevStudents =>
@@ -47,20 +47,20 @@ const Sheet = ({ navigation, route }) => {
           )
         );
 
-        console.log(student[6].attendance)
-        console.log(student[7].attendance)
-        console.log(student[8].attendance)
+        // console.log(student[6].attendance)
+        // console.log(student[7].attendance)
+        // console.log(student[8].attendance)
 
         // Increment the present count
         setPresentCount(prevCount => prevCount + 1);
       }
     };
 
-    // return () => {
-    //   if (socket.readyState === WebSocket.OPEN) {
-    //     socket.close();
-    //   }
-    // };
+    return () => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+    };
   }, []);
 
   const handleSetAttendance = async (val) => {
@@ -84,6 +84,8 @@ const Sheet = ({ navigation, route }) => {
 
   const handleSetAttendance2 = () => {
     let interval;
+
+    socket.send(JSON.stringify({type:'first_call'}));
       
       interval = setInterval(() => {
         setTime(prev => {
@@ -94,13 +96,13 @@ const Sheet = ({ navigation, route }) => {
             setFinalTime(0);
   
             // Send final time update to WebSocket before closing
-            console.log('Sending final time update:', 0);
+            // console.log('Sending final time update:', 0);
             socket.send(JSON.stringify({ type: 'time_update', time: 0 }));
             return 0;
           }
           
           // Send time updates in real-time via WebSocket
-          console.log('Sending real-time time update:', prev-1);
+          // console.log('Sending real-time time update:', prev-1);
           socket.send(JSON.stringify({ type: 'time_update', time: prev - 1 }));
           
           return prev - 1;
@@ -219,9 +221,9 @@ const Sheet = ({ navigation, route }) => {
               <TouchableWithoutFeedback>
 
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text className="text-lg font-bold">OTP : {otp}</Text>
+                  <Text className="text-lg font-bold text-gray-400">OTP : {otp}</Text>
                   <View className="w-full">
-                    <Text className="pb-3">Time Remaining: {time} seconds</Text>
+                    <Text className="pb-3 text-gray-500">Time Remaining: {time} seconds</Text>
                     <ProgressBar progress={time/finalTime} color={'#01818C'} />
                   </View>
                   <Pressable

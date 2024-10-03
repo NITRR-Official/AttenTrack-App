@@ -33,7 +33,7 @@ const SignUp = (props) => {
           <View className="h-20 w-20 bg-[#01808c87] absolute bottom-0 right-0 rounded-tl-full"></View>
           <View><ReportIcon color={'#01818C'} size={30} /></View>
           <View><Text className="text-3xl font-bold text-[#2e2e2e]">{isStudent ? 'Student Sign Up' : 'Teacher Sign Up'}</Text></View>
-          <View><Text className="text-sm">Already have an account? <Text className="text-[#01818C] underline" onPress={() => props.setIsSignUp(false)}>Log In!</Text></Text></View>
+          <View><Text className="text-sm text-gray-500">Already have an account? <Text className="text-[#01818C] underline" onPress={() => props.setIsSignUp(false)}>Log In!</Text></Text></View>
           <View className="flex flex-row justify-around w-[80%]">
 
             <TouchableOpacity onPress={() => setIsStudent(true)} className={`${isStudent ? 'bg-[#01818C]' : 'bg-white'} border-[#01818C] border-2 w-[50%] py-2 flex justify-center items-center rounded-l-lg`}><Text className={`${isStudent ? 'text-white' : 'text-[#01818C]'} text-[13px] font-medium`}>Student</Text></TouchableOpacity>
