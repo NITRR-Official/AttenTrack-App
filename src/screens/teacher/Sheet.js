@@ -192,11 +192,11 @@ const Sheet = ({ navigation, route }) => {
                     handleSetAttendance(parseInt(value));
                     handleSetAttendance2();
                   }}>
-                    <RadioButton.Item label="10 Seconds" value="10" />
-                    <RadioButton.Item label="20 Seconds" value="20" />
-                    <RadioButton.Item label="30 Seconds" value="30" />
-                    <RadioButton.Item label="1 Minute" value="60" />
-                    <RadioButton.Item label="2 Minutes" value="120" />
+                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="10 Seconds" value="10" />
+                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="20 Seconds" value="20" />
+                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="30 Seconds" value="30" />
+                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="1 Minute" value="60" />
+                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="2 Minutes" value="120" />
                   </RadioButton.Group>
                 </View>
               </TouchableWithoutFeedback>
