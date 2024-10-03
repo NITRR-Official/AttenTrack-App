@@ -27,7 +27,7 @@ const Sheet = ({ navigation, route }) => {
   const [finalTime, setFinalTime] = useState(0);
 
   useEffect(() => {
-    socket = new WebSocket('ws://192.168.1.175:3000');
+    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     console.log('Socket from teacher side connected!');
 
     socket.onmessage = (event) => {
@@ -36,7 +36,7 @@ const Sheet = ({ navigation, route }) => {
       // Listen for attendance updates
       if (data.type === 'attendance2') {
         const updatedRollNumber = data.rollNumber;
-        console.log('Updated Roll Number',updatedRollNumber);
+        // console.log('Updated Roll Number',updatedRollNumber);
 
         // Update the student's attendance status in real time
         setStudent(prevStudents =>
@@ -47,9 +47,9 @@ const Sheet = ({ navigation, route }) => {
           )
         );
 
-        console.log(student[6].attendance)
-        console.log(student[7].attendance)
-        console.log(student[8].attendance)
+        // console.log(student[6].attendance)
+        // console.log(student[7].attendance)
+        // console.log(student[8].attendance)
 
         // Increment the present count
         setPresentCount(prevCount => prevCount + 1);
@@ -69,7 +69,7 @@ const Sheet = ({ navigation, route }) => {
   
     try {
       // Await the axios post request to set attendance
-      await axios.post('http://192.168.1.175:3000/setAttendance', {
+      await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
         otp: generatedOtp,
         time: val
       });
@@ -84,6 +84,8 @@ const Sheet = ({ navigation, route }) => {
 
   const handleSetAttendance2 = () => {
     let interval;
+
+    socket.send(JSON.stringify({type:'first_call'}));
       
       interval = setInterval(() => {
         setTime(prev => {
@@ -221,7 +223,7 @@ const Sheet = ({ navigation, route }) => {
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
                   <Text className="text-lg font-bold text-gray-400">OTP : {otp}</Text>
                   <View className="w-full">
-                    <Text className="pb-3">Time Remaining: {time} seconds</Text>
+                    <Text className="pb-3 text-gray-500">Time Remaining: {time} seconds</Text>
                     <ProgressBar progress={time/finalTime} color={'#01818C'} />
                   </View>
                   <Pressable
