@@ -29,7 +29,7 @@ const Report = () => {
 
   const [subject, setSubject] = React.useState('');
   const [body, setBody] = React.useState(
-`Dear Student,
+    `Dear Student,
 
 I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
 
@@ -474,7 +474,7 @@ Please take necessary steps to improve your attendance to meet the required thre
                   body: body,
                   checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
                 }).catch(console.error);
-                }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
             </View>
             {report.lowAttendanceStudents2.length > 0 ? (
               <View style={styles.table}>
@@ -535,7 +535,12 @@ Please take necessary steps to improve your attendance to meet the required thre
 
 I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
 
-Please take necessary steps to improve your attendance to meet the required threshold.`,
+Please take necessary steps to improve your attendance to meet the required threshold.
+
+Best regards,
+[Your Name]
+[Your Position/Role]
+[Your Contact Information]`,
                           checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
                         }).catch(console.error);
                       }}><Text className="text-white font-bold text-center">Send</Text></TouchableOpacity>
