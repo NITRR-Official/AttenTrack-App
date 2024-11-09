@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
     View,
     Text,
@@ -12,6 +12,7 @@ import {
     BackHandler,
     Alert,
     ScrollView,
+    ToastAndroid,
 } from 'react-native';
 
 import { ArrowUpTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
@@ -29,6 +30,7 @@ import Papa from 'papaparse';
 import DocumentPicker from 'react-native-document-picker';
 import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
+import { useAuth } from '../../utils/auth';
 
 
 
@@ -41,9 +43,9 @@ const CreateClass = () => {
 
     const navigation = useNavigation();
 
-    const [number, onChangeNumber] = React.useState('');
-    const { readString } = usePapaParse();
-    const [jsonData, setJsonData] = useState([]);
+    const [className, setClassName] = React.useState('');
+    const [jsonLocalData, setJsonLocalData] = useState([]);
+    const { setJsonGlobalData, setClasses } = useAuth();
 
     const showAlert = (show) => {
         Alert.alert(
@@ -54,19 +56,20 @@ const CreateClass = () => {
         );
     };
 
+
     const handleOnFileLoad = async () => {
         try {
             const res = await DocumentPicker.pick({
                 type: [DocumentPicker.types.allFiles],
             });
 
-            console.log(res);
+            console.log(1,res);
 
             const filetype = res[0].type;
 
             if (filetype !== 'text/comma-separated-values') {
                 showAlert("Please select a comma-separated-values file");
-                throw new Error('Please select a comma-separated-values file');
+                throw new Error(2,'Please select a comma-separated-values file');
             }
 
             const fileUri = res[0].uri;
@@ -84,9 +87,9 @@ const CreateClass = () => {
             }
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
-                console.log('User canceled the picker');
+                console.log(7,'User canceled the picker');
             } else {
-                console.error('Unknown error: ', err);
+                console.error(8,'Unknown error: ', err);
             }
         }
     };
@@ -97,78 +100,15 @@ const CreateClass = () => {
             header: true,
             skipEmptyLines: true,
         });
-
-        // const data 
-
-        setJsonData(json.data);
-        console.log('json.data', typeof (json));
-        console.log('json.datakjjkjkjk', typeof (json.data));
-        console.log('json.data', json);
-        console.log('json.data only data', json.data);
+        
+        const json2 = json.data.map((item) => ({
+            ...item,
+            ATTENDANCE: false,
+        }));
+        
+        setJsonLocalData(json2);
     };
-
-    const saveDataToFile = async () => {
-
-        const curTime = new Date().toISOString();
-
-        if (number === '') {
-            showAlert('Please enter class name');
-            return;
-        }
-
-        const store = {
-            className: number,
-            time: curTime,
-            data: jsonData
-        }
-
-        const pascalCase = number
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join('');
-
-
-        console.log('store check ', pascalCase, number);
-
-        console.log('store', store);
-
-        const Data = JSON.stringify(store);
-
-        try {
-            await RNFS.mkdir(folderPath); // Create folder if it doesn't exist
-            await RNFS.writeFile(filePath, Data, 'utf8'); // Save file
-            console.log('File written successfully!', Data);
-
-            showAlert('Data saved successfully!');
-            navigation.goBack();
-
-        } catch (error) {
-            console.log('Error writing file:', error);
-            navigation.goBack();
-            console.log('File written successfully!', Data);
-        }
-    };
-
-    const [fileContent, setFileContent] = useState([]);
-
-    // Function to read the data
-    const readDataFromFile = async () => {
-        try {
-            const content = await RNFS.readFile(filePath, 'utf8');
-            //   setFileContent(content); // Update state with file content
-
-            const data = JSON.parse(content);
-
-            setJsonData(data.data);
-            //   console.log('File read successfully!', content);
-            console.log('File read successfully! state fri', fileContent);
-        } catch (error) {
-            console.log('Error reading file:', error);
-        }
-    };
-
-
-
+    
 
     return (
         <SafeAreaView style={{ flex: 1, alignItems: 'center' }} >
@@ -177,7 +117,16 @@ const CreateClass = () => {
                 <TouchableOpacity onPress={() => navigation.goBack()} >
                     <XMarkIcon size={wp(8)} color={theme.maincolor} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={saveDataToFile} style={{ backgroundColor: theme.maincolor, width: wp(14), height: wp(8), borderRadius: wp(2), justifyContent: 'center', alignItems: 'center' }} >
+                <TouchableOpacity 
+                onPress={() => {
+                    if(!jsonLocalData.length || !className) ToastAndroid.show('Please Add CSV File as well as Class Name!', ToastAndroid.LONG);
+                    else{
+                        setJsonGlobalData(jsonLocalData);
+                        setClasses(prevClasses => [...prevClasses, className]);
+                        navigation.goBack();
+                    }
+                }}
+                 style={{ backgroundColor: theme.maincolor, width: wp(14), height: wp(8), borderRadius: wp(2), justifyContent: 'center', alignItems: 'center' }} >
                     <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >Save</Text>
                 </TouchableOpacity>
             </View>
@@ -186,8 +135,8 @@ const CreateClass = () => {
             <TextInput
                 placeholder="Class Name"
                 placeholderTextColor='#909090'
-                onChangeText={onChangeNumber}
-                value={number}
+                onChangeText={setClassName}
+                value={className}
                 keyboardType="text"
                 style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(7), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(8), color: theme.maincolor, fontSize: wp(5), fontWeight: '500' }}
             />
@@ -212,7 +161,7 @@ const CreateClass = () => {
                 style={{ backgroundColor: '#e3e3e3', height: hp(100), width: wp(98) }}
             >
 
-                {jsonData.map((student, index) => (
+                {jsonLocalData.map((student, index) => (
                     // console.log('student', student)
                     <View key={index} style={{ borderWidth: 1, borderColor: theme.maincolor, marginTop: wp(2), backgroundColor: '#fff', borderRadius: wp(2), paddingHorizontal: wp(4), width: wp(95), height: hp(6), display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={{ fontSize: wp(4), color: '#fff', color: theme.maincolor }}>{student.ROLLNO}</Text>

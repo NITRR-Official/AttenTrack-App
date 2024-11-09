@@ -42,7 +42,7 @@ const Report = () => {
     for (let day = 1; day <= numDays; day++) {
       const dailyAttendance = studentsData.map(student => ({
         ...student,
-        attendance: Math.random() < 0.7 // 70% chance a student is present
+        ATTENDANCE: Math.random() < 0.7 // 70% chance a student is present
       }));
       monthAttendance.push({ date: new Date(currentDate), attendance: dailyAttendance });
       currentDate.setDate(currentDate.getDate() + 1);
@@ -57,7 +57,7 @@ const Report = () => {
     const totalStudents = studentsData.length;
 
     const dailyStats = monthlyAttendance.map(dayData => {
-      const presentCount = dayData.attendance.filter(student => student.attendance).length;
+      const presentCount = dayData.attendance.filter(student => student.ATTENDANCE).length;
       const absentCount = totalStudents - presentCount;
 
       return {
@@ -69,7 +69,7 @@ const Report = () => {
 
     const studentAttendanceCount = studentsData.map(student => {
       const presentDays = monthlyAttendance.filter(dayData =>
-        dayData.attendance.find(s => s.rollNumber === student.rollNumber)?.attendance
+        dayData.attendance.find(s => s.rollNumber === student.rollNumber)?.ATTENDANCE
       ).length;
 
       return {
@@ -224,8 +224,8 @@ const Report = () => {
     report.lowAttendanceStudents.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.attendancePercentage.toFixed(2)}%</td>
         </tr>`;
     });
@@ -246,8 +246,8 @@ const Report = () => {
     report.top10Students.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.attendancePercentage.toFixed(2)}%</td>
         </tr>`;
     });
@@ -268,8 +268,8 @@ const Report = () => {
     report.bottom10Students.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.attendancePercentage.toFixed(2)}%</td>
         </tr>`;
     });
@@ -291,8 +291,8 @@ const Report = () => {
     report.studentAttendanceCount.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.presentDays}</td>
           <td>${student.absentDays}</td>
         </tr>`;
@@ -367,9 +367,9 @@ const Report = () => {
           />
         </View>
         <View className="flex flex-col items-start p-2">
-          <Button className="cursor-pointer" onPress={()=>setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500">Attendance less than 60% : {lowAttStudents}</Text></View></Button>
-          <Button className="cursor-pointer" onPress={()=>setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></Button>
-          <Button className="cursor-pointer" onPress={()=>setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500">Attendance more than 75% : {lowAttStudents2}</Text></View></Button>
+          <TouchableOpacity className="cursor-pointer my-1" onPress={()=>setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500">Attendance less than 60% : {lowAttStudents}</Text></View></TouchableOpacity>
+          <TouchableOpacity className="cursor-pointer my-1" onPress={()=>setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></TouchableOpacity>
+          <TouchableOpacity className="cursor-pointer my-1" onPress={()=>setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500">Attendance more than 75% : {lowAttStudents2}</Text></View></TouchableOpacity>
         </View>
       </View>
 
@@ -408,8 +408,8 @@ const Report = () => {
                 </View>
                 {report.lowAttendanceStudents.map((student, index) => (
                   <View key={index} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                    <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                     <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                   </View>
                 ))}
@@ -432,8 +432,8 @@ const Report = () => {
                 </View>
                 {report.lowAttendanceStudents1.map((student, index) => (
                   <View key={index} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                    <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                     <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                   </View>
                 ))}
@@ -456,8 +456,8 @@ const Report = () => {
                 </View>
                 {report.lowAttendanceStudents2.map((student, index) => (
                   <View key={index} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                    <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                     <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                   </View>
                 ))}
@@ -479,8 +479,8 @@ const Report = () => {
               </View>
               {report.top10Students.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                  <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                   <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                 </View>
               ))}
@@ -498,8 +498,8 @@ const Report = () => {
               </View>
               {report.bottom10Students.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell3}>{student.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell3}>{student.ROLLNO}</Text>
+                  <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                   <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                 </View>
               ))}
@@ -519,8 +519,8 @@ const Report = () => {
               </View>
               {report.studentAttendanceCount.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell3}>{student.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell3}>{student.ROLLNO}</Text>
+                  <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                   <Text style={styles.tableCell2}>{student.presentDays}</Text>
                   <Text style={styles.tableCell2}>{student.absentDays}</Text>
                 </View>
