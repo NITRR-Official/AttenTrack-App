@@ -41,9 +41,11 @@ const Sheet = ({ navigation, route }) => {
         // console.log('Updated Roll Number',updatedRollNumber);
 
         // Update the student's attendance status in real time
-        setStudent(prevStudents =>
-          prevStudents.map(student =>
-            student.rollNumber === updatedRollNumber
+
+        setStudent(prevStudents => 
+          prevStudents.map(student => 
+            student.ROLLNO ==
+             updatedRollNumber
               ? { ...student, ATTENDANCE: true }
               : student
           )

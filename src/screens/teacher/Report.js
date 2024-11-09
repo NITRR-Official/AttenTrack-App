@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, SafeAreaView, Modal, TouchableWithoutFeedback, Linking } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { studentsData } from './studentsData'; // Assuming the studentsData is imported from this file
 import { theme } from '../../theme';
@@ -8,10 +8,11 @@ import {
 } from 'react-native-responsive-screen';
 import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityIndicator, Button, ProgressBar } from 'react-native-paper';
+import { ActivityIndicator, Button, ProgressBar, TextInput } from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs'; // For managing files
 import PieChart from 'react-native-pie-chart';
+import email from 'react-native-email';
 
 const Report = () => {
   const [report, setReport] = useState(null);
@@ -23,6 +24,16 @@ const Report = () => {
   const sliceColor2 = ['#c41111c4', '#01808cb9', '#258a4ac4'];
 
   const navigation = useNavigation();
+
+  const [modalVisible1, setModalVisible1] = React.useState(false);
+
+  const [subject, setSubject] = React.useState('');
+  const [body, setBody] = React.useState(
+`Dear Student,
+
+I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
+
+Please take necessary steps to improve your attendance to meet the required threshold.`);
 
   // Helper function to format dates as "1st August, 2024"
   const formatDate = (date) => {
@@ -334,7 +345,7 @@ const Report = () => {
   }
 
   return (
-<>
+    <>
       <View className="w-full flex flex-row justify-between items-center p-4">
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
@@ -349,29 +360,29 @@ const Report = () => {
 
       <ScrollView>
 
-      <View style={styles.container}>
-        {/* Overall Class Attendance */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>Overall Class Attendance: {report.overallClassAttendance.toFixed(2)}%</Text>
-        </View>
-        <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
+        <View style={styles.container}>
+          {/* Overall Class Attendance */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Overall Class Attendance: {report.overallClassAttendance.toFixed(2)}%</Text>
+          </View>
+          <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
 
-        <View style={{ width: wp(95) }} className="p-2 rounded-md border-[#01808c7a] border-2">
-        <View className="flex flex-row w-full justify-around p-4">
-          <PieChart
-            widthAndHeight={150}
-            series={[lowAttStudents, lowAttStudents1, lowAttStudents2]}
-            sliceColor={sliceColor2}
-            coverRadius={0.45}
-            coverFill={'#FFF'}
-          />
-        </View>
-        <View className="flex flex-col items-start p-2">
-          <TouchableOpacity className="cursor-pointer my-1" onPress={()=>setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500">Attendance less than 60% : {lowAttStudents}</Text></View></TouchableOpacity>
-          <TouchableOpacity className="cursor-pointer my-1" onPress={()=>setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></TouchableOpacity>
-          <TouchableOpacity className="cursor-pointer my-1" onPress={()=>setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500">Attendance more than 75% : {lowAttStudents2}</Text></View></TouchableOpacity>
-        </View>
-      </View>
+          <View className="rounded-md border-[#01808c7a] border-2 my-2">
+            <View className="flex flex-row w-full justify-around p-4">
+              <PieChart
+                widthAndHeight={150}
+                series={[lowAttStudents, lowAttStudents1, lowAttStudents2]}
+                sliceColor={sliceColor2}
+                coverRadius={0.45}
+                coverFill={'#FFF'}
+              />
+            </View>
+            <View className="flex flex-col items-start p-2">
+              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance less than 60% : {lowAttStudents}</Text></View></TouchableOpacity>
+              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></TouchableOpacity>
+              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance more than 75% : {lowAttStudents2}</Text></View></TouchableOpacity>
+            </View>
+          </View>
 
           {/* Daily Statistics */}
           {/* <View style={styles.section}>
@@ -394,11 +405,14 @@ const Report = () => {
 
 
           {/* Low Attendance Students */}
-          {percent==1&&<View style={styles.section}>
+          {percent == 1 && <View style={styles.section}>
             <Text style={styles.subHeader}>Students with Attendance Less Than 60% :</Text>
-            <Text style={styles.count}>
-              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
-            </Text>
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text style={styles.count}>
+                Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible1(true)} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+            </View>
             {report.lowAttendanceStudents.length > 0 ? (
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
@@ -418,11 +432,14 @@ const Report = () => {
               <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
             )}
           </View>}
-          {percent==2&&<View style={styles.section}>
+          {percent == 2 && <View style={styles.section}>
             <Text style={styles.subHeader}>Students with Attendance Between Than 60% and 75% :</Text>
-            <Text style={styles.count}>
-              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents1.length}</Text>
-            </Text>
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text style={styles.count}>
+                Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents1.length}</Text>
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible1(true)} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+            </View>
             {report.lowAttendanceStudents1.length > 0 ? (
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
@@ -442,11 +459,23 @@ const Report = () => {
               <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
             )}
           </View>}
-          {percent==3&&<View style={styles.section}>
+          {percent == 3 && <View style={styles.section}>
             <Text style={styles.subHeader}>Students with Attendance More Than 75%:</Text>
-            <Text style={styles.count}>
-              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents2.length}</Text>
-            </Text>
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text style={styles.count}>
+                Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents2.length}</Text>
+              </Text>
+              <TouchableOpacity onPress={() => {
+                // setModalVisible1(true);
+                email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                  // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                  // bcc: 'mee@mee.com',
+                  subject: 'Short Attendance Notice',
+                  body: body,
+                  checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                }).catch(console.error);
+                }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+            </View>
             {report.lowAttendanceStudents2.length > 0 ? (
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
@@ -466,6 +495,56 @@ const Report = () => {
               <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
             )}
           </View>}
+
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible1}
+            onRequestClose={() => {
+              setModalVisible1(!modalVisible1);
+            }}>
+            <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
+              <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+                <TouchableWithoutFeedback>
+
+                  <View className="bg-white p-4 m-4 rounded-3xl">
+                    {/* <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">yoyo</Text> */}
+                    <TextInput
+                      className="h-[40px] my-2 rounded-none rounded-t-lg"
+                      onChangeText={setSubject}
+                      value={subject}
+                      placeholder="Enter Subject Here"
+                    />
+                    <TextInput
+                      className=" rounded-none"
+                      onChangeText={setBody}
+                      value={body}
+                      placeholder="Enter Body Here"
+                      multiline={true}
+                      numberOfLines={6} // Adjust this value to control the height of the text area
+                      style={{ textAlignVertical: 'top' }} // Ensures the text starts at the top
+                    />
+                    <View className="flex flex-row justify-between mt-5">
+                      <TouchableOpacity className=" bg-red-400  p-3 w-[100px] rounded-2xl " onPress={() => setModalVisible1(false)}><Text className="text-white font-bold text-center">Cancel</Text></TouchableOpacity>
+                      <TouchableOpacity className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl " onPress={() => {
+                        email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                          // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                          // bcc: 'mee@mee.com',
+                          subject: 'Short Attendance Notice',
+                          body: `Dear Student,
+
+I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
+
+Please take necessary steps to improve your attendance to meet the required threshold.`,
+                          checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                        }).catch(console.error);
+                      }}><Text className="text-white font-bold text-center">Send</Text></TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
 
 
           {/* Top 10 Students */}
@@ -527,7 +606,7 @@ const Report = () => {
               ))}
             </View>
           </View>
-      </View>
+        </View>
       </ScrollView>
     </>
   );
@@ -574,7 +653,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // Align text properly
   },
   count: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 8,
     color: '#e74c3c', // Highlighting low attendance count

@@ -129,7 +129,7 @@ const MarkAttendance = () => {
         targetLatitude, targetLongitude);
       
       if (distance <= radius) {
-        socket.send(JSON.stringify({type: 'attendance', rollNumber: 21116008}));
+        socket.send(JSON.stringify({type: 'attendance', rollNumber: 21117102}));
         ToastAndroid.show('Location Matched ! Attendance Marked as Present !',
           ToastAndroid.LONG);
         setTimeout(()=>{setModalVisible2(false)},2000);
