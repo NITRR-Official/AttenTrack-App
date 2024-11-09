@@ -411,7 +411,16 @@ Please take necessary steps to improve your attendance to meet the required thre
               <Text style={styles.count}>
                 Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
               </Text>
-              <TouchableOpacity onPress={() => setModalVisible1(true)} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() =>{
+                // setModalVisible1(true);
+                email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                  // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                  // bcc: 'mee@mee.com',
+                  subject: 'Short Attendance Notice',
+                  body: body,
+                  checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                }).catch(console.error);
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
             </View>
             {report.lowAttendanceStudents.length > 0 ? (
               <View style={styles.table}>
@@ -438,7 +447,16 @@ Please take necessary steps to improve your attendance to meet the required thre
               <Text style={styles.count}>
                 Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents1.length}</Text>
               </Text>
-              <TouchableOpacity onPress={() => setModalVisible1(true)} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                // setModalVisible1(true);
+                email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                  // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                  // bcc: 'mee@mee.com',
+                  subject: 'Short Attendance Notice',
+                  body: body,
+                  checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                }).catch(console.error);
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
             </View>
             {report.lowAttendanceStudents1.length > 0 ? (
               <View style={styles.table}>
