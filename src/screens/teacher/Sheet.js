@@ -47,10 +47,6 @@ const Sheet = ({ navigation, route }) => {
           )
         );
 
-        // console.log(student[6].attendance)
-        // console.log(student[7].attendance)
-        // console.log(student[8].attendance)
-
         // Increment the present count
         setPresentCount(prevCount => prevCount + 1);
       }

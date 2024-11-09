@@ -22,7 +22,6 @@ const MarkAttendance = () => {
   const [receivedOtp, setReceivedOtp] = useState(null);
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
-  const [permissionGranted, setPermissionGranted] = useState(false);
 
   const handleGetAttendance = async () => {
     try {
@@ -120,30 +119,19 @@ const MarkAttendance = () => {
   };
 
   const getCurrentLocation = () => {
-    const targetLatitude = 21.24971860350971;  // target latitude
-    const targetLongitude = 81.60521936379199;  // target longitude
+    const targetLatitude = 21.24973790975813;  // target latitude
+    const targetLongitude = 81.60502712836308;  // target longitude
     const radius = 3000;  // range
-  
-    GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000,
-    })
+
+    GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
     .then(location => {
-      // console.log("My Location:", location);
-  
-      const distance = calculateDistance(
-        location.latitude,
-        location.longitude,
-        targetLatitude,
-        targetLongitude
-      );
-  
+      const distance = calculateDistance(location.latitude, location.longitude,
+        targetLatitude, targetLongitude);
+      
       if (distance <= radius) {
-        socket.send(JSON.stringify({
-          type: 'attendance',
-          rollNumber: 21116008,  // Include the roll number
-        }));
-        ToastAndroid.show('Location Matched ! Attendance Marked as Present !', ToastAndroid.LONG);
+        socket.send(JSON.stringify({type: 'attendance', rollNumber: 21116008}));
+        ToastAndroid.show('Location Matched ! Attendance Marked as Present !',
+          ToastAndroid.LONG);
         setTimeout(()=>{setModalVisible2(false)},2000);
       } else {
         ToastAndroid.show('Location not within range', ToastAndroid.LONG);

@@ -8,12 +8,19 @@ import {
 } from 'react-native-responsive-screen';
 import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityIndicator, ProgressBar } from 'react-native-paper';
+import { ActivityIndicator, Button, ProgressBar } from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs'; // For managing files
+import PieChart from 'react-native-pie-chart';
 
 const Report = () => {
   const [report, setReport] = useState(null);
+
+  const [percent, setPercentage] = useState(0);
+  const [lowAttStudents, setLowAttStudents] = useState(0);
+  const [lowAttStudents1, setLowAttStudents1] = useState(0);
+  const [lowAttStudents2, setLowAttStudents2] = useState(0);
+  const sliceColor2 = ['#c41111c4', '#01808cb9', '#258a4ac4'];
 
   const navigation = useNavigation();
 
@@ -73,7 +80,12 @@ const Report = () => {
       };
     });
 
-    const lowAttendanceStudents = studentAttendanceCount.filter(student => student.attendancePercentage < attendanceThreshold * 100);
+    const lowAttendanceStudents = studentAttendanceCount.filter(student => student.attendancePercentage < 60);
+    setLowAttStudents(lowAttendanceStudents.length)
+    const lowAttendanceStudents1 = studentAttendanceCount.filter(student => student.attendancePercentage < 75 && student.attendancePercentage > 60);
+    setLowAttStudents1(lowAttendanceStudents1.length)
+    const lowAttendanceStudents2 = studentAttendanceCount.filter(student => student.attendancePercentage > 75);
+    setLowAttStudents2(lowAttendanceStudents2.length)
 
     // Sort students by attendance for top 10 and bottom 10
     const sortedStudents = [...studentAttendanceCount].sort((a, b) => b.attendancePercentage - a.attendancePercentage);
@@ -89,6 +101,8 @@ const Report = () => {
       dailyStats,
       studentAttendanceCount,
       lowAttendanceStudents,
+      lowAttendanceStudents1,
+      lowAttendanceStudents2,
       top10Students,
       bottom10Students,
       dayWithMostAttendance,
@@ -342,9 +356,25 @@ const Report = () => {
         </View>
         <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
 
+        <View style={{ width: wp(95) }} className="p-2 rounded-md border-[#01808c7a] border-2">
+        <View className="flex flex-row w-full justify-around p-4">
+          <PieChart
+            widthAndHeight={150}
+            series={[lowAttStudents, lowAttStudents1, lowAttStudents2]}
+            sliceColor={sliceColor2}
+            coverRadius={0.45}
+            coverFill={'#FFF'}
+          />
+        </View>
+        <View className="flex flex-col items-start p-2">
+          <Button className="cursor-pointer" onPress={()=>setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500">Attendance less than 60% : {lowAttStudents}</Text></View></Button>
+          <Button className="cursor-pointer" onPress={()=>setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></Button>
+          <Button className="cursor-pointer" onPress={()=>setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500">Attendance more than 75% : {lowAttStudents2}</Text></View></Button>
+        </View>
+      </View>
 
           {/* Daily Statistics */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -360,12 +390,12 @@ const Report = () => {
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
 
 
           {/* Low Attendance Students */}
-          <View style={styles.section}>
-            <Text style={styles.subHeader}>Students with Attendance Less Than 75%:</Text>
+          {percent==1&&<View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance Less Than 60% :</Text>
             <Text style={styles.count}>
               Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
             </Text>
@@ -387,11 +417,59 @@ const Report = () => {
             ) : (
               <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
             )}
-          </View>
+          </View>}
+          {percent==2&&<View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance Between Than 60% and 75% :</Text>
+            <Text style={styles.count}>
+              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents1.length}</Text>
+            </Text>
+            {report.lowAttendanceStudents1.length > 0 ? (
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Roll Number</Text>
+                  <Text style={styles.tableHeaderText}>Name</Text>
+                  <Text style={styles.tableHeaderText}>Attendance (%)</Text>
+                </View>
+                {report.lowAttendanceStudents1.map((student, index) => (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
+                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
+            )}
+          </View>}
+          {percent==3&&<View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance More Than 75%:</Text>
+            <Text style={styles.count}>
+              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents2.length}</Text>
+            </Text>
+            {report.lowAttendanceStudents2.length > 0 ? (
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Roll Number</Text>
+                  <Text style={styles.tableHeaderText}>Name</Text>
+                  <Text style={styles.tableHeaderText}>Attendance (%)</Text>
+                </View>
+                {report.lowAttendanceStudents2.map((student, index) => (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
+                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
+            )}
+          </View>}
 
 
           {/* Top 10 Students */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.subHeader}>Top 10 Students by Attendance:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -407,10 +485,10 @@ const Report = () => {
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
 
           {/* Bottom 10 Students */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.subHeader}>Bottom 10 Students by Attendance:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -426,7 +504,7 @@ const Report = () => {
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
 
 
           {/* List of All Students */}
