@@ -14,7 +14,7 @@ import {
     ScrollView,
 } from 'react-native';
 
-import { ArrowUpTrayIcon,XMarkIcon } from 'react-native-heroicons/outline';
+import { ArrowUpTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from "@react-navigation/native";
 
 import {
@@ -101,8 +101,8 @@ const CreateClass = () => {
         // const data 
 
         setJsonData(json.data);
-        console.log('json.data', typeof(json));
-        console.log('json.datakjjkjkjk', typeof(json.data));
+        console.log('json.data', typeof (json));
+        console.log('json.datakjjkjkjk', typeof (json.data));
         console.log('json.data', json);
         console.log('json.data only data', json.data);
     };
@@ -111,54 +111,64 @@ const CreateClass = () => {
 
         const curTime = new Date().toISOString();
 
-        if(number === '') {
+        if (number === '') {
             showAlert('Please enter class name');
             return;
         }
 
         const store = {
-            className : number,
-            time : curTime,
-            data : jsonData
+            className: number,
+            time: curTime,
+            data: jsonData
         }
+
+        const pascalCase = number
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join('');
+
+
+        console.log('store check ', pascalCase, number);
 
         console.log('store', store);
 
         const Data = JSON.stringify(store);
-    
-        try {
-          await RNFS.mkdir(folderPath); // Create folder if it doesn't exist
-          await RNFS.writeFile(filePath, Data, 'utf8'); // Save file
-          console.log('File written successfully!', Data);
 
-          showAlert('Data saved successfully!');
-          navigation.goBack();
+        try {
+            await RNFS.mkdir(folderPath); // Create folder if it doesn't exist
+            await RNFS.writeFile(filePath, Data, 'utf8'); // Save file
+            console.log('File written successfully!', Data);
+
+            showAlert('Data saved successfully!');
+            navigation.goBack();
 
         } catch (error) {
-          console.log('Error writing file:', error);
+            console.log('Error writing file:', error);
+            navigation.goBack();
+            console.log('File written successfully!', Data);
         }
-      };
+    };
 
-      const [fileContent, setFileContent] = useState([]);
-    
-      // Function to read the data
-      const readDataFromFile = async () => {
+    const [fileContent, setFileContent] = useState([]);
+
+    // Function to read the data
+    const readDataFromFile = async () => {
         try {
-          const content = await RNFS.readFile(filePath, 'utf8');
-        //   setFileContent(content); // Update state with file content
+            const content = await RNFS.readFile(filePath, 'utf8');
+            //   setFileContent(content); // Update state with file content
 
-        const data = JSON.parse(content);
+            const data = JSON.parse(content);
 
-          setJsonData(data.data);
-        //   console.log('File read successfully!', content);
-          console.log('File read successfully! state fri', fileContent);
+            setJsonData(data.data);
+            //   console.log('File read successfully!', content);
+            console.log('File read successfully! state fri', fileContent);
         } catch (error) {
-          console.log('Error reading file:', error);
+            console.log('Error reading file:', error);
         }
-      };
-    
+    };
 
-  
+
+
 
     return (
         <SafeAreaView style={{ flex: 1, alignItems: 'center' }} >
