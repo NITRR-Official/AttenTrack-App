@@ -26,11 +26,13 @@ import {
 import * as React from 'react';
 
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from '../../utils/auth';
 
 
 const ReportHome = () => {
 
   const navigation = useNavigation();
+  const {classes, jsonGlobalData} = useAuth();
 
   return (
     <SafeAreaView>
@@ -49,9 +51,11 @@ const ReportHome = () => {
         style={{ backgroundColor: '#fff', height: hp(100) }}
       >
 
-        <TouchableOpacity
+{
+          classes.map((item, id)=>{return(
+            <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Report')}
+          onPress={() => navigation.navigate('Report', jsonGlobalData)}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />
           <Text
@@ -59,39 +63,13 @@ const ReportHome = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            VLSI (2025 BATCH)
+            {item}
+            
           </Text>
+
         </TouchableOpacity>
-
-
-        <TouchableOpacity
-          className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Report')}
-        >
-          <PhoneIcon size={wp(8)} color="#01808cb9" />
-          <Text
-            className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            Analog Communication (2026 BATCH)
-          </Text>
-        </TouchableOpacity>
-
-
-        <TouchableOpacity
-          className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Report')}
-        >
-          <ComputerDesktopIcon size={wp(8)} color="#01808cb9" />
-          <Text
-            className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            Operating System (2026 BATCH)
-          </Text>
-        </TouchableOpacity>
+          )})
+        }
 
 
 

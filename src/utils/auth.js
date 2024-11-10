@@ -1,32 +1,30 @@
 import * as React from "react";
-
-// Navigators
-import {createContext, useContext, useState} from 'react';
-import {ToastAndroid, Linking} from 'react-native';
-
+import { createContext, useContext, useState } from 'react';
+import { studentsData } from "../screens/teacher/studentsData";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
 
-    const [student, setStudent] = useState(false);
+    const [classes, setClasses] = useState(['VLSI (2025 BATCH)','Analog Communication (2026 BATCH)','Operating System (2026 BATCH)']);
     const [index, setIndex] = useState(0);
+    const [jsonGlobalData, setJsonGlobalData] = useState(studentsData);
 
     return (
         <AuthContext.Provider
-          value={{
-            student,
-            setStudent,
-            index,
-            setIndex
-          }}>
-          {children}
+            value={{
+                classes,
+                setClasses,
+                index,
+                setIndex,
+                jsonGlobalData,
+                setJsonGlobalData
+            }}>
+            {children}
         </AuthContext.Provider>
-      );
-    
+    );
 }
-
 
 export const useAuth = () => {
     return useContext(AuthContext);
-  };
+};

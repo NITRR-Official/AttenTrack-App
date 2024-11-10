@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, SafeAreaView, Modal, TouchableWithoutFeedback, Linking } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { studentsData } from './studentsData'; // Assuming the studentsData is imported from this file
 import { theme } from '../../theme';
@@ -8,14 +8,32 @@ import {
 } from 'react-native-responsive-screen';
 import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityIndicator, ProgressBar } from 'react-native-paper';
+import { ActivityIndicator, Button, ProgressBar, TextInput } from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs'; // For managing files
+import PieChart from 'react-native-pie-chart';
+import email from 'react-native-email';
 
 const Report = () => {
   const [report, setReport] = useState(null);
 
+  const [percent, setPercentage] = useState(0);
+  const [lowAttStudents, setLowAttStudents] = useState(0);
+  const [lowAttStudents1, setLowAttStudents1] = useState(0);
+  const [lowAttStudents2, setLowAttStudents2] = useState(0);
+  const sliceColor2 = ['#c41111c4', '#01808cb9', '#258a4ac4'];
+
   const navigation = useNavigation();
+
+  const [modalVisible1, setModalVisible1] = React.useState(false);
+
+  const [subject, setSubject] = React.useState('');
+  const [body, setBody] = React.useState(
+    `Dear Student,
+
+I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
+
+Please take necessary steps to improve your attendance to meet the required threshold.`);
 
   // Helper function to format dates as "1st August, 2024"
   const formatDate = (date) => {
@@ -35,7 +53,7 @@ const Report = () => {
     for (let day = 1; day <= numDays; day++) {
       const dailyAttendance = studentsData.map(student => ({
         ...student,
-        attendance: Math.random() < 0.7 // 70% chance a student is present
+        ATTENDANCE: Math.random() < 0.7 // 70% chance a student is present
       }));
       monthAttendance.push({ date: new Date(currentDate), attendance: dailyAttendance });
       currentDate.setDate(currentDate.getDate() + 1);
@@ -50,7 +68,7 @@ const Report = () => {
     const totalStudents = studentsData.length;
 
     const dailyStats = monthlyAttendance.map(dayData => {
-      const presentCount = dayData.attendance.filter(student => student.attendance).length;
+      const presentCount = dayData.attendance.filter(student => student.ATTENDANCE).length;
       const absentCount = totalStudents - presentCount;
 
       return {
@@ -62,7 +80,7 @@ const Report = () => {
 
     const studentAttendanceCount = studentsData.map(student => {
       const presentDays = monthlyAttendance.filter(dayData =>
-        dayData.attendance.find(s => s.rollNumber === student.rollNumber)?.attendance
+        dayData.attendance.find(s => s.rollNumber === student.rollNumber)?.ATTENDANCE
       ).length;
 
       return {
@@ -73,7 +91,12 @@ const Report = () => {
       };
     });
 
-    const lowAttendanceStudents = studentAttendanceCount.filter(student => student.attendancePercentage < attendanceThreshold * 100);
+    const lowAttendanceStudents = studentAttendanceCount.filter(student => student.attendancePercentage < 60);
+    setLowAttStudents(lowAttendanceStudents.length)
+    const lowAttendanceStudents1 = studentAttendanceCount.filter(student => student.attendancePercentage < 75 && student.attendancePercentage > 60);
+    setLowAttStudents1(lowAttendanceStudents1.length)
+    const lowAttendanceStudents2 = studentAttendanceCount.filter(student => student.attendancePercentage > 75);
+    setLowAttStudents2(lowAttendanceStudents2.length)
 
     // Sort students by attendance for top 10 and bottom 10
     const sortedStudents = [...studentAttendanceCount].sort((a, b) => b.attendancePercentage - a.attendancePercentage);
@@ -89,6 +112,8 @@ const Report = () => {
       dailyStats,
       studentAttendanceCount,
       lowAttendanceStudents,
+      lowAttendanceStudents1,
+      lowAttendanceStudents2,
       top10Students,
       bottom10Students,
       dayWithMostAttendance,
@@ -210,8 +235,8 @@ const Report = () => {
     report.lowAttendanceStudents.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.attendancePercentage.toFixed(2)}%</td>
         </tr>`;
     });
@@ -232,8 +257,8 @@ const Report = () => {
     report.top10Students.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.attendancePercentage.toFixed(2)}%</td>
         </tr>`;
     });
@@ -254,8 +279,8 @@ const Report = () => {
     report.bottom10Students.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.attendancePercentage.toFixed(2)}%</td>
         </tr>`;
     });
@@ -277,8 +302,8 @@ const Report = () => {
     report.studentAttendanceCount.forEach(student => {
       html += `
         <tr>
-          <td>${student.rollNumber}</td>
-          <td>${student.name}</td>
+          <td>${student.ROLLNO}</td>
+          <td>${student.STUDNAME}</td>
           <td>${student.presentDays}</td>
           <td>${student.absentDays}</td>
         </tr>`;
@@ -320,7 +345,7 @@ const Report = () => {
   }
 
   return (
-<>
+    <>
       <View className="w-full flex flex-row justify-between items-center p-4">
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
@@ -335,16 +360,32 @@ const Report = () => {
 
       <ScrollView>
 
-      <View style={styles.container}>
-        {/* Overall Class Attendance */}
-        <View style={styles.section}>
-          <Text style={styles.subHeader}>Overall Class Attendance: {report.overallClassAttendance.toFixed(2)}%</Text>
-        </View>
-        <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
+        <View style={styles.container}>
+          {/* Overall Class Attendance */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Overall Class Attendance: {report.overallClassAttendance.toFixed(2)}%</Text>
+          </View>
+          <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" />
 
+          <View className="rounded-md border-[#01808c7a] border-2 my-2">
+            <View className="flex flex-row w-full justify-around p-4">
+              <PieChart
+                widthAndHeight={150}
+                series={[lowAttStudents, lowAttStudents1, lowAttStudents2]}
+                sliceColor={sliceColor2}
+                coverRadius={0.45}
+                coverFill={'#FFF'}
+              />
+            </View>
+            <View className="flex flex-col items-start p-2">
+              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance less than 60% : {lowAttStudents}</Text></View></TouchableOpacity>
+              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></TouchableOpacity>
+              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance more than 75% : {lowAttStudents2}</Text></View></TouchableOpacity>
+            </View>
+          </View>
 
           {/* Daily Statistics */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -360,15 +401,27 @@ const Report = () => {
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
 
 
           {/* Low Attendance Students */}
-          <View style={styles.section}>
-            <Text style={styles.subHeader}>Students with Attendance Less Than 75%:</Text>
-            <Text style={styles.count}>
-              Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
-            </Text>
+          {percent == 1 && <View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance Less Than 60% :</Text>
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text style={styles.count}>
+                Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents.length}</Text>
+              </Text>
+              <TouchableOpacity onPress={() =>{
+                // setModalVisible1(true);
+                email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                  // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                  // bcc: 'mee@mee.com',
+                  subject: 'Short Attendance Notice',
+                  body: body,
+                  checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                }).catch(console.error);
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+            </View>
             {report.lowAttendanceStudents.length > 0 ? (
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
@@ -378,8 +431,8 @@ const Report = () => {
                 </View>
                 {report.lowAttendanceStudents.map((student, index) => (
                   <View key={index} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                    <Text style={styles.tableCell1}>{student.name}</Text>
+                    <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                    <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                     <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                   </View>
                 ))}
@@ -387,11 +440,138 @@ const Report = () => {
             ) : (
               <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
             )}
-          </View>
+          </View>}
+          {percent == 2 && <View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance Between Than 60% and 75% :</Text>
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text style={styles.count}>
+                Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents1.length}</Text>
+              </Text>
+              <TouchableOpacity onPress={() => {
+                // setModalVisible1(true);
+                email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                  // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                  // bcc: 'mee@mee.com',
+                  subject: 'Short Attendance Notice',
+                  body: body,
+                  checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                }).catch(console.error);
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+            </View>
+            {report.lowAttendanceStudents1.length > 0 ? (
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Roll Number</Text>
+                  <Text style={styles.tableHeaderText}>Name</Text>
+                  <Text style={styles.tableHeaderText}>Attendance (%)</Text>
+                </View>
+                {report.lowAttendanceStudents1.map((student, index) => (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                    <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
+                    <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
+            )}
+          </View>}
+          {percent == 3 && <View style={styles.section}>
+            <Text style={styles.subHeader}>Students with Attendance More Than 75%:</Text>
+            <View className="flex flex-row justify-between items-center mb-1">
+              <Text style={styles.count}>
+                Number of students: <Text style={{ fontWeight: 'bold' }}>{report.lowAttendanceStudents2.length}</Text>
+              </Text>
+              <TouchableOpacity onPress={() => {
+                // setModalVisible1(true);
+                email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                  // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                  // bcc: 'mee@mee.com',
+                  subject: 'Short Attendance Notice',
+                  body: body,
+                  checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                }).catch(console.error);
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+            </View>
+            {report.lowAttendanceStudents2.length > 0 ? (
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Roll Number</Text>
+                  <Text style={styles.tableHeaderText}>Name</Text>
+                  <Text style={styles.tableHeaderText}>Attendance (%)</Text>
+                </View>
+                {report.lowAttendanceStudents2.map((student, index) => (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                    <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
+                    <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.studentText}>All students have more than 75% attendance.</Text>
+            )}
+          </View>}
+
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible1}
+            onRequestClose={() => {
+              setModalVisible1(!modalVisible1);
+            }}>
+            <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
+              <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+                <TouchableWithoutFeedback>
+
+                  <View className="bg-white p-4 m-4 rounded-3xl">
+                    {/* <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">yoyo</Text> */}
+                    <TextInput
+                      className="h-[40px] my-2 rounded-none rounded-t-lg"
+                      onChangeText={setSubject}
+                      value={subject}
+                      placeholder="Enter Subject Here"
+                    />
+                    <TextInput
+                      className=" rounded-none"
+                      onChangeText={setBody}
+                      value={body}
+                      placeholder="Enter Body Here"
+                      multiline={true}
+                      numberOfLines={6} // Adjust this value to control the height of the text area
+                      style={{ textAlignVertical: 'top' }} // Ensures the text starts at the top
+                    />
+                    <View className="flex flex-row justify-between mt-5">
+                      <TouchableOpacity className=" bg-red-400  p-3 w-[100px] rounded-2xl " onPress={() => setModalVisible1(false)}><Text className="text-white font-bold text-center">Cancel</Text></TouchableOpacity>
+                      <TouchableOpacity className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl " onPress={() => {
+                        email(['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'], {
+                          // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                          // bcc: 'mee@mee.com',
+                          subject: 'Short Attendance Notice',
+                          body: `Dear Student,
+
+I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
+
+Please take necessary steps to improve your attendance to meet the required threshold.
+
+Best regards,
+[Your Name]
+[Your Position/Role]
+[Your Contact Information]`,
+                          checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+                        }).catch(console.error);
+                      }}><Text className="text-white font-bold text-center">Send</Text></TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
 
 
           {/* Top 10 Students */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.subHeader}>Top 10 Students by Attendance:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -401,16 +581,16 @@ const Report = () => {
               </View>
               {report.top10Students.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{student.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell}>{student.ROLLNO}</Text>
+                  <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                   <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
 
           {/* Bottom 10 Students */}
-          <View style={styles.section}>
+          {/* <View style={styles.section}>
             <Text style={styles.subHeader}>Bottom 10 Students by Attendance:</Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -420,13 +600,13 @@ const Report = () => {
               </View>
               {report.bottom10Students.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell3}>{student.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell3}>{student.ROLLNO}</Text>
+                  <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                   <Text style={styles.tableCell2}>{student.attendancePercentage.toFixed(2)}%</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
 
 
           {/* List of All Students */}
@@ -441,15 +621,15 @@ const Report = () => {
               </View>
               {report.studentAttendanceCount.map((student, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell3}>{student.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{student.name}</Text>
+                  <Text style={styles.tableCell3}>{student.ROLLNO}</Text>
+                  <Text style={styles.tableCell1}>{student.STUDNAME}</Text>
                   <Text style={styles.tableCell2}>{student.presentDays}</Text>
                   <Text style={styles.tableCell2}>{student.absentDays}</Text>
                 </View>
               ))}
             </View>
           </View>
-      </View>
+        </View>
       </ScrollView>
     </>
   );
@@ -496,7 +676,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // Align text properly
   },
   count: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 8,
     color: '#e74c3c', // Highlighting low attendance count

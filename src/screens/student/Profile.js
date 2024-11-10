@@ -59,10 +59,10 @@ const Profile = () => {
       </View>
 
       <View style={{ width: wp(95) }} className="p-2 rounded-md border-[#01808c7a] border-2">
-        <View className="flex flex-row w-full justify-around p-4">
-          <PieChart widthAndHeight={150} series={series} sliceColor={sliceColor} />
+        <View className="flex flex-row w-full justify-around p-2">
+          <PieChart widthAndHeight={140} series={series} sliceColor={sliceColor} />
           <PieChart
-            widthAndHeight={150}
+            widthAndHeight={140}
             series={series2}
             sliceColor={sliceColor2}
             coverRadius={0.45}

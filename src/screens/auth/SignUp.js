@@ -5,6 +5,7 @@ import { theme } from '../../theme';
 import { useAuth } from '../../utils/auth';
 
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 
 const SignUp = (props) => {
@@ -18,7 +19,23 @@ const SignUp = (props) => {
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [department, setDepartment] = React.useState('');
-  const navigation = useNavigation();
+
+  const handleSignUp = async () => {
+    try {
+      console.log(email,name,rollNumber,password,passwordConfirm,department,isStudent);
+        const response = await axios.post('http://localhost:5000/register', {
+            email: email,
+            password: password,
+            isStudent: isStudent,
+            rollNumber: isStudent ? rollNumber : undefined,
+            department: !isStudent ? department : undefined,
+        });
+        console.log('Registration successful:', response.data);
+    } catch (error) {
+        console.error('Registration failed:', error.response ? error.response.data : error.message);
+    }
+};
+
   return (
     <>
       <KeyboardAvoidingView>
@@ -100,7 +117,10 @@ const SignUp = (props) => {
             </View>
           </View>
           <TouchableOpacity 
-          onPress={() => setIndex(isStudent ? 2 : 1)}
+          onPress={ () => {
+            handleSignUp();
+          // setIndex(isStudent ? 2 : 1);
+          }}
           // onPress={() => navigation.navigate('LogIn')} 
           className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Sign Up</Text></TouchableOpacity>
         </View>

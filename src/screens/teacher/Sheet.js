@@ -9,13 +9,15 @@ import { theme } from '../../theme';
 import { ScrollView } from 'react-native';
 // import { useNavigation } from "@react-navigation/native";
 import { ProgressBar, RadioButton } from 'react-native-paper';
-import { studentsData } from './studentsData';
 import axios from 'axios';
+import { useAuth } from '../../utils/auth';
 
 const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
 
-  const [student, setStudent] = useState(studentsData);
+  const {jsonGlobalData}= useAuth();
+
+  const [student, setStudent] = useState(jsonGlobalData);
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
 
@@ -39,17 +41,15 @@ const Sheet = ({ navigation, route }) => {
         // console.log('Updated Roll Number',updatedRollNumber);
 
         // Update the student's attendance status in real time
-        setStudent(prevStudents =>
-          prevStudents.map(student =>
-            student.rollNumber === updatedRollNumber
-              ? { ...student, attendance: true }
+
+        setStudent(prevStudents => 
+          prevStudents.map(student => 
+            student.ROLLNO ==
+             updatedRollNumber
+              ? { ...student, ATTENDANCE: true }
               : student
           )
         );
-
-        // console.log(student[6].attendance)
-        // console.log(student[7].attendance)
-        // console.log(student[8].attendance)
 
         // Increment the present count
         setPresentCount(prevCount => prevCount + 1);
@@ -122,7 +122,7 @@ const Sheet = ({ navigation, route }) => {
 
   // Calculate present and absent students
   const calculateAttendance = () => {
-    const present = student.filter(item => item.attendance).length;
+    const present = student.filter(item => item.ATTENDANCE).length;
     const absent = student.length - present;
     setPresentCount(present);
     setAbsentCount(absent);
@@ -131,14 +131,14 @@ const Sheet = ({ navigation, route }) => {
   // Function to mark all students as present
   const markAllPresent = () => {
     setStudent(prevStudents =>
-      prevStudents.map(student => ({ ...student, attendance: true }))
+      prevStudents.map(student => ({ ...student, ATTENDANCE: true }))
     );
   };
 
   // Function to mark all students as absent
   const markAllAbsent = () => {
     setStudent(prevStudents =>
-      prevStudents.map(student => ({ ...student, attendance: false }))
+      prevStudents.map(student => ({ ...student, ATTENDANCE: false }))
     );
   };
 
@@ -279,24 +279,24 @@ const Sheet = ({ navigation, route }) => {
 
           {student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.rollNumber}</Text>
-              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.name}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.ROLLNO}</Text>
+              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.STUDNAME}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
-                  thumbColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
+                  thumbColor={item.ATTENDANCE ? '#258a4ac4' : '#c41111c4'}
                   // trackColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
                   trackColor={{ false: '#ffaaaac4', true: '#8bdca8c4' }}
                   onValueChange={() => {
                     setStudent(prevStudents =>
                       prevStudents.map((student, idx) =>
                         id === idx
-                          ? { ...student, attendance: !student.attendance }
+                          ? { ...student, ATTENDANCE: !student.ATTENDANCE }
                           : student
                       )
                     );
                   }}
-                  value={item.attendance} />
-                <Text className={`text-gray-400 font-semibold`}>{item.attendance ? 'P' : 'A'}</Text>
+                  value={item.ATTENDANCE} />
+                <Text className={`text-gray-400 font-semibold`}>{item.ATTENDANCE ? 'P' : 'A'}</Text>
               </View>
             </View>
           ))}
