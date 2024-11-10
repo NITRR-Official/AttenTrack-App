@@ -91,11 +91,14 @@ Please take necessary steps to improve your attendance to meet the required thre
       };
     });
 
-    const lowAttendanceStudents = studentAttendanceCount.filter(student => student.attendancePercentage < 60);
+    // const lowAttendanceStudents = studentAttendanceCount.filter(student => student.attendancePercentage < 60);
+    const lowAttendanceStudents = studentAttendanceCount.filter(student => parseInt(student.ROLLNO) < 21117030);
     setLowAttStudents(lowAttendanceStudents.length)
-    const lowAttendanceStudents1 = studentAttendanceCount.filter(student => student.attendancePercentage < 75 && student.attendancePercentage > 60);
+    // const lowAttendanceStudents1 = studentAttendanceCount.filter(student => student.attendancePercentage < 75 && student.attendancePercentage > 60);
+    const lowAttendanceStudents1 = studentAttendanceCount.filter(student => parseInt(student.ROLLNO) >= 21117060 && parseInt(student.ROLLNO) < 21117090);
     setLowAttStudents1(lowAttendanceStudents1.length)
-    const lowAttendanceStudents2 = studentAttendanceCount.filter(student => student.attendancePercentage > 75);
+    // const lowAttendanceStudents2 = studentAttendanceCount.filter(student => student.attendancePercentage > 75);
+    const lowAttendanceStudents2 = studentAttendanceCount.filter(student => parseInt(student.ROLLNO) >= 21117090);
     setLowAttStudents2(lowAttendanceStudents2.length)
 
     // Sort students by attendance for top 10 and bottom 10
@@ -420,7 +423,7 @@ Please take necessary steps to improve your attendance to meet the required thre
                   body: body,
                   checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
                 }).catch(console.error);
-              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg"><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
+              }} className="bg-[#01808ce0] w-[100px] p-2 rounded-lg "><Text className="text-white font-extrabold text-center">Send Email</Text></TouchableOpacity>
             </View>
             {report.lowAttendanceStudents.length > 0 ? (
               <View style={styles.table}>
