@@ -10,7 +10,6 @@ import {
     Button,
     TouchableOpacity,
     BackHandler,
-    Alert,
     ScrollView,
     ToastAndroid,
 } from 'react-native';
@@ -31,6 +30,8 @@ import DocumentPicker from 'react-native-document-picker';
 import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import { useAuth } from '../../utils/auth';
+import axios from 'axios';
+import { ActivityIndicator } from 'react-native-paper';
 
 
 
@@ -43,18 +44,12 @@ const CreateClass = () => {
 
     const navigation = useNavigation();
 
-    const [className, setClassName] = React.useState('');
+    const [classname, setClassname] = React.useState('');
+    const [batch, setBatch] = React.useState('');
+    const [semester, setSemester] = React.useState('');
     const [jsonLocalData, setJsonLocalData] = useState([]);
-    const { setJsonGlobalData, setClasses } = useAuth();
-
-    const showAlert = (show) => {
-        Alert.alert(
-            "Error",
-            show,
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-            { cancelable: false }
-        );
-    };
+    const [students, setStudents] = useState([]);
+    const { setJsonGlobalData, setClasses, departmentG, teacherid, loading, setLoading } = useAuth();
 
 
     const handleOnFileLoad = async () => {
@@ -63,12 +58,12 @@ const CreateClass = () => {
                 type: [DocumentPicker.types.allFiles],
             });
 
-            console.log(1,res);
+            // console.log(1,res);
 
             const filetype = res[0].type;
 
             if (filetype !== 'text/comma-separated-values') {
-                showAlert("Please select a comma-separated-values file");
+                ToastAndroid.show('Please select a comma-separated-values file',ToastAndroid.LONG);
                 throw new Error(2,'Please select a comma-separated-values file');
             }
 
@@ -105,8 +100,40 @@ const CreateClass = () => {
             ...item,
             ATTENDANCE: false,
         }));
-        
+
+        const transformedData = json.data.map((item) => ({
+            rollNumber: item.ROLLNO,
+            name: item.STUDNAME,            
+        }));
+        setStudents(transformedData);
         setJsonLocalData(json2);
+    };
+
+    const createClass = async () => {
+        try {
+            setLoading(true);
+          if(!classname || !batch || !semester || !students) {
+            ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+            return;
+          }
+            const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/class/createClass', {
+                classname: classname,
+                batch: batch,
+                semester: semester,
+                department: departmentG,
+                teacherid:teacherid,
+                students:students
+            });
+            ToastAndroid.show(`Class Added Successfully !`, ToastAndroid.LONG);
+            console.log('Class Added Successful:', response.data);
+            setClasses(prevClasses => [...prevClasses, {classname}]);
+            navigation.goBack();
+            setLoading(false);
+        } catch (error) {
+        //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+        console.error(error);
+        setLoading(false);
+        }
     };
     
 
@@ -119,15 +146,13 @@ const CreateClass = () => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                 onPress={() => {
-                    if(!jsonLocalData.length || !className) ToastAndroid.show('Please Add CSV File as well as Class Name!', ToastAndroid.LONG);
-                    else{
                         setJsonGlobalData(jsonLocalData);
-                        setClasses(prevClasses => [...prevClasses, className]);
-                        navigation.goBack();
-                    }
+                        createClass();
                 }}
-                 style={{ backgroundColor: theme.maincolor, width: wp(14), height: wp(8), borderRadius: wp(2), justifyContent: 'center', alignItems: 'center' }} >
-                    <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >Save</Text>
+                 style={{ backgroundColor: theme.maincolor, width: wp(18), height: wp(10), borderRadius: wp(2), justifyContent: 'center', alignItems: 'center', marginTop:8 }} >
+                    <Text style={{ color: '#fff', fontSizeq: wp(6), fontWeight: '700' }} >
+                    {loading?<ActivityIndicator animating={true} color={'white'} />:'Save'}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
@@ -135,10 +160,26 @@ const CreateClass = () => {
             <TextInput
                 placeholder="Class Name"
                 placeholderTextColor='#909090'
-                onChangeText={setClassName}
-                value={className}
+                onChangeText={setClassname}
+                value={classname}
                 keyboardType="text"
-                style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(7), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(8), color: theme.maincolor, fontSize: wp(5), fontWeight: '500' }}
+                style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(5.5), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(4), color: theme.maincolor, fontSize: wp(4), fontWeight: '500' }}
+            />
+            <TextInput
+                placeholder="Semester"
+                placeholderTextColor='#909090'
+                onChangeText={setSemester}
+                value={semester}
+                keyboardType='numeric'
+                style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(5.5), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(4), color: theme.maincolor, fontSize: wp(4), fontWeight: '500' }}
+            />
+            <TextInput
+                placeholder="Batch"
+                placeholderTextColor='#909090'
+                onChangeText={setBatch}
+                value={batch}
+                keyboardType='numeric'
+                style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(5.5), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(4), color: theme.maincolor, fontSize: wp(4), fontWeight: '500' }}
             />
 
             <TouchableOpacity

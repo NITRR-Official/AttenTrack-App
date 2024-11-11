@@ -6,9 +6,12 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
 
-    const [classes, setClasses] = useState(['VLSI (2025 BATCH)','Analog Communication (2026 BATCH)','Operating System (2026 BATCH)']);
+    const [classes, setClasses] = useState([]);
     const [index, setIndex] = useState(0);
     const [jsonGlobalData, setJsonGlobalData] = useState(studentsData);
+    const [teacherid, setTeacherid] = useState('');
+    const [departmentG, setDepartmentG] = useState('');
+    const [loading, setLoading] = useState(false);
 
     return (
         <AuthContext.Provider
@@ -18,7 +21,13 @@ export const AuthProvider = ({ children }) => {
                 index,
                 setIndex,
                 jsonGlobalData,
-                setJsonGlobalData
+                setJsonGlobalData,
+                teacherid,
+                setTeacherid,
+                departmentG,
+                setDepartmentG,
+                loading,
+                setLoading
             }}>
             {children}
         </AuthContext.Provider>

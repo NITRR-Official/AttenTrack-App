@@ -63,7 +63,7 @@ const ReportHome = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {item}
+            {item.classname}
             
           </Text>
 

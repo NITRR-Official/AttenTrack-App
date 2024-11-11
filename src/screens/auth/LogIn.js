@@ -7,6 +7,7 @@ import SignUp from './SignUp';
 import { useAuth } from '../../utils/auth';
 import { theme } from '../../theme';
 import axios from 'axios';
+import { ActivityIndicator } from 'react-native-paper';
 
 
 const LogIn = () => {
@@ -18,10 +19,11 @@ const LogIn = () => {
   const [department, setDepartment] = React.useState('');
   const [isSignUp, setIsSignUp] = React.useState(false);
 
-  const { setIndex } = useAuth();
+  const { setIndex, setClasses, setTeacherid, setDepartmentG, loading, setLoading } = useAuth();
 
   const handleTeacherLogin = async () => {
     try {
+      setLoading(true);
       if(!email || !department || !password) {
         ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
         return;
@@ -31,16 +33,22 @@ const LogIn = () => {
             department: department,
             password: password,
         });
-        console.log('Login Successful:', response.data);
         ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
+        console.log('Login Successful:', response.data);
+        setClasses(response.data.classes);
+        setTeacherid(response.data._id);
+        setDepartmentG(response.data.department);
         setIndex(1);
+        setLoading(false);
     } catch (error) {
       ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);
+      setLoading(false);
     }
 };
 
   const handleStudentLogin = async () => {
     try {
+      setLoading(true);
       if(!email || !rollNumber || !password) {
         ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
         return;
@@ -53,8 +61,10 @@ const LogIn = () => {
         console.log('Login successful:', response.data);
         ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
         setIndex(2);
+        setLoading(false);
     } catch (error) {
       ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);
+      setLoading(false);
     }
 };
 
@@ -129,7 +139,7 @@ const LogIn = () => {
         <Text className="text-sm">Remember me</Text>
         <Text className="text-[#01818C] underline">Forgot Password?</Text>
       </View>
-      <TouchableOpacity onPress={()=>isStudent?handleStudentLogin():handleTeacherLogin()} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Login</Text></TouchableOpacity>
+      <TouchableOpacity onPress={()=>isStudent?handleStudentLogin():handleTeacherLogin()} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">{loading?<ActivityIndicator animating={true} color={'white'} />:'Login'}</Text></TouchableOpacity>
       </View>
       </>
       )}
