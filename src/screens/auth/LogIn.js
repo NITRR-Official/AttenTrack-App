@@ -1,11 +1,12 @@
 
-import { KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View, SafeAreaView, ToastAndroid } from 'react-native';
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
 import SignUp from './SignUp';
 
 import { useAuth } from '../../utils/auth';
 import { theme } from '../../theme';
+import axios from 'axios';
 
 
 const LogIn = () => {
@@ -19,6 +20,44 @@ const LogIn = () => {
 
   const { setIndex } = useAuth();
 
+  const handleTeacherLogin = async () => {
+    try {
+      if(!email || !department || !password) {
+        ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+        return;
+      }
+        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/login', {
+            email: email,
+            department: department,
+            password: password,
+        });
+        console.log('Login Successful:', response.data);
+        ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
+        setIndex(1);
+    } catch (error) {
+      ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);
+    }
+};
+
+  const handleStudentLogin = async () => {
+    try {
+      if(!email || !rollNumber || !password) {
+        ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+        return;
+      }
+        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/student/login', {
+            email: email,
+            rollNumber: rollNumber,
+            password: password,
+        });
+        console.log('Login successful:', response.data);
+        ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
+        setIndex(2);
+    } catch (error) {
+      ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);
+    }
+};
+
   return (
     <>
       <KeyboardAvoidingView>
@@ -29,7 +68,7 @@ const LogIn = () => {
       />
       <ScrollView >
        {isSignUp ? (
-        <SignUp setIsSignUp={setIsSignUp}/>  // Show the SignUp component if isSignUp is true
+        <SignUp setIsSignUp={setIsSignUp} setIsStudent={setIsStudent}/>  // Show the SignUp component if isSignUp is true
       ) : (
         <>
         <View className="h-screen flex justify-center items-center gap-y-4 relative">
@@ -90,7 +129,7 @@ const LogIn = () => {
         <Text className="text-sm">Remember me</Text>
         <Text className="text-[#01818C] underline">Forgot Password?</Text>
       </View>
-      <TouchableOpacity onPress={()=>setIndex(isStudent?2:1)} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Login</Text></TouchableOpacity>
+      <TouchableOpacity onPress={()=>isStudent?handleStudentLogin():handleTeacherLogin()} className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Login</Text></TouchableOpacity>
       </View>
       </>
       )}

@@ -42,25 +42,25 @@ const Home = () => {
   const [selectedClass, setSelectedClass] = React.useState(null);
   const {classes, setClasses} = useAuth();
 
-  React.useEffect(() => {
-    const readDataFromFile = async () => {
-      try {
-        const content = await RNFS.readFile(filePath, 'utf8');
-        //   setFileContent(content); // Update state with file content
+  // React.useEffect(() => {
+  //   const readDataFromFile = async () => {
+  //     try {
+  //       const content = await RNFS.readFile(filePath, 'utf8');
+  //       //   setFileContent(content); // Update state with file content
 
-        const data = JSON.parse(content);
+  //       const data = JSON.parse(content);
 
-        setJsonData(data);
-        //   console.log('File read successfully!', content);
-        console.log('File read successfully! state fri', jsonData);
-      } catch (error) {
-        console.log('Error reading file:', error);
-      }
-    };
+  //       setJsonData(data);
+  //       //   console.log('File read successfully!', content);
+  //       console.log('File read successfully! state fri', jsonData);
+  //     } catch (error) {
+  //       console.log('Error reading file:', error);
+  //     }
+  //   };
 
-    readDataFromFile();
+  //   readDataFromFile();
 
-  }, []);
+  // }, []);
 
 
 

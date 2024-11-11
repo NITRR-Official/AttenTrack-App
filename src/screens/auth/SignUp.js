@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, StatusBar, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
 import { theme } from '../../theme';
@@ -14,25 +14,64 @@ const SignUp = (props) => {
 
   const [isStudent, setIsStudent] = React.useState(true);
   const [email, setEmail] = React.useState('');
-  const [name, setName] = React.useState('');
+  const [fullName, setFullName] = React.useState('');
   const [rollNumber, setRollNumber] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [department, setDepartment] = React.useState('');
 
-  const handleSignUp = async () => {
+  const handleTeacherSignUp = async () => {
     try {
-      console.log(email,name,rollNumber,password,passwordConfirm,department,isStudent);
-        const response = await axios.post('http://localhost:5000/register', {
+      if(!email || !fullName || !department || !password) {
+        ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+        return;
+      }
+      if(password!==passwordConfirm){
+        ToastAndroid.show('Password Does not Match',ToastAndroid.LONG);
+        return;
+      }
+        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/register', {
             email: email,
+            fullName: fullName,
+            department: department,
             password: password,
-            isStudent: isStudent,
-            rollNumber: isStudent ? rollNumber : undefined,
-            department: !isStudent ? department : undefined,
+        });
+        console.log('Registration Successful:', response.data);
+        ToastAndroid.show('Registration Successful !', ToastAndroid.LONG);
+        props.setIsStudent(false);
+        props.setIsSignUp(false);
+    } catch (error) {
+      if(typeof(error.response.data.error)=="string"){
+        ToastAndroid.show(`Registration failed: ${error.response.data.error}`, ToastAndroid.LONG);
+      }else{
+        ToastAndroid.show(`Registration failed: ${error.response.data}`, ToastAndroid.LONG);
+      }
+    }
+};
+
+  const handleStudentSignUp = async () => {
+    try {
+      if(!email || !fullName || !rollNumber || !password) {
+        ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+        return;
+      }
+      if(password!==passwordConfirm){
+        ToastAndroid.show('Password Does not Match',ToastAndroid.LONG);
+        return;
+      }
+        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/student/register', {
+            email: email,
+            fullName: fullName,
+            rollNumber: rollNumber,
+            password: password,
         });
         console.log('Registration successful:', response.data);
+        ToastAndroid.show('Registration Successful !', ToastAndroid.LONG);
+        props.setIsStudent(true);
+        props.setIsSignUp(false);
     } catch (error) {
-        console.error('Registration failed:', error.response ? error.response.data : error.message);
+      ToastAndroid.show(`Registration failed: ${error.response.data}`, ToastAndroid.LONG);
+
     }
 };
 
@@ -71,8 +110,8 @@ const SignUp = (props) => {
             <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
               <TextInput
                 placeholderTextColor='#909090'
-                onChangeText={setName}
-                value={name}
+                onChangeText={setFullName}
+                value={fullName}
                 placeholder="Enter Full Name..."
                 style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
               />
@@ -118,8 +157,7 @@ const SignUp = (props) => {
           </View>
           <TouchableOpacity 
           onPress={ () => {
-            handleSignUp();
-          // setIndex(isStudent ? 2 : 1);
+            isStudent?handleStudentSignUp():handleTeacherSignUp();
           }}
           // onPress={() => navigation.navigate('LogIn')} 
           className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Sign Up</Text></TouchableOpacity>
