@@ -111,6 +111,7 @@ const CreateClass = () => {
 
     const createClass = async () => {
         try {
+            console.log(students);
             setLoading(true);
           if(!classname || !batch || !semester || !students) {
             ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);

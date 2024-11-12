@@ -6,11 +6,12 @@ import { useAuth } from '../../utils/auth';
 
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { ActivityIndicator } from 'react-native-paper';
 
 
 const SignUp = (props) => {
 
-  const { index, setIndex } = useAuth();
+  const { loading, setLoading } = useAuth();
 
   const [isStudent, setIsStudent] = React.useState(true);
   const [email, setEmail] = React.useState('');
@@ -22,6 +23,7 @@ const SignUp = (props) => {
 
   const handleTeacherSignUp = async () => {
     try {
+      setLoading(true);
       if(!email || !fullName || !department || !password) {
         ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
         return;
@@ -40,17 +42,20 @@ const SignUp = (props) => {
         ToastAndroid.show('Registration Successful !', ToastAndroid.LONG);
         props.setIsStudent(false);
         props.setIsSignUp(false);
+        setLoading(false);
     } catch (error) {
       if(typeof(error.response.data.error)=="string"){
         ToastAndroid.show(`Registration failed: ${error.response.data.error}`, ToastAndroid.LONG);
       }else{
         ToastAndroid.show(`Registration failed: ${error.response.data}`, ToastAndroid.LONG);
       }
+      setLoading(false);
     }
 };
 
   const handleStudentSignUp = async () => {
     try {
+      setLoading(true);
       if(!email || !fullName || !rollNumber || !password) {
         ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
         return;
@@ -69,9 +74,10 @@ const SignUp = (props) => {
         ToastAndroid.show('Registration Successful !', ToastAndroid.LONG);
         props.setIsStudent(true);
         props.setIsSignUp(false);
+        setLoading(false);
     } catch (error) {
       ToastAndroid.show(`Registration failed: ${error.response.data}`, ToastAndroid.LONG);
-
+      setLoading(false);
     }
 };
 
@@ -160,7 +166,7 @@ const SignUp = (props) => {
             isStudent?handleStudentSignUp():handleTeacherSignUp();
           }}
           // onPress={() => navigation.navigate('LogIn')} 
-          className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">Sign Up</Text></TouchableOpacity>
+          className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg"><Text className="text-white text-[16px] font-bold">{loading?<ActivityIndicator animating={true} color={'white'} />:'Sign Up'}</Text></TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </>

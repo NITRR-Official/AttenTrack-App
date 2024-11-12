@@ -13,6 +13,7 @@ import {attendanceData} from './attendanceData'
 import axios from 'axios';
 import GetLocation from 'react-native-get-location'
 import { calculateDistance } from './locationTracker';
+import { useAuth } from '../../utils/auth';
 
 const MarkAttendance = () => {
   const navigation = useNavigation();
@@ -22,6 +23,7 @@ const MarkAttendance = () => {
   const [receivedOtp, setReceivedOtp] = useState(null);
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
+  const {rollNumberG} = useAuth();
 
   const handleGetAttendance = async () => {
     try {
@@ -129,7 +131,7 @@ const MarkAttendance = () => {
         targetLatitude, targetLongitude);
       
       if (distance <= radius) {
-        socket.send(JSON.stringify({type: 'attendance', rollNumber: 21117102}));
+        socket.send(JSON.stringify({type: 'attendance', rollNumber:rollNumberG }));
         ToastAndroid.show('Location Matched ! Attendance Marked as Present !',
           ToastAndroid.LONG);
         setTimeout(()=>{setModalVisible2(false)},2000);

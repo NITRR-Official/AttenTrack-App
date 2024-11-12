@@ -19,7 +19,7 @@ const LogIn = () => {
   const [department, setDepartment] = React.useState('');
   const [isSignUp, setIsSignUp] = React.useState(false);
 
-  const { setIndex, setClasses, setTeacherid, setDepartmentG, loading, setLoading } = useAuth();
+  const { setIndex, setClasses, setTeacherid, setDepartmentG, loading, setLoading, setRollNumberG } = useAuth();
 
   const handleTeacherLogin = async () => {
     try {
@@ -60,6 +60,7 @@ const LogIn = () => {
         });
         console.log('Login successful:', response.data);
         ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
+        setRollNumberG(response.data.rollNumber);
         setIndex(2);
         setLoading(false);
     } catch (error) {

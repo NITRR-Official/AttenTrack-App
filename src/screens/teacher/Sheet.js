@@ -8,16 +8,20 @@ import { BookOpenIcon, CpuChipIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon 
 import { theme } from '../../theme';
 import { ScrollView } from 'react-native';
 // import { useNavigation } from "@react-navigation/native";
-import { ProgressBar, RadioButton } from 'react-native-paper';
+import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
 import axios from 'axios';
 import { useAuth } from '../../utils/auth';
 
 const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
 
-  const {jsonGlobalData}= useAuth();
+  const { jsonGlobalData, classId, loading, setLoading } = useAuth();
 
   const [student, setStudent] = useState(jsonGlobalData);
+  const [records, setRecords] = useState(
+    student.map((s) => ({ rollNumber: s.rollNumber, is_present: false }))
+  );
+
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
 
@@ -38,16 +42,12 @@ const Sheet = ({ navigation, route }) => {
       // Listen for attendance updates
       if (data.type === 'attendance2') {
         const updatedRollNumber = data.rollNumber;
-        // console.log('Updated Roll Number',updatedRollNumber);
 
-        // Update the student's attendance status in real time
-
-        setStudent(prevStudents => 
-          prevStudents.map(student => 
-            student.ROLLNO ==
-             updatedRollNumber
-              ? { ...student, ATTENDANCE: true }
-              : student
+        setRecords(prevRecords =>
+          prevRecords.map(record =>
+            record.rollNumber === updatedRollNumber 
+              ? { ...record, is_present: true } 
+              : record
           )
         );
 
@@ -66,86 +66,107 @@ const Sheet = ({ navigation, route }) => {
   const handleSetAttendance = async (val) => {
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setOtp(generatedOtp);
-  
+
     try {
       // Await the axios post request to set attendance
       await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
         otp: generatedOtp,
         time: val
       });
-      
+
       console.log('OTP and time sent to server');
     } catch (error) {
       // Catch any errors and handle them
       console.error('Error sending OTP and time to server:', error);
       alert('Failed to set attendance. Please try again.');
     }
-  };   
+  };
 
   const handleSetAttendance2 = () => {
     let interval;
 
-    socket.send(JSON.stringify({type:'first_call'}));
-      
-      interval = setInterval(() => {
-        setTime(prev => {
-          if (prev <= 0) {
-            setModalVisible2(false);
-            clearInterval(interval);
-            setTime(0);
-            setFinalTime(0);
-  
-            // Send final time update to WebSocket before closing
-            // console.log('Sending final time update:', 0);
-            socket.send(JSON.stringify({ type: 'time_update', time: 0 }));
-            return 0;
-          }
-          
-          // Send time updates in real-time via WebSocket
-          // console.log('Sending real-time time update:', prev-1);
-          socket.send(JSON.stringify({ type: 'time_update', time: prev - 1 }));
-          
-          return prev - 1;
-        });
-      }, 1000);
-  
+    socket.send(JSON.stringify({ type: 'first_call' }));
+
+    interval = setInterval(() => {
+      setTime(prev => {
+        if (prev <= 0) {
+          setModalVisible2(false);
+          clearInterval(interval);
+          setTime(0);
+          setFinalTime(0);
+
+          // Send final time update to WebSocket before closing
+          // console.log('Sending final time update:', 0);
+          socket.send(JSON.stringify({ type: 'time_update', time: 0 }));
+          return 0;
+        }
+
+        // Send time updates in real-time via WebSocket
+        // console.log('Sending real-time time update:', prev-1);
+        socket.send(JSON.stringify({ type: 'time_update', time: prev - 1 }));
+
+        return prev - 1;
+      });
+    }, 1000);
+
     socket.onerror = (error) => {
       console.error('WebSocket Error:', error);
       alert('Error with WebSocket connection');
       clearInterval(interval);
     };
-  
+
     socket.onclose = () => {
       console.log('WebSocket connection closed.');
     };
-  };  
+  };
+
+  const createAttendance = async () => {
+    try {
+        setLoading(true);
+        console.log(classId, new Date(), records);
+        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/attendance/createAttendance', {
+            class_id: classId,
+            date: new Date(),
+            records: records
+        });
+        ToastAndroid.show(`Attendance Added Successfully !`, ToastAndroid.LONG);
+        console.log('Attendance Added Successful:', response.data);
+        navigation.goBack();
+        setLoading(false);
+    } catch (error) {
+    //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+    console.error(error);
+    setLoading(false);
+    }
+};
 
   // Calculate present and absent students
   const calculateAttendance = () => {
-    const present = student.filter(item => item.ATTENDANCE).length;
-    const absent = student.length - present;
+    const present = records.filter(record => record.is_present).length;
+    const absent = records.length - present;
     setPresentCount(present);
     setAbsentCount(absent);
   };
 
-  // Function to mark all students as present
-  const markAllPresent = () => {
-    setStudent(prevStudents =>
-      prevStudents.map(student => ({ ...student, ATTENDANCE: true }))
-    );
-  };
+// Function to mark all students as present
+const markAllPresent = () => {
+  setRecords(prevRecords =>
+    prevRecords.map(record => ({ ...record, is_present: true }))
+  );
+};
+
 
   // Function to mark all students as absent
   const markAllAbsent = () => {
-    setStudent(prevStudents =>
-      prevStudents.map(student => ({ ...student, ATTENDANCE: false }))
+    setRecords(prevRecords =>
+      prevRecords.map(record => ({ ...record, is_present: false }))
     );
   };
 
   // Calculate the attendance when the component mounts or student list changes
   useEffect(() => {
     calculateAttendance();
-  }, [student]);
+  }, [records]);
 
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
@@ -153,8 +174,8 @@ const Sheet = ({ navigation, route }) => {
         <TouchableOpacity>
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-5" >
-          <Text style={{ color: '#fff', fontSize: wp(3.5), fontWeight: '700' }} >Save</Text>
+        <TouchableOpacity onPress={()=>createAttendance()} style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-5" >
+          <Text style={{ color: '#fff', fontSize: wp(3.5), fontWeight: '700' }} >{loading?<ActivityIndicator animating={true} color={'white'} />:'Save'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -164,7 +185,7 @@ const Sheet = ({ navigation, route }) => {
           <Text className="text-gray-600">Chitrakant Sahu</Text>
         </View>
         <TouchableOpacity
-          onPress={()=>{
+          onPress={() => {
             setModalVisible1(true)
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
@@ -192,11 +213,11 @@ const Sheet = ({ navigation, route }) => {
                     handleSetAttendance(parseInt(value));
                     handleSetAttendance2();
                   }}>
-                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="10 Seconds" value="10" />
-                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="20 Seconds" value="20" />
-                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="30 Seconds" value="30" />
-                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="1 Minute" value="60" />
-                    <RadioButton.Item labelStyle={{ color:"#6a6a6a" }} label="2 Minutes" value="120" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="10 Seconds" value="10" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="20 Seconds" value="20" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="30 Seconds" value="30" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="1 Minute" value="60" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="2 Minutes" value="120" />
                   </RadioButton.Group>
                 </View>
               </TouchableWithoutFeedback>
@@ -224,7 +245,7 @@ const Sheet = ({ navigation, route }) => {
                   <Text className="text-lg font-bold text-gray-400">OTP : {otp}</Text>
                   <View className="w-full">
                     <Text className="pb-3 text-gray-500">Time Remaining: {time} seconds</Text>
-                    <ProgressBar progress={time/finalTime} color={'#01818C'} />
+                    <ProgressBar progress={time / finalTime} color={'#01818C'} />
                   </View>
                   <Pressable
                     className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
@@ -279,24 +300,27 @@ const Sheet = ({ navigation, route }) => {
 
           {student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.ROLLNO}</Text>
-              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.STUDNAME}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.rollNumber}</Text>
+              <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.name}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
-                  thumbColor={item.ATTENDANCE ? '#258a4ac4' : '#c41111c4'}
-                  // trackColor={item.attendance ? '#258a4ac4' : '#c41111c4'}
+                  thumbColor={records[id].is_present ? '#258a4ac4' : '#c41111c4'}
                   trackColor={{ false: '#ffaaaac4', true: '#8bdca8c4' }}
                   onValueChange={() => {
-                    setStudent(prevStudents =>
-                      prevStudents.map((student, idx) =>
-                        id === idx
-                          ? { ...student, ATTENDANCE: !student.ATTENDANCE }
-                          : student
-                      )
-                    );
+                    setRecords(prevRecords => {
+                      if (id >= prevRecords.length) return prevRecords; // Prevents out-of-range access
+                
+                      // Ensure you're not mutating the original state
+                      const updatedRecords = [...prevRecords];
+                      updatedRecords[id] = {
+                        ...updatedRecords[id],
+                        is_present: !updatedRecords[id].is_present,
+                      };
+                      return updatedRecords;
+                    });
                   }}
-                  value={item.ATTENDANCE} />
-                <Text className={`text-gray-400 font-semibold`}>{item.ATTENDANCE ? 'P' : 'A'}</Text>
+                  value={records[id].is_present} />
+                <Text className={`text-gray-400 font-semibold`}>{records[id].is_present ? 'P' : 'A'}</Text>
               </View>
             </View>
           ))}
