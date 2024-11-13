@@ -8,7 +8,7 @@ import { useAuth } from '../../utils/auth';
 import { theme } from '../../theme';
 import axios from 'axios';
 import { ActivityIndicator } from 'react-native-paper';
-import {sinfo} from 'react-native-encrypted-storage';
+// import {sinfo} from 'react-native-encrypted-storage';
 
 
 const LogIn = () => {
@@ -22,7 +22,7 @@ const LogIn = () => {
 
   const saveData = async (ind) => {
     try {
-      await sinfo.setItem('@index', ind)
+      // await sinfo.setItem('@index', ind)
     } catch (e) {
       console.error(e);
     }

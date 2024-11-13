@@ -8,7 +8,7 @@ import {
 import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
-import EncryptedStorage from 'react-native-encrypted-storage';
+// import EncryptedStorage from 'react-native-encrypted-storage';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -18,7 +18,7 @@ const Profile = () => {
 
   const saveData = async (ind) => {
     try {
-      await EncryptedStorage.setItem('@index', ind)
+      // await EncryptedStorage.setItem('@index', ind)
     } catch (e) {
       console.error(e);
     }
