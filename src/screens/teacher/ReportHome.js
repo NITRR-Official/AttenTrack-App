@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   BackHandler,
   ScrollView,
+  ToastAndroid,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -27,12 +28,33 @@ import * as React from 'react';
 
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
+import axios from 'axios';
 
 
 const ReportHome = () => {
 
   const navigation = useNavigation();
-  const {classes, jsonGlobalData} = useAuth();
+  const {classes, jsonGlobalData, setLoading} = useAuth();
+
+  const createAttendance = async (id) => {
+    try {
+        setLoading(true);
+        console.log(id, new Date(), new Date());
+        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/records', {
+            classId : id,
+            startDate: '2024-10-01',
+            endDate: new Date()
+        });
+        ToastAndroid.show(`Attendance Added Successfully !`, ToastAndroid.LONG);
+        console.log('Attendance Added Successful:', response.data);
+        navigation.goBack();
+        setLoading(false);
+    } catch (error) {
+    //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+    console.error(error);
+    setLoading(false);
+    }
+};
 
   return (
     <SafeAreaView>
@@ -51,11 +73,14 @@ const ReportHome = () => {
         style={{ backgroundColor: '#fff', height: hp(100) }}
       >
 
-{
+        {
           classes.map((item, id)=>{return(
             <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Report', jsonGlobalData)}
+          onPress={() => {
+            createAttendance(item.id);
+            // navigation.navigate('Report', jsonGlobalData);
+          }}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />
           <Text
