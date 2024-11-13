@@ -15,7 +15,8 @@ import GetLocation from 'react-native-get-location'
 import { calculateDistance } from './locationTracker';
 import { useAuth } from '../../utils/auth';
 
-const MarkAttendance = () => {
+const MarkAttendance = ({route}) => {
+  console.log('hi',route.params);
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [modalVisible1, setModalVisible1] = useState(false);
@@ -23,7 +24,7 @@ const MarkAttendance = () => {
   const [receivedOtp, setReceivedOtp] = useState(null);
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
-  const {rollNumberG} = useAuth();
+  const {rollNumberG, className} = useAuth();
 
   const handleGetAttendance = async () => {
     try {
@@ -152,14 +153,14 @@ const MarkAttendance = () => {
 
   useEffect(() => {
     calculateAttendance();
-  }, [attendanceData]);
+  }, []);
 
   const calculateAttendance = () => {
     let present = 0;
     let absent = 0;
 
-    attendanceData.forEach((record) => {
-      if (record.attendance) {
+    route.params.attDataG?.forEach((record) => {
+      if (record.is_present) {
         present++;
       } else {
         absent++;
@@ -180,7 +181,7 @@ const MarkAttendance = () => {
 
       <View className="w-[95%] bg-[#01808c2e] p-2 px-5 rounded-md border-[#01808c7a] border-2 m-4 mb-3 flex flex-row justify-between items-end">
         <View>
-          <View className="flex flex-row"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} /><Text className="text-2xl text-[#01808cb9] font-medium ml-1">VLSI</Text></View>
+          <View className="flex flex-row"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} /><Text className="text-2xl text-[#01808cb9] font-medium ml-1">{className}</Text></View>
           <Text className="text-gray-600">Chitrakant Sahu</Text>
         </View>
         <TouchableOpacity
@@ -278,10 +279,10 @@ const MarkAttendance = () => {
       >
         <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
 
-          {attendanceData.map((item, id) => (
+          {route.params.attDataG?.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
-              <Text className={`w-3/4 text-[${theme.maincolor}] `} >{item.date}</Text>
-              <Text className={`w-1/4 text-[${theme.maincolor}]  text-right`}>{item.attendance?'Present':'Absent'}</Text>
+              <Text className={`w-3/4 text-[${theme.maincolor}] `} >{new Date(item.date).toISOString().split('T')[0]}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]  text-right`}>{item.is_present?'Present':'Absent'}</Text>
             </View>
           ))}
 

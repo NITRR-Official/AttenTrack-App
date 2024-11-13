@@ -34,7 +34,7 @@ import axios from 'axios';
 const ReportHome = () => {
 
   const navigation = useNavigation();
-  const {classes, setRecordG, setLoading, setTotG} = useAuth();
+  const {classes, setLoading} = useAuth();
 
   const getRecord = async (id) => {
     try {
@@ -45,14 +45,8 @@ const ReportHome = () => {
             startDate: '2024-10-01',
             endDate: new Date()
         });
-        const arrayOfObjects = Object.entries(response.data.attendanceCount).map(([rollNumber, present]) => ({
-          rollNumber,
-          present
-        }));
-        setRecordG(arrayOfObjects);
-        setTotG(response.data.tot);
         setLoading(false);
-        navigation.navigate('Report');
+        navigation.navigate('Report',{recordG:response.data.rec, totG:response.data.tot, recordG2:response.data.attendanceData});
     } catch (error) {
     //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
     console.error(error);
@@ -83,7 +77,6 @@ const ReportHome = () => {
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
           onPress={() => {
             getRecord(item.id);
-            // navigation.navigate('Report', jsonGlobalData);
           }}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />

@@ -19,6 +19,7 @@ import BottomTabs from './BottomTabs'
 import CreateClass from "../screens/teacher/CreateClass";
 import Sheet from "../screens/teacher/Sheet";
 import Report from "../screens/teacher/Report";
+import MarkAttendance from "../screens/student/MarkAttendance";
 
 
 
@@ -47,6 +48,7 @@ export default function AppNavigation() {
         <Stack.Screen name="CreateClass" component={CreateClass} />
         <Stack.Screen name="Sheet" component={Sheet} />
         <Stack.Screen name="Report" component={Report} />
+        <Stack.Screen name="MarkAttendance" component={MarkAttendance} />
       </Stack.Navigator>
     </NavigationContainer>
 

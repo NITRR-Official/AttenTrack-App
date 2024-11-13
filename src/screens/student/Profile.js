@@ -24,7 +24,7 @@ const Profile = () => {
     }
   }
 
-  const { setIndex } = useAuth();
+  const { setIndex, studentNameG, studentEmailG, rollNumberG } = useAuth();
 
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
@@ -51,15 +51,15 @@ const Profile = () => {
         <View className="flex-1">
           <View className="flex flex-row items-center">
             <UserCircleIcon size={wp(10)} color={theme.maincolor} />
-            <Text className="text-3xl text-[#01808cb9] font-medium ml-1">Aniket Kumar</Text>
+            <Text className="text-3xl text-[#01808cb9] font-medium ml-1">{studentNameG}</Text>
           </View>
-          <Text className="text-[#01808c] font-medium pt-2">Roll Number: <Text className="text-gray-500">{21116008}</Text></Text>
+          <Text className="text-[#01808c] font-medium pt-2">Roll Number: <Text className="text-gray-500">{rollNumberG}</Text></Text>
+          <Text className="text-[#01808c] font-medium pt-2">Email: <Text className="text-gray-500">{studentEmailG}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Branch: <Text className="text-gray-500">{'Electronics & Communication Engineering'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Semester: <Text className="text-gray-500">{'4th'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Graduation Year: <Text className="text-gray-500">{2025}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Enrollment Number: <Text className="text-gray-500">{211061}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">College: <Text className="text-gray-500">{'National Institute of Technology Raipur'}</Text></Text>
-          <Text className="text-[#01808c] font-medium pt-2">Email: <Text className="text-gray-500">{'kraniket123654@gmail.com'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Phone Number: <Text className="text-gray-500">{7717789081}</Text></Text>
         </View>
         <TouchableOpacity

@@ -35,7 +35,7 @@ import axios from 'axios';
 const Home = () => {
 
   const [selectedClass, setSelectedClass] = React.useState(null);
-  const {classes, setClasses, setJsonGlobalData, setClassId} = useAuth();
+  const {classes, setClasses, setClassId} = useAuth();
 
   const deleteClass = async () => {
     try {
@@ -51,7 +51,7 @@ const Home = () => {
   const getList = async (id) => {
     try {
         const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/class/getList/${id}`);
-        setJsonGlobalData(response.data);
+        navigation.navigate('Sheet',{jsonGlobalData:response.data, id:id});
     } catch (error) {
     //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
     console.error(error);
@@ -89,9 +89,7 @@ const Home = () => {
             <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
           onPress={() => {
-            setClassId(item.id);
             getList(item.id);
-            navigation.navigate('Sheet');
           }}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />

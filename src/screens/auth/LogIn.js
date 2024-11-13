@@ -28,7 +28,9 @@ const LogIn = () => {
     }
   }
 
-  const { setIndex, setClasses, setTeacheridG, setDepartmentG, loading, setLoading, setRollNumberG, setTeacherNameG, setTeacherEmailG } = useAuth();
+  const { setIndex, setClasses, setTeacheridG, setDepartmentG, loading, setLoading, setRollNumberG, setTeacherNameG, setTeacherEmailG,
+    setStudentidG, setStudentNameG, setStudentEmailG
+   } = useAuth();
 
   const handleTeacherLogin = async () => {
     try {
@@ -80,6 +82,9 @@ const LogIn = () => {
       setRollNumberG(response.data.rollNumber);
       saveData('2');
       setIndex('2');
+      setStudentidG(response.data._id);
+      setStudentNameG(response.data.fullName)
+      setStudentEmailG(response.data.email)
       setLoading(false);
     } catch (error) {
       ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);

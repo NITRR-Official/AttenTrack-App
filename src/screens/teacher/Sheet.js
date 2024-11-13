@@ -15,18 +15,39 @@ import { useAuth } from '../../utils/auth';
 const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
 
-  const { jsonGlobalData, classId, loading, setLoading } = useAuth();
+  const {  loading, setLoading } = useAuth();
 
   const [student, setStudent] = useState();
 
-  useEffect(()=>setStudent(jsonGlobalData),[jsonGlobalData]);
+  useEffect(()=>setStudent(route.params.jsonGlobalData),[]);
 
   const [records, setRecords] = useState([]);
 
-  useEffect(()=>{
-    setRecords(student?.map((s) => ({ rollNumber: s.rollNumber, is_present: false })));
-    calculateAttendance();
-  },[student]);
+  useEffect(() => {
+    if (student) {
+      setRecords(student.map((s) => ({ rollNumber: s.rollNumber, is_present: false })));
+    }
+  }, [student]);
+  
+  useEffect(() => {
+    if (records && records.length > 0) {
+      calculateAttendance();
+    }
+  }, [records]);
+  
+  // Calculate present and absent students
+  const calculateAttendance = () => {
+    if (records && records.length > 0) {
+      const present = records.filter(record => record.is_present).length;
+      const absent = records.length - present;
+      setPresentCount(present);
+      setAbsentCount(absent);
+    } else {
+      setPresentCount(0);
+      setAbsentCount(0);
+    }
+  };
+  
 
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
@@ -129,9 +150,8 @@ const Sheet = ({ navigation, route }) => {
   const createAttendance = async () => {
     try {
         setLoading(true);
-        console.log(classId, new Date(), records);
         const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/attendance/createAttendance', {
-            class_id: classId,
+            class_id: route.params.id,
             date: new Date(),
             records: records
         });
@@ -145,14 +165,6 @@ const Sheet = ({ navigation, route }) => {
     setLoading(false);
     }
 };
-
-  // Calculate present and absent students
-  const calculateAttendance = () => {
-    const present = records?.filter(record => record.is_present).length;
-    const absent = records?.length - present;
-    setPresentCount(present);
-    setAbsentCount(absent);
-  };
 
 // Function to mark all students as present
 const markAllPresent = () => {

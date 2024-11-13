@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
 
     const [index, setIndex] = useState('0');
     const [classes, setClasses] = useState([]);
-    const [jsonGlobalData, setJsonGlobalData] = useState();
 
     const [teacheridG, setTeacheridG] = useState('');
     const [teacherNameG, setTeacherNameG] = useState('');
@@ -15,22 +14,21 @@ export const AuthProvider = ({ children }) => {
     const [departmentG, setDepartmentG] = useState('');
 
     const [classId, setClassId] = useState('');
-    const [recordG, setRecordG] = useState([]);
-    const [totG, setTotG] = useState(0);
 
     const [loading, setLoading] = useState(false);
     
-    const [rollNumberG, setRollNumberG] = useState(false);
+    const [rollNumberG, setRollNumberG] = useState('');
+    const [studentidG, setStudentidG] = useState('');
+    const [studentNameG, setStudentNameG] = useState('');
+    const [studentEmailG, setStudentEmailG] = useState('');
     
     return (
         <AuthContext.Provider
-            value={{
+            value={{studentidG, setStudentidG, studentNameG, setStudentNameG, studentEmailG, setStudentEmailG,
                 classes,
                 setClasses,
                 index,
                 setIndex,
-                jsonGlobalData,
-                setJsonGlobalData,
                 teacheridG,
                 setTeacheridG,
                 teacherNameG,
@@ -45,10 +43,6 @@ export const AuthProvider = ({ children }) => {
                 setRollNumberG,
                 classId,
                 setClassId,
-                recordG,
-                setRecordG,
-                totG,
-                setTotG
             }}>
             {children}
         </AuthContext.Provider>
