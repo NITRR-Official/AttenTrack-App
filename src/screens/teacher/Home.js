@@ -27,28 +27,31 @@ import {
 } from "react-native-heroicons/outline";
 
 import * as React from 'react';
-import RNFS from 'react-native-fs';
 
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
-import { Button } from 'react-native-paper';
 import axios from 'axios';
-
-const folderName = 'StudentsDataFolder';
-const folderPath = `${RNFS.DownloadDirectoryPath}/${folderName}`;
-const filePath = `${folderPath}/studentsData.json`;
 
 const Home = () => {
 
-  const [jsonData, setJsonData] = React.useState({});
   const [selectedClass, setSelectedClass] = React.useState(null);
-  const {classes, setClasses} = useAuth();
+  const {classes, setClasses, setJsonGlobalData} = useAuth();
 
   const deleteClass = async () => {
     try {
         const response = await axios.delete(`https://attendancetrackerbackend.onrender.com/api/class/remove/${selectedClass}`);
         ToastAndroid.show(`${selectedClass} Deleted Successfully !`, ToastAndroid.LONG);
         console.log('Class Deleted Successfully:', response.data);
+    } catch (error) {
+    //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+    console.error(error);
+    }
+};
+
+  const getList = async (id) => {
+    try {
+        const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/class/getList/${id}`);
+        setJsonGlobalData(response.data);
     } catch (error) {
     //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
     console.error(error);
@@ -85,7 +88,10 @@ const Home = () => {
           classes.map((item, id)=>{return(
             <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
-          onPress={() => navigation.navigate('Sheet', jsonData)}
+          onPress={() => {
+            getList(item.id);
+            navigation.navigate('Sheet');
+          }}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />
           <Text

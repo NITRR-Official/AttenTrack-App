@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StatusBar, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, StatusBar, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import ReportIcon from '../../components/ReportIcon';
 import { theme } from '../../theme';
@@ -26,10 +26,12 @@ const SignUp = (props) => {
       setLoading(true);
       if(!email || !fullName || !department || !password) {
         ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+        setLoading(false);
         return;
       }
       if(password!==passwordConfirm){
         ToastAndroid.show('Password Does not Match',ToastAndroid.LONG);
+        setLoading(false);
         return;
       }
         const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/register', {
@@ -58,10 +60,12 @@ const SignUp = (props) => {
       setLoading(true);
       if(!email || !fullName || !rollNumber || !password) {
         ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+        setLoading(false);
         return;
       }
       if(password!==passwordConfirm){
         ToastAndroid.show('Password Does not Match',ToastAndroid.LONG);
+        setLoading(false);
         return;
       }
         const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/student/register', {
@@ -93,7 +97,13 @@ const SignUp = (props) => {
           <View className="h-28 w-28 bg-[#01818C] absolute top-0 left-0 rounded-br-full"></View>
           <View className="h-36 w-36 bg-[#01808c87] absolute top-0 left-0 rounded-br-full"></View>
           <View className="h-20 w-20 bg-[#01808c87] absolute bottom-0 right-0 rounded-tl-full"></View>
-          <View><ReportIcon color={'#01818C'} size={30} /></View>
+          {/* <View><ReportIcon color={'#01818C'} size={30} /></View> */}
+          <Image
+      style={{width:100, height:100}}
+       source={{
+        uri: isStudent?'https://icons.veryicon.com/png/o/avatar/character-series/student-10.png':'https://icons.veryicon.com/png/o/miscellaneous/wisdom-training/teacher-27.png',
+      }}
+      />
           <View><Text className="text-3xl font-bold text-[#2e2e2e]">{isStudent ? 'Student Sign Up' : 'Teacher Sign Up'}</Text></View>
           <View><Text className="text-sm text-gray-500">Already have an account? <Text className="text-[#01818C] underline" onPress={() => props.setIsSignUp(false)}>Log In!</Text></Text></View>
           <View className="flex flex-row justify-around w-[80%]">

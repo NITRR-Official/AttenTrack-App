@@ -49,7 +49,7 @@ const CreateClass = () => {
     const [semester, setSemester] = React.useState('');
     const [jsonLocalData, setJsonLocalData] = useState([]);
     const [students, setStudents] = useState([]);
-    const { setJsonGlobalData, setClasses, departmentG, teacherid, loading, setLoading } = useAuth();
+    const { setJsonGlobalData, setClasses, departmentG, teacheridG, loading, setLoading } = useAuth();
 
 
     const handleOnFileLoad = async () => {
@@ -115,6 +115,7 @@ const CreateClass = () => {
             setLoading(true);
           if(!classname || !batch || !semester || !students) {
             ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
+            setLoading(false);
             return;
           }
             const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/class/createClass', {
@@ -122,12 +123,12 @@ const CreateClass = () => {
                 batch: batch,
                 semester: semester,
                 department: departmentG,
-                teacherid:teacherid,
+                teacherid:teacheridG,
                 students:students
             });
             ToastAndroid.show(`Class Added Successfully !`, ToastAndroid.LONG);
             console.log('Class Added Successful:', response.data);
-            setClasses(prevClasses => [...prevClasses, {classname}]);
+            setClasses(prevClasses => [...prevClasses, {id:response.data._id, classname}]);
             navigation.goBack();
             setLoading(false);
         } catch (error) {
@@ -136,7 +137,6 @@ const CreateClass = () => {
         setLoading(false);
         }
     };
-    
 
     return (
         <SafeAreaView style={{ flex: 1, alignItems: 'center' }} >
@@ -186,7 +186,7 @@ const CreateClass = () => {
             <TouchableOpacity
                 onPress={handleOnFileLoad}
                 style={{ height: hp(7), width: wp(44), backgroundColor: theme.maincolor, borderRadius: wp(2), justifyContent: 'space-between', alignItems: 'center', marginTop: wp(8), display: 'flex', flexDirection: 'row', paddingHorizontal: wp(4) }} >
-                <Text style={{ color: "#fff", fontSize: wp(4), fontWeight: '200', width: wp(22), textAlign: 'center' }} >Upload Excel Sheet</Text>
+                <Text style={{ color: "#fff", fontSize: wp(4), fontWeight: '400', width: wp(22), textAlign: 'center' }} >Upload Excel Sheet</Text>
                 <ArrowUpTrayIcon size={wp(8)} color="#fff" />
             </TouchableOpacity>
 

@@ -8,6 +8,7 @@ import {
 import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -15,7 +16,15 @@ const Profile = () => {
   const sliceColor = ['#01818C', '#01808c7a', '#01808c2e', '#01808cb9', '#01808c37'];
   const sliceColor2 = ['#258a4ac4', '#c41111c4'];
 
-  const { setIndex } = useAuth();
+  const saveData = async (ind) => {
+    try {
+      await EncryptedStorage.setItem('@index', ind)
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const { setIndex, teacherNameG, departmentG, teacherEmailG } = useAuth();
 
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
@@ -28,7 +37,10 @@ const Profile = () => {
 
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }} >Profile</Text>
-        <TouchableOpacity onPress={() => setIndex(0)} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
+        <TouchableOpacity onPress={() => {
+          setIndex(0);
+          saveData(0);
+        }} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
             <Text style={{ color: theme.maincolor, fontSize: wp(3.5), fontWeight: '700', marginLeft: 5 }}>Logout</Text>
           </View>
@@ -39,13 +51,13 @@ const Profile = () => {
         <View className="flex-1">
           <View className="flex flex-row items-center">
             <UserCircleIcon size={wp(10)} color={theme.maincolor} />
-            <Text className="text-3xl text-[#01808cb9] font-medium ml-1">Chitrakant Sahu</Text>
+            <Text className="text-3xl text-[#01808cb9] font-medium ml-1">{teacherNameG}</Text>
           </View>
-          <Text className="text-[#01808c] font-medium pt-2">Department: <Text className="text-gray-500">{'Associate Professor'}</Text></Text>
+          <Text className="text-[#01808c] font-medium pt-2">Department: <Text className="text-gray-500">{departmentG}</Text></Text>
+          <Text className="text-[#01808c] font-medium pt-2">Email ID: <Text className="text-gray-500">{teacherEmailG}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Designation: <Text className="text-gray-500">{'Electronics & Telecom. Engineering'}</Text></Text>
-          <Text className="text-[#01808c] font-medium pt-2">College: <Text className="text-gray-500">{'National Institute of Technology Raipur'}</Text></Text>
+          <Text className="text-[#0c1213] font-medium pt-2">College: <Text className="text-gray-500">{'National Institute of Technology Raipur'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Educational Qualification: <Text className="text-gray-500">{'Ph.D'}</Text></Text>
-          <Text className="text-[#01808c] font-medium pt-2">Email ID: <Text className="text-gray-500">{'csahu.etc@nitrr.ac.in'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Contact Number: <Text className="text-gray-500">{9549655371}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Areas of Interest: <Text className="text-gray-500">{'VLSI and Microelectronics, Non-Classical CMOS Devices and Sensors'}</Text></Text>
         </View>

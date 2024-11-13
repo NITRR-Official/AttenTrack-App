@@ -17,10 +17,16 @@ const Sheet = ({ navigation, route }) => {
 
   const { jsonGlobalData, classId, loading, setLoading } = useAuth();
 
-  const [student, setStudent] = useState(jsonGlobalData);
-  const [records, setRecords] = useState(
-    student.map((s) => ({ rollNumber: s.rollNumber, is_present: false }))
-  );
+  const [student, setStudent] = useState();
+
+  useEffect(()=>setStudent(jsonGlobalData),[jsonGlobalData]);
+
+  const [records, setRecords] = useState([]);
+
+  useEffect(()=>{
+    setRecords(student?.map((s) => ({ rollNumber: s.rollNumber, is_present: false })));
+    calculateAttendance();
+  },[student]);
 
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
@@ -142,8 +148,8 @@ const Sheet = ({ navigation, route }) => {
 
   // Calculate present and absent students
   const calculateAttendance = () => {
-    const present = records.filter(record => record.is_present).length;
-    const absent = records.length - present;
+    const present = records?.filter(record => record.is_present).length;
+    const absent = records?.length - present;
     setPresentCount(present);
     setAbsentCount(absent);
   };
@@ -162,11 +168,6 @@ const markAllPresent = () => {
       prevRecords.map(record => ({ ...record, is_present: false }))
     );
   };
-
-  // Calculate the attendance when the component mounts or student list changes
-  useEffect(() => {
-    calculateAttendance();
-  }, [records]);
 
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
@@ -298,13 +299,13 @@ const markAllPresent = () => {
       >
         <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
 
-          {student.map((item, id) => (
+          {student&&records?student.map((item, id) => (
             <View className="flex flex-row justify-between" key={id}>
               <Text className={`w-1/4 text-[${theme.maincolor}]`}>{item.rollNumber}</Text>
               <Text className={`w-1/2 text-[${theme.maincolor}]`}>{item.name}</Text>
               <View className="w-1/4 flex flex-row justify-end items-center">
                 <Switch
-                  thumbColor={records[id].is_present ? '#258a4ac4' : '#c41111c4'}
+                  thumbColor={records[id]?.is_present ? '#258a4ac4' : '#c41111c4'}
                   trackColor={{ false: '#ffaaaac4', true: '#8bdca8c4' }}
                   onValueChange={() => {
                     setRecords(prevRecords => {
@@ -319,11 +320,11 @@ const markAllPresent = () => {
                       return updatedRecords;
                     });
                   }}
-                  value={records[id].is_present} />
-                <Text className={`text-gray-400 font-semibold`}>{records[id].is_present ? 'P' : 'A'}</Text>
+                  value={records[id]?.is_present} />
+                <Text className={`text-gray-400 font-semibold`}>{records[id]?.is_present ? 'P' : 'A'}</Text>
               </View>
             </View>
-          ))}
+          )):<Text>Student Data is Empty !</Text>}
 
         </View>
 

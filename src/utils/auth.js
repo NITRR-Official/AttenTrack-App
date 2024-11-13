@@ -1,20 +1,25 @@
 import * as React from "react";
 import { createContext, useContext, useState } from 'react';
-import { studentsData } from "../screens/teacher/studentsData";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
 
-    const [classes, setClasses] = useState([]);
     const [index, setIndex] = useState(0);
-    const [jsonGlobalData, setJsonGlobalData] = useState(studentsData);
-    const [teacherid, setTeacherid] = useState('');
-    const [departmentG, setDepartmentG] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [rollNumberG, setRollNumberG] = useState(false);
-    const [classId, setClassId] = useState('hi');
+    const [classes, setClasses] = useState([]);
+    const [jsonGlobalData, setJsonGlobalData] = useState();
 
+    const [teacheridG, setTeacheridG] = useState('');
+    const [teacherNameG, setTeacherNameG] = useState('');
+    const [teacherEmailG, setTeacherEmailG] = useState('');
+    const [departmentG, setDepartmentG] = useState('');
+
+    const [classId, setClassId] = useState('');
+
+    const [loading, setLoading] = useState(false);
+    
+    const [rollNumberG, setRollNumberG] = useState(false);
+    
     return (
         <AuthContext.Provider
             value={{
@@ -24,8 +29,12 @@ export const AuthProvider = ({ children }) => {
                 setIndex,
                 jsonGlobalData,
                 setJsonGlobalData,
-                teacherid,
-                setTeacherid,
+                teacheridG,
+                setTeacheridG,
+                teacherNameG,
+                setTeacherNameG,
+                teacherEmailG,
+                setTeacherEmailG,
                 departmentG,
                 setDepartmentG,
                 loading,
