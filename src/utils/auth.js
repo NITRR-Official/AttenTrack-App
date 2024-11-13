@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
     const [departmentG, setDepartmentG] = useState('');
 
     const [classId, setClassId] = useState('');
+    const [recordG, setRecordG] = useState([]);
+    const [totG, setTotG] = useState(0);
 
     const [loading, setLoading] = useState(false);
     
@@ -42,7 +44,11 @@ export const AuthProvider = ({ children }) => {
                 rollNumberG,
                 setRollNumberG,
                 classId,
-                setClassId
+                setClassId,
+                recordG,
+                setRecordG,
+                totG,
+                setTotG
             }}>
             {children}
         </AuthContext.Provider>

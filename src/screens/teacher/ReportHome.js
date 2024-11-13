@@ -34,9 +34,9 @@ import axios from 'axios';
 const ReportHome = () => {
 
   const navigation = useNavigation();
-  const {classes, jsonGlobalData, setLoading} = useAuth();
+  const {classes, setRecordG, setLoading, setTotG} = useAuth();
 
-  const createAttendance = async (id) => {
+  const getRecord = async (id) => {
     try {
         setLoading(true);
         console.log(id, new Date(), new Date());
@@ -45,10 +45,14 @@ const ReportHome = () => {
             startDate: '2024-10-01',
             endDate: new Date()
         });
-        ToastAndroid.show(`Attendance Added Successfully !`, ToastAndroid.LONG);
-        console.log('Attendance Added Successful:', response.data);
-        navigation.goBack();
+        const arrayOfObjects = Object.entries(response.data.attendanceCount).map(([rollNumber, present]) => ({
+          rollNumber,
+          present
+        }));
+        setRecordG(arrayOfObjects);
+        setTotG(response.data.tot);
         setLoading(false);
+        navigation.navigate('Report');
     } catch (error) {
     //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
     console.error(error);
@@ -78,7 +82,7 @@ const ReportHome = () => {
             <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
           onPress={() => {
-            createAttendance(item.id);
+            getRecord(item.id);
             // navigation.navigate('Report', jsonGlobalData);
           }}
         >
