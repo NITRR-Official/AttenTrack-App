@@ -35,7 +35,7 @@ import axios from 'axios';
 const Home = () => {
 
   const [selectedClass, setSelectedClass] = React.useState(null);
-  const {classes, setClasses, setJsonGlobalData} = useAuth();
+  const {classes, setClasses, setJsonGlobalData, setClassId} = useAuth();
 
   const deleteClass = async () => {
     try {
@@ -89,6 +89,7 @@ const Home = () => {
             <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
           onPress={() => {
+            setClassId(item.id);
             getList(item.id);
             navigation.navigate('Sheet');
           }}
