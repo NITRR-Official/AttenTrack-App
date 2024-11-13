@@ -8,7 +8,7 @@ import { useAuth } from '../../utils/auth';
 import { theme } from '../../theme';
 import axios from 'axios';
 import { ActivityIndicator } from 'react-native-paper';
-// import {sinfo} from 'react-native-encrypted-storage';
+import sinfo from 'react-native-encrypted-storage';
 
 
 const LogIn = () => {
@@ -22,7 +22,7 @@ const LogIn = () => {
 
   const saveData = async (ind) => {
     try {
-      // await sinfo.setItem('@index', ind)
+      await sinfo.setItem('@index', ind)
     } catch (e) {
       console.error(e);
     }
@@ -53,8 +53,8 @@ const LogIn = () => {
       setDepartmentG(response.data.department);
       setTeacherNameG(response.data.fullName);
       setTeacherEmailG(response.data.email);
-      saveData(1);
-      setIndex(1);
+      saveData('1');
+      setIndex('1');
       setLoading(false);
     } catch (error) {
       ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);
@@ -78,8 +78,8 @@ const LogIn = () => {
       console.log('Login successful:', response.data);
       ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
       setRollNumberG(response.data.rollNumber);
-      saveData(2);
-      setIndex(2);
+      saveData('2');
+      setIndex('2');
       setLoading(false);
     } catch (error) {
       ToastAndroid.show(`Login failed: ${error.response.data.error}`, ToastAndroid.LONG);

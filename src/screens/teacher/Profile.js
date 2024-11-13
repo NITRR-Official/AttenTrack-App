@@ -8,7 +8,7 @@ import {
 import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
-// import EncryptedStorage from 'react-native-encrypted-storage';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -18,7 +18,7 @@ const Profile = () => {
 
   const saveData = async (ind) => {
     try {
-      // await EncryptedStorage.setItem('@index', ind)
+      await EncryptedStorage.setItem('@index', ind)
     } catch (e) {
       console.error(e);
     }
@@ -38,8 +38,8 @@ const Profile = () => {
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }} >Profile</Text>
         <TouchableOpacity onPress={() => {
-          setIndex(0);
-          saveData(0);
+          setIndex('0');
+          saveData('0');
         }} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
             <Text style={{ color: theme.maincolor, fontSize: wp(3.5), fontWeight: '700', marginLeft: 5 }}>Logout</Text>

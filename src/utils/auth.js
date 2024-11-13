@@ -5,7 +5,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
 
-    const [index, setIndex] = useState(0);
+    const [index, setIndex] = useState('0');
     const [classes, setClasses] = useState([]);
     const [jsonGlobalData, setJsonGlobalData] = useState();
 
