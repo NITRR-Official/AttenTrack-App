@@ -56,7 +56,7 @@ const Profile = () => {
           <Text className="text-[#01808c] font-medium pt-2">Department: <Text className="text-gray-500">{departmentG}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Email ID: <Text className="text-gray-500">{teacherEmailG}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Designation: <Text className="text-gray-500">{'Electronics & Telecom. Engineering'}</Text></Text>
-          <Text className="text-[#0c1213] font-medium pt-2">College: <Text className="text-gray-500">{'National Institute of Technology Raipur'}</Text></Text>
+          <Text className="text-[#01808c] font-medium pt-2">College: <Text className="text-gray-500">{'National Institute of Technology Raipur'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Educational Qualification: <Text className="text-gray-500">{'Ph.D'}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Contact Number: <Text className="text-gray-500">{9549655371}</Text></Text>
           <Text className="text-[#01808c] font-medium pt-2">Areas of Interest: <Text className="text-gray-500">{'VLSI and Microelectronics, Non-Classical CMOS Devices and Sensors'}</Text></Text>
