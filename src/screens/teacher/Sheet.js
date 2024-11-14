@@ -324,7 +324,6 @@ const markAllPresent = () => {
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="20m" value="20" />
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="30m" value="30" />
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="40m" value="40" />
-                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="500m" value="500" />
                   </RadioButton.Group>
                 </View>
               </TouchableWithoutFeedback>
