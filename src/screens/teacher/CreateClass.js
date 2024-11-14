@@ -49,7 +49,7 @@ const CreateClass = () => {
     const [semester, setSemester] = React.useState('');
     const [jsonLocalData, setJsonLocalData] = useState([]);
     const [students, setStudents] = useState([]);
-    const { setJsonGlobalData, setClasses, departmentG, teacheridG, loading, setLoading } = useAuth();
+    const { setClasses, departmentG, teacheridG, loading, setLoading } = useAuth();
 
 
     const handleOnFileLoad = async () => {
@@ -147,7 +147,7 @@ const CreateClass = () => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                 onPress={() => {
-                        setJsonGlobalData(jsonLocalData);
+                        // setJsonGlobalData(jsonLocalData);
                         createClass();
                 }}
                  style={{ backgroundColor: theme.maincolor, width: wp(18), height: wp(10), borderRadius: wp(2), justifyContent: 'center', alignItems: 'center', marginTop:8 }} >
