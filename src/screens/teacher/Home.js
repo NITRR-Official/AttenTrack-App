@@ -48,10 +48,11 @@ const Home = () => {
     }
 };
 
-  const getList = async (id) => {
+  const getList = async (id, name) => {
     try {
         const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/class/getList/${id}`);
-        navigation.navigate('Sheet',{jsonGlobalData:response.data, id:id});
+        console.log('tn',response.data);
+        navigation.navigate('Sheet',{jsonGlobalData:response.data.rec, id:id, classname:name, teacherName:response.data.teacher});
     } catch (error) {
     //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
     console.error(error);
@@ -89,7 +90,7 @@ const Home = () => {
             <TouchableOpacity key={id}
           className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
           onPress={() => {
-            getList(item.id);
+            getList(item.id, item.classname);
           }}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />

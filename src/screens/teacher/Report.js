@@ -87,25 +87,6 @@ Please take necessary steps to improve your attendance to meet the required thre
             </View>
           </View> */}
 
-          {/* Daily Statistics */}
-          <View style={styles.section}>
-            <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
-            <View style={styles.table}>
-              <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderText1}>Date</Text>
-                <Text style={styles.tableHeaderText2}>Present</Text>
-                <Text style={styles.tableHeaderText2}>Absent</Text>
-              </View>
-              {route.params.recordG2.map((dayStat, index) => (
-                <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell1}>{dayStat.date}</Text>
-                  <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
-                  <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
           <View  className="flex flex-row items-center p-1">
             <Text style={styles.subHeader} className="mr-1">Students with Attendance Under </Text>
             <TouchableOpacity className={`border-[${theme.maincolor}] border-2 rounded-lg`} onPress={()=>{setModalVisible2(true)}}>
@@ -215,6 +196,29 @@ Best regards,
             </View>
           </TouchableWithoutFeedback>
         </Modal>
+
+
+          {/* Daily Statistics */}
+          <View style={styles.section}>
+            <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.tableHeaderText1}>Date</Text>
+                <Text style={styles.tableHeaderText2}>Present</Text>
+                <Text style={styles.tableHeaderText2}>Absent</Text>
+              </View>
+              {route.params.recordG2?.map((dayStat, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <Text style={styles.tableCell1}>{new Date(dayStat.date).toISOString().split('T')[0]}</Text>
+                  <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
+                  <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+
+
       </ScrollView>
     </>
   );
@@ -225,7 +229,7 @@ export default Report;
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    marginBottom: 80,
+    marginBottom: 0,
     backgroundColor: '#f5f5f5',
   },
   header: {

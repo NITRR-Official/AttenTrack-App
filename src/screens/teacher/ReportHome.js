@@ -41,7 +41,7 @@ const ReportHome = () => {
         setLoading(true);
         console.log(id, new Date(), new Date());
         const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/records', {
-            classId : id,
+            class_id : id,
             startDate: '2024-10-01',
             endDate: new Date()
         });

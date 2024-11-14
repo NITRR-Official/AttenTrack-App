@@ -194,8 +194,8 @@ const markAllPresent = () => {
 
       <View className="w-[95%] bg-[#01808c2e] p-2 px-5 rounded-md border-[#01808c7a] border-2 m-4 mb-3 flex flex-row justify-between items-end">
         <View>
-          <View className="flex flex-row"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} /><Text className="text-2xl text-[#01808cb9] font-medium ml-1">VLSI</Text></View>
-          <Text className="text-gray-600">Chitrakant Sahu</Text>
+          <View className="flex flex-row"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} /><Text className="text-2xl text-[#01808cb9] font-medium ml-1">{route.params.classname}</Text></View>
+          <Text className="text-gray-600">{route.params.teacherName}</Text>
         </View>
         <TouchableOpacity
           onPress={() => {
