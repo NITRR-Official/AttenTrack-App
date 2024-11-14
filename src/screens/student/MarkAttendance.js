@@ -16,7 +16,7 @@ import { calculateDistance } from './locationTracker';
 import { useAuth } from '../../utils/auth';
 
 const MarkAttendance = ({route}) => {
-  console.log('hi',route.params);
+  // console.log('hi',route.params);
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [modalVisible1, setModalVisible1] = useState(false);
@@ -25,6 +25,9 @@ const MarkAttendance = ({route}) => {
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
   const {rollNumberG} = useAuth();
+  const [range, setRange] = useState();
+  const [lat, setLat] = useState();
+  const [long, setLong] = useState();
 
   const handleGetAttendance = async () => {
     try {
@@ -59,6 +62,11 @@ const MarkAttendance = ({route}) => {
         }
         setTime(data.time);  // Update time based on WebSocket message
         // console.log(`Real-time time update received 2: ${data.time}`);
+      }
+      if(data.type === 'teacherLoc'){
+        setRange(data.range);
+        setLat(data.location.latitude);
+        setLong(data.location.longitude);
       }
       if(data.type === 'first_call'){
         setOtp('');
@@ -122,16 +130,13 @@ const MarkAttendance = ({route}) => {
   };
 
   const getCurrentLocation = () => {
-    const targetLatitude = 21.24973790975813;  // target latitude
-    const targetLongitude = 81.60502712836308;  // target longitude
-    const radius = 3000;  // range
 
     GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
     .then(location => {
       const distance = calculateDistance(location.latitude, location.longitude,
-        targetLatitude, targetLongitude);
+        lat, long);
       
-      if (distance <= radius) {
+      if (distance <= range) {
         socket.send(JSON.stringify({type: 'attendance', rollNumber:rollNumberG }));
         ToastAndroid.show('Location Matched ! Attendance Marked as Present !',
           ToastAndroid.LONG);

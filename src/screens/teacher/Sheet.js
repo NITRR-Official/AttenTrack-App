@@ -1,4 +1,4 @@
-import { Modal, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Modal, PermissionsAndroid, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
@@ -11,6 +11,7 @@ import { ScrollView } from 'react-native';
 import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
 import axios from 'axios';
 import { useAuth } from '../../utils/auth';
+import GetLocation from 'react-native-get-location';
 
 const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
@@ -18,6 +19,7 @@ const Sheet = ({ navigation, route }) => {
   const {  loading, setLoading } = useAuth();
 
   const [student, setStudent] = useState();
+  const [range, setRange] = useState(3000);
 
   useEffect(()=>setStudent(route.params.jsonGlobalData),[]);
 
@@ -52,6 +54,7 @@ const Sheet = ({ navigation, route }) => {
   const [presentCount, setPresentCount] = useState(0);  // Count for present students
   const [absentCount, setAbsentCount] = useState(0);    // Count for absent students
 
+  const [modalVisible0, setModalVisible0] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
 
@@ -101,7 +104,7 @@ const Sheet = ({ navigation, route }) => {
         time: val
       });
 
-      console.log('OTP and time sent to server');
+      // console.log('OTP and time sent to server');
     } catch (error) {
       // Catch any errors and handle them
       console.error('Error sending OTP and time to server:', error);
@@ -181,6 +184,46 @@ const markAllPresent = () => {
     );
   };
 
+  const requestLocationPermission = async () => {
+    if(Platform.OS === "android"){
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Location Permission",
+          message: "This app needs access to your location",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK"
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // console.log("You can access location");
+        getCurrentLocation();  // Call your function to get the location
+      } else {
+        // console.log("Location permission denied");
+        ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
+        // setTimeout(()=>{setModalVisible2(false)},2000);
+      }
+    } catch (err) {
+      console.warn(err);
+    }}
+  };
+
+  const getCurrentLocation = () => {
+    GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
+    .then(location => {
+      socket.send(JSON.stringify({type: 'teacherLoc', location:location, range:range }));
+      setModalVisible0(false);
+      setModalVisible1(true);
+    })
+    .catch(error => {
+      const { code, message } = error;
+      console.warn(code, message);
+    });
+  };
+  
+
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
       <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
@@ -199,13 +242,41 @@ const markAllPresent = () => {
         </View>
         <TouchableOpacity
           onPress={() => {
-            setModalVisible1(true)
+            setModalVisible0(true);
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[15px] font-medium">Take Attendance</Text>
         </TouchableOpacity>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible0}
+          onRequestClose={() => {
+            setModalVisible0(!modalVisible0);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible0(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
 
+                <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
+                  <Text className="text-black">Select Range :</Text>
+                  <RadioButton.Group onValueChange={value => {
+                    setRange(parseInt(value));
+                    requestLocationPermission();
+                  }}>
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="1m" value="1" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="10m" value="10" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="20m" value="20" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="30m" value="30" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="40m" value="40" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="500m" value="500" />
+                  </RadioButton.Group>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
         <Modal
           animationType="fade"
           transparent={true}
