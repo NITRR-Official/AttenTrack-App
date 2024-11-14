@@ -319,6 +319,7 @@ const markAllPresent = () => {
                     requestLocationPermission();
                   }}>
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="1m" value="1" />
+                    <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="5m" value="5" />
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="10m" value="10" />
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="20m" value="20" />
                     <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="30m" value="30" />
