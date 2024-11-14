@@ -1,4 +1,4 @@
-import { Modal, PermissionsAndroid, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Alert, Modal, PermissionsAndroid, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
@@ -12,6 +12,8 @@ import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper'
 import axios from 'axios';
 import { useAuth } from '../../utils/auth';
 import GetLocation from 'react-native-get-location';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import RNFS from 'react-native-fs';
 
 const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
@@ -158,8 +160,10 @@ const Sheet = ({ navigation, route }) => {
             date: new Date(),
             records: records
         });
+
         ToastAndroid.show(`Attendance Added Successfully !`, ToastAndroid.LONG);
         console.log('Attendance Added Successful:', response.data);
+        downloadReport();
         navigation.goBack();
         setLoading(false);
     } catch (error) {
@@ -223,6 +227,55 @@ const markAllPresent = () => {
     });
   };
   
+  const generateHTML = () => {
+    if (!records) return '';
+  
+    // Main styles for the PDF
+    let html = `
+    <h1>${new Date().toISOString().split('T')[0]} : Attendance Report</h1>
+    <table border="1" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="padding: 8px;">Roll Number</th>
+          <th style="padding: 8px;">Name</th>
+          <th style="padding: 8px;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${records.map(record => `
+          <tr>
+            <td style="padding: 8px;">${record.rollNumber}</td>
+            <td style="padding: 8px;">${student.find(s => s.rollNumber === record.rollNumber)?.name || 'N/A'}</td>
+            <td style="padding: 8px;">${record.is_present ? 'Present' : 'Absent'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  
+    return html;
+  };
+  
+    // Function to generate and download the PDF
+    const downloadReport = async () => {
+      const options = {
+        html: generateHTML(),
+        fileName: `${new Date().toISOString().split('T')[0]}_Attendance_Report`,
+        directory: 'Download',
+      };
+  
+      try {
+        const file = await RNHTMLtoPDF.convert(options);
+        const newPath = `${RNFS.DownloadDirectoryPath}/${new Date().toISOString().split('T')[0]}_Attendance_Report.pdf`;
+  
+        // Move file to download directory
+        await RNFS.moveFile(file.filePath, newPath);
+  
+        Alert.alert('Report Downloaded', `The report has been moved to: ${newPath}`);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to download the report.');
+      }
+    };
 
   return (
     <SafeAreaView style={{ alignItems: 'center' }} >
