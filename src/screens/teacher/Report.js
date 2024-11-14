@@ -39,6 +39,88 @@ I hope this email finds you well. This is to inform you that your current attend
 
 Please take necessary steps to improve your attendance to meet the required threshold.`);
 
+const generateHTML = () => {
+  if (!route.params.recordG) return '';
+
+  // Main styles for the PDF
+  let html = `
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    th { background-color: #f4f4f4; }
+    h2 { color: ${theme.maincolor}; }
+  </style>
+</head>
+<body>
+  <h2>Attendance Report</h2>
+  <h3>Students with Attendance Under ${thresPerc}%</h3>
+  <table>
+    <tr>
+      <th>Roll Number</th>
+      <th>Name</th>
+      <th>Attendance (%)</th>
+    </tr>
+    ${route.params.recordG
+      ?.filter((item) => (item.noDaysP * 100) / route.params.totG <= thresPerc)
+      .map(
+        (item) => `
+        <tr>
+          <td>${item.rollNumber}</td>
+          <td>${item.name}</td>
+          <td>${(item.noDaysP * 100) / route.params.totG.toFixed(2)}%</td>
+        </tr>`
+      )
+      .join('')}
+  </table>
+  <h3>Daily Attendance Statistics</h3>
+  <table>
+    <tr>
+      <th>Date</th>
+      <th>Present</th>
+      <th>Absent</th>
+    </tr>
+    ${route.params.recordG2
+      ?.map(
+        (dayStat) => `
+        <tr>
+          <td>${new Date(dayStat.date).toISOString().split('T')[0]}</td>
+          <td>${dayStat.presentCount}</td>
+          <td>${dayStat.absentCount}</td>
+        </tr>`
+      )
+      .join('')}
+  </table>
+</body>
+</html>
+`;
+
+  return html;
+};
+
+  // Function to generate and download the PDF
+  const downloadReport = async () => {
+    const options = {
+      html: generateHTML(),
+      fileName: 'Class_Attendance_Report',
+      directory: 'Download',
+    };
+
+    try {
+      const file = await RNHTMLtoPDF.convert(options);
+      const newPath = `${RNFS.DownloadDirectoryPath}/Class_Attendance_Report.pdf`;
+
+      // Move file to download directory
+      await RNFS.moveFile(file.filePath, newPath);
+
+      Alert.alert('Report Downloaded', `The report has been moved to: ${newPath}`);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to download the report.');
+    }
+  };
+
   if (!route.params.recordG) {
     return <View className="flex justify-center items-center h-screen">
       {/* <ActivityIndicator animating={true} color={'black'} /> */}
@@ -52,7 +134,7 @@ Please take necessary steps to improve your attendance to meet the required thre
           <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
         </TouchableOpacity>
         <TouchableOpacity
-          // onPress={downloadReport} 
+          onPress={downloadReport} 
           style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
             <ArrowDownTrayIcon color={'white'} size={20} />
