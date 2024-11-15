@@ -184,10 +184,15 @@ const MarkAttendance = ({route}) => {
         </TouchableOpacity>
       </View>
 
-      <View className="w-[95%] bg-[#01808c2e] p-2 px-5 rounded-md border-[#01808c7a] border-2 m-4 mb-3 flex flex-row justify-between items-end">
-        <View>
-          <View className="flex flex-row"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} /><Text className="text-2xl text-[#01808cb9] font-medium ml-1">{route.params.className}</Text></View>
-          <Text className="text-gray-600">{route.params.teacherName}</Text>
+      <View className="w-[95%] bg-[#01808c2e] p-2 px-3 rounded-md border-[#01808c7a] border-2 m-4 mb-3 flex flex-row justify-between items-end">
+      <View>
+          <View className="flex flex-row flex-wrap"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} />
+          <Text className="text-2xl text-[#01808cb9] font-medium ml-1">
+            {route.params.className.length > 10 ? route.params.className.substring(0, 10) + "..." : route.params.className}
+            </Text></View>
+          <Text className="text-gray-600">
+            {route.params.teacherName.length > 25 ? route.params.teacherName.substring(0, 25) + "..." : route.params.teacherName}
+          </Text>
         </View>
         <TouchableOpacity
           onPress={() => {
@@ -198,7 +203,7 @@ const MarkAttendance = ({route}) => {
               setModalVisible1(true);
               setOtp('');
             }}}
-          className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 px-5 rounded-md border-[#01808c7a] border-2">
+          className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
           <Text className="text-white text-[15px] font-medium">Mark Attendance</Text>
         </TouchableOpacity>
@@ -280,7 +285,7 @@ const MarkAttendance = ({route}) => {
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
-        style={{ backgroundColor: '#fff', height: hp(67) }}
+        style={{ backgroundColor: '#fff', height: hp(60) }}
       >
         <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
 

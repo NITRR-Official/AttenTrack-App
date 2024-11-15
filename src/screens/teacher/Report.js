@@ -170,9 +170,9 @@ const generateHTML = () => {
           </View> */}
 
           <View  className="flex flex-row items-center p-1">
-            <Text style={styles.subHeader} className="mr-1">Students with Attendance Under </Text>
+            <Text style={styles.subHeader} className="mr-1">Students with Attendance </Text>
             <TouchableOpacity className={`border-[${theme.maincolor}] border-2 rounded-lg`} onPress={()=>{setModalVisible2(true)}}>
-              <Text className={` p-2 px-4 text-[15px] text-[${theme.maincolor}] font-bold rounded-lg`}>{thresPerc} %</Text>
+              <Text className={` p-2 px-4 text-[15px] text-[${theme.maincolor}] font-bold rounded-lg`}>&lt;= {thresPerc} %</Text>
             </TouchableOpacity>
           </View>
           <View><TouchableOpacity className={`bg-[${theme.maincolor}] p-2 rounded-lg w-[120px]`} onPress={()=>setModalVisible1(true)}><Text className={`text-white font-bold text-center`}>Send Email</Text></TouchableOpacity></View>
@@ -207,15 +207,15 @@ const generateHTML = () => {
                       setModalVisible2(false);
                       setThresPerc(parseInt(value));
                     }}>
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 10%" value="10" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 20%" value="20" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 30%" value="30" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 40%" value="40" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 50%" value="50" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 60%" value="60" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 70%" value="70" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 75%" value="75" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="< 100%" value="100" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 10%" value="10" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 20%" value="20" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 30%" value="30" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 40%" value="40" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 50%" value="50" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 60%" value="60" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 70%" value="70" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 75%" value="75" />
+                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 100%" value="100" />
                     </RadioButton.Group>
                   </View>
                 </TouchableWithoutFeedback>

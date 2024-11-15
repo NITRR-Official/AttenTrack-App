@@ -203,7 +203,7 @@ const StudentReport = () => {
             <Text style={styles.value}>{((subject.numberOfDatesP*100)/(subject.numberOfDatesP+subject.numberOfDatesA))?.toFixed(2)}%</Text>
           </View>
 
-          <ProgressBar progress={((subject.numberOfDatesP)/(subject.numberOfDatesP+subject.numberOfDatesA))?.toFixed(2)} color={theme.maincolor} style={styles.progressBar} />
+          <ProgressBar progress={((subject.numberOfDatesP)/(subject.numberOfDatesP+subject.numberOfDatesA))} color={theme.maincolor} style={styles.progressBar} />
         </View>
       ))}
 
