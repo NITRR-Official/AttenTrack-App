@@ -30,14 +30,16 @@ import * as React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
+import { ActivityIndicator } from 'react-native-paper';
 
 
 const Home = () => {
 
   const navigation = useNavigation();
-  const { rollNumberG, classes, setClasses, setAttDataG } = useAuth();
+  const { rollNumberG, classes, setClasses, loading, setLoading } = useAuth();
 
   const getClassInfo = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/student/class-info/${rollNumberG}`);
       setClasses(response.data.map(classItem => ({
@@ -47,10 +49,13 @@ const Home = () => {
     } catch (error) {
       //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
       console.error(error);
+    } finally{
+      setLoading(false);
     }
   }
 
   const getAttendance = async (id, name) => {
+    setLoading(true);
     try {
       const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/student/attendance?class_id=${id}&rollNumber=${rollNumberG}`);
       console.log(response.data);
@@ -58,6 +63,8 @@ const Home = () => {
     } catch (error) {
       //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
       console.error(error);
+    } finally{
+      setLoading(false);
     }
   }
 
@@ -66,7 +73,7 @@ const Home = () => {
   }, [])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView classItem="relative">
       <StatusBar
         backgroundColor={theme.maincolor}
         barStyle={"light-content"}
@@ -81,10 +88,14 @@ const Home = () => {
           <PlusCircleIcon size={wp(10)} color="#fff" />
         </TouchableOpacity> */}
       </View>
+
+      { loading && <View className="z-10 w-full p-2 top-[40%] absolute ">
+      <ActivityIndicator animating={true} color={'#01808c7a'} size={wp(10)} />
+      </View> }
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
-        style={{ backgroundColor: '#fff', height: hp(100) }}
+        style={{ backgroundColor: '#fff', height: hp(100), opacity:loading?0.5:1 }}
       >
 
         {
@@ -95,6 +106,7 @@ const Home = () => {
                 onPress={() => {
                   getAttendance(item.id, item.classname);
                 }}
+                disabled={loading}
               >
                 <CpuChipIcon size={wp(8)} color="#01808cb9" />
                 <Text
@@ -108,7 +120,7 @@ const Home = () => {
             )
           })
         }
-        {classes?.length == 0 && <Text className="text-gray-600 text-center pt-4 text-lg">You Have Not Been Added In Any Class</Text>}
+        {!loading && classes?.length == 0 && <Text className="text-gray-600 text-center pt-4 text-lg">You Have Not Been Added In Any Class</Text>}
 
       </ScrollView>
 

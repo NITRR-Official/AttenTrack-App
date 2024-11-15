@@ -29,16 +29,17 @@ import * as React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
+import { ActivityIndicator } from 'react-native-paper';
 
 
 const ReportHome = () => {
 
   const navigation = useNavigation();
-  const {classes, setLoading} = useAuth();
+  const {classes, setLoading, loading} = useAuth();
 
   const getRecord = async (id) => {
+    setLoading(true);
     try {
-        setLoading(true);
         console.log(id, new Date(), new Date());
         const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/records', {
             class_id : id,
@@ -51,11 +52,13 @@ const ReportHome = () => {
     //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
     console.error(error);
     setLoading(false);
+    } finally {
+      setLoading(false);
     }
 };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="relative">
              <StatusBar
         backgroundColor={theme.maincolor}
         barStyle={"light-content"}
@@ -65,10 +68,14 @@ const ReportHome = () => {
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight:500 }} >Monthly Attendance Report</Text>
         </View>
+
+        { loading && <View className="z-10 w-full p-2 top-[40%] absolute ">
+      <ActivityIndicator animating={true} color={'#01808c7a'} size={wp(10)} />
+      </View> }
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
-        style={{ backgroundColor: '#fff', height: hp(100) }}
+        style={{ backgroundColor: '#fff', height: hp(100),opacity:loading?0.5:1  }}
       >
 
         {
@@ -78,6 +85,7 @@ const ReportHome = () => {
           onPress={() => {
             getRecord(item.id);
           }}
+          disabled={loading}
         >
           <CpuChipIcon size={wp(8)} color="#01808cb9" />
           <Text
