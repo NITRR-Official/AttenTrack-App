@@ -31,37 +31,30 @@ const MarkAttendance = ({route}) => {
 
   const handleGetAttendance = async () => {
     try {
-      // Await the axios post request to set attendance
       const resp = await axios.get('https://attendancetrackerbackend.onrender.com/getAttendance');
-      const data2 = resp.data;  // Contains currentOTP and finalTime
-      // console.log('OTP (FrontEnd): ', data2.currentOTP);
-      // console.log('Final Time (FrontEnd): ', data2.finalTime);
+      const data2 = resp.data;
       setReceivedOtp(data2.currentOTP);
       setFinalTime(data2.finalTime);
     } catch (error) {
-      // Catch any errors and handle them
       console.error('Error sending OTP and time to server:', error);
-      Alert.alert('Failed to set attendance. Please try again.');
+      ToastAndroid.show('Failed to set attendance. Please try again.', ToastAndroid.LONG);
     }
   }; 
 
   useEffect(() => {
 
-    // Set up WebSocket connection
     socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-      // Handle real-time time updates from the WebSocket
       if (data.type === 'time_update2') {
         handleGetAttendance();
         if(data.time<=0){
             setModalVisible1(false);
         }
-        setTime(data.time);  // Update time based on WebSocket message
-        // console.log(`Real-time time update received 2: ${data.time}`);
+        setTime(data.time);
       }
       if(data.type === 'teacherLoc'){
         setRange(data.range);
@@ -75,8 +68,8 @@ const MarkAttendance = ({route}) => {
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket Error:', error);
-      Alert.alert('Error with WebSocket connection');
+      console.log('WebSocket Error:', error);
+      ToastAndroid.show('Error With WebSocket Connection', ToastAndroid.LONG);
     };
 
     socket.onclose = () => {
@@ -92,13 +85,11 @@ const MarkAttendance = ({route}) => {
 
   const handleOtpSubmit = () => {
     if (receivedOtp === otp) {
-      // console.log('OTP Matched');
       ToastAndroid.show('OTP Verified !', ToastAndroid.LONG);
       setModalVisible1(false);
       setModalVisible2(true);
         requestLocationPermission();
     } else {
-      // console.log('Incorrect OTP');
       ToastAndroid.show('Incorrect OTP !', ToastAndroid.LONG);
     }
   };
@@ -117,10 +108,8 @@ const MarkAttendance = ({route}) => {
         }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        // console.log("You can access location");
-        getCurrentLocation();  // Call your function to get the location
+        getCurrentLocation(); 
       } else {
-        // console.log("Location permission denied");
         ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
         setTimeout(()=>{setModalVisible2(false)},2000);
       }

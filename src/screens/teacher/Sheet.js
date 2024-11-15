@@ -100,17 +100,13 @@ const Sheet = ({ navigation, route }) => {
     setOtp(generatedOtp);
 
     try {
-      // Await the axios post request to set attendance
       await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
         otp: generatedOtp,
         time: val
       });
-
-      // console.log('OTP and time sent to server');
     } catch (error) {
-      // Catch any errors and handle them
       console.error('Error sending OTP and time to server:', error);
-      alert('Failed to set attendance. Please try again.');
+      ToastAndroid.show('Failed to set attendance. Please try again.', ToastAndroid.LONG);
     }
   };
 
@@ -142,8 +138,8 @@ const Sheet = ({ navigation, route }) => {
     }, 1000);
 
     socket.onerror = (error) => {
-      console.error('WebSocket Error:', error);
-      alert('Error with WebSocket connection');
+      console.log('WebSocket Error:', error);
+      ToastAndroid.show('Error with WebSocket connection', ToastAndroid.LONG);
       clearInterval(interval);
     };
 
@@ -273,7 +269,8 @@ const markAllPresent = () => {
   
         Alert.alert('Report Downloaded', `The report has been moved to: ${newPath}`);
       } catch (error) {
-        Alert.alert('Error', 'Failed to download the report.');
+        console.log(error);
+        ToastAndroid.show('Failed to download the report.', ToastAndroid.LONG);
       }
     };
 
