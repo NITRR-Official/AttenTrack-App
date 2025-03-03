@@ -52,7 +52,7 @@ const CreateClass = () => {
     const { setClasses, departmentG, teacheridG, loading, setLoading } = useAuth();
 
 
-    const handleOnFileLoad = async () => {
+    const FileLoad = async () => {
         try {
             const res = await DocumentPicker.pick({
                 type: [DocumentPicker.types.allFiles],

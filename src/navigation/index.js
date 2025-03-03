@@ -44,6 +44,7 @@ export default function AppNavigation() {
         }}
         initialRouteName={BottomTabs}
       >
+      {/* <Stack.Screen name="LogIn" component={Login} /> */}
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="CreateClass" component={CreateClass} />
         <Stack.Screen name="Sheet" component={Sheet} />

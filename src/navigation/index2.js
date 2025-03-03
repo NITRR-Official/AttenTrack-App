@@ -42,6 +42,7 @@ import MarkAttendance from "../screens/student/MarkAttendance";
           }}
           initialRouteName={BottomTabs2}
         >
+        {/* <Stack.Screen name="LogIn" component={Login} /> */}
           <Stack.Screen name="BottomTabs2" component={BottomTabs2} />
           <Stack.Screen name="MarkAttendance" component={MarkAttendance} />
         </Stack.Navigator>
