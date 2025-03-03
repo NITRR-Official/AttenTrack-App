@@ -221,17 +221,19 @@ const LogIn = () => {
       });
       ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
       console.log('Login Successful:', response.data);
-      setClasses(response.data.classes.map(classItem => ({
+      console.log(response.data);
+      setClasses(response.data.coursesId.map(classItem => ({
         id: classItem._id,
-        classname: classItem.classname
       })));
-      setTeacheridG(response.data._id);
+      setTeacheridG(response.data.id);
+      console.log(response.data);
       setDepartmentG(response.data.department);
       setTeacherNameG(response.data.fullName);
       setTeacherEmailG(response.data.email);
       setIndex('1'); // Set index for teacher
       setLoading(false);
     } catch (error) {
+      console.log(error);
       ToastAndroid.show(`Login failed: ${error.response?.data?.error || 'Unknown error'}`, ToastAndroid.LONG);
       setLoading(false);
     }
@@ -253,7 +255,7 @@ const LogIn = () => {
       ToastAndroid.show(`Login Successful. Welcome ${response.data.fullName} !`, ToastAndroid.LONG);
       setRollNumberG(response.data.rollNumber);
       setIndex('2'); // Set index for student
-      setStudentidG(response.data._id);
+      setStudentidG(response.data.id);
       setStudentNameG(response.data.fullName);
       setStudentEmailG(response.data.email);
       setLoading(false);

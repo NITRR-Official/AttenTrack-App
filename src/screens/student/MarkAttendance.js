@@ -16,7 +16,7 @@ import { calculateDistance } from './locationTracker';
 import { useAuth } from '../../utils/auth';
 
 const MarkAttendance = ({route}) => {
-  // console.log('hi',route.params);
+  console.log('hi',route.params);
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [modalVisible1, setModalVisible1] = useState(false);
@@ -179,9 +179,9 @@ const MarkAttendance = ({route}) => {
           <Text className="text-2xl text-[#01808cb9] font-medium ml-1">
             {route.params.className.length > 10 ? route.params.className.substring(0, 10) + "..." : route.params.className}
             </Text></View>
-          <Text className="text-gray-600">
+          {/* <Text className="text-gray-600">
             {route.params.teacherName.length > 25 ? route.params.teacherName.substring(0, 25) + "..." : route.params.teacherName}
-          </Text>
+          </Text> */}
         </View>
         <TouchableOpacity
           onPress={() => {

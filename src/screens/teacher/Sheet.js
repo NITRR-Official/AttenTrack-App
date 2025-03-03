@@ -24,7 +24,7 @@ const Sheet = ({ navigation, route }) => {
   const [range, setRange] = useState(3000);
 
   useEffect(()=>setStudent(route.params.jsonGlobalData),[]);
-
+  console.log(route.params);
   const [records, setRecords] = useState([]);
 
   useEffect(() => {
@@ -293,6 +293,7 @@ const markAllPresent = () => {
             </Text></View>
           <Text className="text-gray-600">
             {route.params.teacherName.length > 25 ? route.params.teacherName.substring(0, 25) + "..." : route.params.teacherName}
+
           </Text>
         </View>
         <TouchableOpacity

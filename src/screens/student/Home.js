@@ -36,19 +36,20 @@ import { ActivityIndicator } from 'react-native-paper';
 const Home = () => {
 
   const navigation = useNavigation();
-  const { rollNumberG, classes, setClasses, loading, setLoading } = useAuth();
+  const { rollNumberG, classes, setClasses, loading, setLoading , studentidG} = useAuth();
+  const [selectedClass, setSelectedClass] = React.useState(null);
 
   const getClassInfo = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/student/class-info/${rollNumberG}`);
-      setClasses(response.data.map(classItem => ({
-        id: classItem._id,
-        classname: classItem.classname
-      })));
+      console.log('Student ID:', studentidG);
+      const response = await axios.get(`https://attentrackbackend-production.up.railway.app/api/student/classes-info/${studentidG}`);
+      console.log('Classes:', classes);
+      setSelectedClass(response.data.classes);
+      console.log(selectedClass)
     } catch (error) {
       //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
-      console.error(error);
+      console.log(error);
     } finally{
       setLoading(false);
     }
@@ -57,12 +58,12 @@ const Home = () => {
   const getAttendance = async (id, name) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/student/attendance?class_id=${id}&rollNumber=${rollNumberG}`);
-      console.log(response.data);
-      navigation.navigate('MarkAttendance', {attDataG:response.data.res, teacherName:response.data.teacher, className:name} );
+      const response = await axios.post(`https://attentrackbackend-production.up.railway.app/api/student/attendance`, {class_id:id, rollNumber:rollNumberG});
+      console.log('Attendance:', response.data);
+      navigation.navigate('MarkAttendance', {attDataG:response.data.res, className:name} );
     } catch (error) {
       //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
-      console.error(error);
+      console.log("From get attendance: ",error);
     } finally{
       setLoading(false);
     }
@@ -70,7 +71,7 @@ const Home = () => {
 
   React.useEffect(() => {
     getClassInfo();
-  }, [])
+  }, [studentidG])
 
   return (
     <SafeAreaView classItem="relative">
@@ -99,12 +100,13 @@ const Home = () => {
       >
 
         {
-          classes?.map((item, id) => {
+          selectedClass?.map((item, id) => {
             return (
               <TouchableOpacity key={id}
                 className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
                 onPress={() => {
-                  getAttendance(item.id, item.classname);
+                  console.log("From button: ",item);
+                  getAttendance(item.class_id, item.classname);
                 }}
                 disabled={loading}
               >
@@ -120,7 +122,7 @@ const Home = () => {
             )
           })
         }
-        {!loading && classes?.length == 0 && <Text className="text-gray-600 text-center pt-4 text-lg">You Have Not Been Added In Any Class</Text>}
+        {!loading && selectedClass?.length == 0 && <Text className="text-gray-600 text-center pt-4 text-lg">You Have Not Been Added In Any Class</Text>}
 
       </ScrollView>
 

@@ -26,7 +26,7 @@ import {
   TrashIcon,
 } from "react-native-heroicons/outline";
 
-import * as React from 'react';
+import React, {useEffect} from 'react';
 
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
@@ -36,25 +36,42 @@ import { ActivityIndicator } from 'react-native-paper';
 const Home = () => {
 
   const [selectedClass, setSelectedClass] = React.useState(null);
-  const { classes, setClasses, loading, setLoading } = useAuth();
+  const { classes, setClasses, loading, setLoading, teacheridG, teacherNameG, teacherEmailG } = useAuth();
+
+  useEffect(() => {
+    setLoading(true);
+    console.log('Teacher ID:', teacheridG, teacherNameG, teacherEmailG);
+    const fetchData = async () => {
+      axios.get(`https://attentrackbackend-production.up.railway.app/api/teacher/classes-info/${teacheridG}`)
+      .then((response) => {
+        console.log('Classes:', response.data);
+        setClasses(response.data.classes);
+      }).catch((error) => {
+        console.log(error);
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+    fetchData();
+  }, [])
 
   const deleteClass = async () => {
     try {
-      const response = await axios.delete(`https://attendancetrackerbackend.onrender.com/api/class/remove/${selectedClass}`);
+      const response = await axios.delete(`https://attentrackbackend-production.up.railway.app/api/class/remove/${selectedClass}`);
       ToastAndroid.show(`${selectedClass} Deleted Successfully !`, ToastAndroid.LONG);
       console.log('Class Deleted Successfully:', response.data);
     } catch (error) {
       //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
-      console.error(error);
+      console.log(error);
     }
   };
 
   const getList = async (id, name) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/class/getList/${id}`);
+      const response = await axios.get(`https://attentrackbackend-production.up.railway.app/api/class/getList/${id}`);
       console.log('tn', response.data);
-      navigation.navigate('Sheet', { jsonGlobalData: response.data.rec, id: id, classname: name, teacherName: response.data.teacher });
+      navigation.navigate('Sheet', { jsonGlobalData: response.data.students, id: id, classname: name, teacherName: teacherNameG });
     } catch (error) {
       //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
       console.error(error);
@@ -99,7 +116,8 @@ const Home = () => {
                 disabled={loading}
                 className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
                 onPress={() => {
-                  getList(item.id, item.classname);
+                  console.log(item);
+                  getList(item.class_id, item.classname);
                 }}
               >
                 <CpuChipIcon size={wp(8)} color="#01808cb9" />
