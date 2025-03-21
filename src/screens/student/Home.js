@@ -31,7 +31,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
 import { ActivityIndicator } from 'react-native-paper';
-
+import { BASE_URL } from '../../constants/constants';
 
 const Home = () => {
 
@@ -43,7 +43,7 @@ const Home = () => {
     setLoading(true);
     try {
       console.log('Student ID:', studentidG);
-      const response = await axios.get(`https://attentrackbackend-production.up.railway.app/api/student/classes-info/${studentidG}`);
+      const response = await axios.get(`${BASE_URL}/api/student/classes-info/${studentidG}`);
       console.log('Classes:', classes);
       setSelectedClass(response.data.classes);
       console.log(selectedClass)
@@ -58,7 +58,7 @@ const Home = () => {
   const getAttendance = async (id, name) => {
     setLoading(true);
     try {
-      const response = await axios.post(`https://attentrackbackend-production.up.railway.app/api/student/attendance`, {class_id:id, rollNumber:rollNumberG});
+      const response = await axios.post(`${BASE_URL}/api/student/attendance`, {class_id:id, rollNumber:rollNumberG});
       console.log('Attendance:', response.data);
       navigation.navigate('MarkAttendance', {attDataG:response.data.res, className:name} );
     } catch (error) {

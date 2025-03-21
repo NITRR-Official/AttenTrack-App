@@ -217,7 +217,7 @@
 //       }
 
 //       const endpoint = isStudent ? '/api/student/register' : '/api/teacher/register';
-//       const response = await axios.post(`https://attentrackbackend-production.up.railway.app${endpoint}`, { email });
+//       const response = await axios.post(`https://attentrackbackend-production.up..app${endpoint}`, { email });
 
 //       // Check if OTP was sent successfully
 //       if (response.status === 200) {
@@ -438,7 +438,7 @@ import axios from 'axios';
 import {theme} from '../../theme';
 import {useAuth} from '../../utils/auth';
 import {useNavigation} from '@react-navigation/native';
-
+import { BASE_URL } from '../../constants/constants';
 const SignUp = props => {
   const {loading, setLoading} = useAuth();
   const navigation = useNavigation();
@@ -467,7 +467,7 @@ const SignUp = props => {
         : '/api/teacher/register';
   
       const response = await fetch(
-        `https://attentrackbackend-production.up.railway.app${endpoint}`,
+        `${BASE_URL}${endpoint}`,
         {
           method: 'POST',
           headers: {
@@ -534,7 +534,7 @@ const endpoint = isStudent
   : '/api/teacher/verify-otp';
 
 const response = await axios.post(
-  `https://attentrackbackend-production.up.railway.app${endpoint}`,
+  `${BASE_URL}${endpoint}`,
   {
     email,
     otp: otp2, // Send the parsed integer OTP

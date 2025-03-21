@@ -32,7 +32,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
 import { ActivityIndicator } from 'react-native-paper';
-
+import { BASE_URL } from '../../constants/constants';
 const Home = () => {
 
   const [selectedClass, setSelectedClass] = React.useState(null);
@@ -42,7 +42,7 @@ const Home = () => {
     setLoading(true);
     console.log('Teacher ID:', teacheridG, teacherNameG, teacherEmailG);
     const fetchData = async () => {
-      axios.get(`https://attentrackbackend-production.up.railway.app/api/teacher/classes-info/${teacheridG}`)
+      axios.get(`${BASE_URL}/api/teacher/classes-info/${teacheridG}`)
       .then((response) => {
         console.log('Classes:', response.data);
         setClasses(response.data.classes);
@@ -57,7 +57,7 @@ const Home = () => {
 
   const deleteClass = async () => {
     try {
-      const response = await axios.delete(`https://attentrackbackend-production.up.railway.app/api/class/remove/${selectedClass}`);
+      const response = await axios.delete(`${BASE_URL}/api/class/remove/${selectedClass}`);
       ToastAndroid.show(`${selectedClass} Deleted Successfully !`, ToastAndroid.LONG);
       console.log('Class Deleted Successfully:', response.data);
     } catch (error) {
@@ -69,7 +69,7 @@ const Home = () => {
   const getList = async (id, name) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://attentrackbackend-production.up.railway.app/api/class/getList/${id}`);
+      const response = await axios.get(`${BASE_URL}/api/class/getList/${id}`);
       console.log('tn', response.data);
       navigation.navigate('Sheet', { jsonGlobalData: response.data.students, id: id, classname: name, teacherName: teacherNameG });
     } catch (error) {

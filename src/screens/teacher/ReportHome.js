@@ -30,7 +30,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
 import { ActivityIndicator } from 'react-native-paper';
-
+import { BASE_URL } from '../../constants/constants'; 
 
 const ReportHome = () => {
 
@@ -41,7 +41,7 @@ const ReportHome = () => {
     setLoading(true);
     try {
         console.log(id, new Date(), new Date());
-        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/teacher/records', {
+        const response = await axios.post(`${BASE_URL}/api/teacher/records`, {
             class_id : id,
             startDate: '2024-10-01',
             endDate: new Date()

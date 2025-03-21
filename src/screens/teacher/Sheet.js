@@ -14,6 +14,8 @@ import { useAuth } from '../../utils/auth';
 import GetLocation from 'react-native-get-location';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
+import { BASE_URL } from '../../constants/constants';
+
 
 const Sheet = ({ navigation, route }) => {
   // const navigation = useNavigation();
@@ -100,7 +102,7 @@ const Sheet = ({ navigation, route }) => {
     setOtp(generatedOtp);
 
     try {
-      await axios.post('https://attendancetrackerbackend.onrender.com/setAttendance', {
+      await axios.post(`${BASE_URL}/setAttendance`, {
         otp: generatedOtp,
         time: val
       });
@@ -151,7 +153,7 @@ const Sheet = ({ navigation, route }) => {
   const createAttendance = async () => {
     try {
         setLoading(true);
-        const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/attendance/createAttendance', {
+        const response = await axios.post(`${BASE_URL}/api/attendance/createAttendance`, {
             class_id: route.params.id,
             date: new Date(),
             records: records

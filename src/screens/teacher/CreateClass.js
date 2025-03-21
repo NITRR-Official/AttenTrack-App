@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { BASE_URL } from '../../constants/constants';
 import {
     View,
     Text,
@@ -52,7 +53,7 @@ const CreateClass = () => {
     const { setClasses, departmentG, teacheridG, loading, setLoading } = useAuth();
 
 
-    const FileLoad = async () => {
+    const handleOnFileLoad = async () => {
         try {
             const res = await DocumentPicker.pick({
                 type: [DocumentPicker.types.allFiles],
@@ -95,6 +96,7 @@ const CreateClass = () => {
             header: true,
             skipEmptyLines: true,
         });
+        console.log(json);
         
         const json2 = json.data.map((item) => ({
             ...item,
@@ -103,7 +105,8 @@ const CreateClass = () => {
 
         const transformedData = json.data.map((item) => ({
             rollNumber: item.ROLLNO,
-            name: item.STUDNAME,            
+            fullName: item.STUDNAME,    
+            email: item.EMAIL      
         }));
         setStudents(transformedData);
         setJsonLocalData(json2);
@@ -113,12 +116,13 @@ const CreateClass = () => {
         try {
             console.log(students);
             setLoading(true);
-          if(!classname || !batch || !semester || !students) {
+          if(!classname || !batch || !semester || !students || !departmentG){
             ToastAndroid.show('Fields Should Not Be Empty',ToastAndroid.LONG);
             setLoading(false);
             return;
           }
-            const response = await axios.post('https://attendancetrackerbackend.onrender.com/api/class/createClass', {
+          console.log(classname, batch, typeof batch, semester,typeof semester, departmentG, teacheridG, students);
+            const response = await axios.post(`${BASE_URL}/api/class/create-class`, {
                 classname: classname,
                 batch: batch,
                 semester: semester,
@@ -174,12 +178,24 @@ const CreateClass = () => {
                 keyboardType='numeric'
                 style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(5.5), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(4), color: theme.maincolor, fontSize: wp(4), fontWeight: '500' }}
             />
+
+
+
             <TextInput
                 placeholder="Batch"
                 placeholderTextColor='#909090'
                 onChangeText={setBatch}
                 value={batch}
                 keyboardType='numeric'
+                style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(5.5), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(4), color: theme.maincolor, fontSize: wp(4), fontWeight: '500' }}
+            />
+
+
+<TextInput
+                placeholder="Department"
+                placeholderTextColor='#909090'
+                onChangeText={setSemester}
+                value={departmentG}
                 style={{ borderWidth: 1, borderColor: theme.maincolor, width: wp(90), height: hp(5.5), borderRadius: wp(2), paddingHorizontal: wp(4), marginTop: wp(4), color: theme.maincolor, fontSize: wp(4), fontWeight: '500' }}
             />
 
@@ -197,6 +213,8 @@ const CreateClass = () => {
                 <Text style={{ fontWeight: '700', fontSize: wp(4), color: '#fff' }} >Roll No</Text>
                 <Text style={{ fontWeight: '700', fontSize: wp(4), color: '#fff' }} >Name</Text>
             </View>
+
+
             <ScrollView
                 scrollEventThrottle={1}
                 contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}
@@ -210,6 +228,10 @@ const CreateClass = () => {
                         <Text style={{ fontSize: wp(4), color: '#fff', color: theme.maincolor }}>{student.STUDNAME}</Text>
                     </View>
                 ))}
+
+                <View style={{ height: hp(10) }} >
+                    
+                </View>
 
             </ScrollView>
 

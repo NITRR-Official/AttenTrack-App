@@ -13,6 +13,7 @@ import {
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
+import { BASE_URL } from '../../constants/constants';
 
 const StudentReport = () => {
   const [lowAttendanceSubjects, setLowAttendanceSubjects] = useState([]);
@@ -23,7 +24,7 @@ const StudentReport = () => {
     setLoading(true);
     try {
       // Await the axios post request to set attendance
-      const response = await axios.get(`https://attendancetrackerbackend.onrender.com/api/student/attendance/${rollNumberG}`);
+      const response = await axios.get(`${BASE_URL}/api/student/attendance/${rollNumberG}`);
       console.log(response.data);
       setData(response.data);
 

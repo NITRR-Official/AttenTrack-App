@@ -14,7 +14,7 @@ import axios from 'axios';
 import GetLocation from 'react-native-get-location'
 import { calculateDistance } from './locationTracker';
 import { useAuth } from '../../utils/auth';
-
+import { BASE_URL } from '../../constants/constants';
 const MarkAttendance = ({route}) => {
   console.log('hi',route.params);
   const navigation = useNavigation();
@@ -29,9 +29,10 @@ const MarkAttendance = ({route}) => {
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
 
+
   const handleGetAttendance = async () => {
     try {
-      const resp = await axios.get('https://attendancetrackerbackend.onrender.com/getAttendance');
+      const resp = await axios.get(`${BASE_URL}/getAttendance`);
       const data2 = resp.data;
       setReceivedOtp(data2.currentOTP);
       setFinalTime(data2.finalTime);
