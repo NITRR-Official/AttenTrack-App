@@ -1,4 +1,4 @@
-package com.myproject
+package com.AttenTrack.nitrr
 
 import com.oblador.vectoricons.VectorIconsPackage;
 
