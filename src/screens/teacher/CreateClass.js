@@ -431,7 +431,7 @@ const CreateClass = () => {
           <XMarkIcon size={wp(8)} color={theme.maincolor} />
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={createClass}
+          onPress={()=>{createClass(); refreshList();}}
           style={styles.saveButton}
           disabled={loading}
         >

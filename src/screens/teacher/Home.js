@@ -25,6 +25,8 @@ import {
   PlusCircleIcon,
   TrashIcon,
 } from "react-native-heroicons/outline";
+import PTRView from "react-native-pull-to-refresh";
+
 
 import React, {useEffect} from 'react';
 
@@ -38,20 +40,21 @@ const Home = () => {
   const [selectedClass, setSelectedClass] = React.useState(null);
   const { classes, setClasses, loading, setLoading, teacheridG, teacherNameG, teacherEmailG } = useAuth();
 
+  const fetchData = async () => {
+    axios.get(`${BASE_URL}/api/teacher/classes-info/${teacheridG}`)
+    .then((response) => {
+      console.log('Classes:', response.data);
+      setClasses(response.data.classes);
+    }).catch((error) => {
+      console.log(error);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }
+
   useEffect(() => {
     setLoading(true);
     console.log('Teacher ID:', teacheridG, teacherNameG, teacherEmailG);
-    const fetchData = async () => {
-      axios.get(`${BASE_URL}/api/teacher/classes-info/${teacheridG}`)
-      .then((response) => {
-        console.log('Classes:', response.data);
-        setClasses(response.data.classes);
-      }).catch((error) => {
-        console.log(error);
-      }).finally(() => {
-        setLoading(false);
-      });
-    }
     fetchData();
   }, [])
 
@@ -84,6 +87,15 @@ const Home = () => {
 
   const [modalVisible1, setModalVisible1] = React.useState(false);
 
+  const refresh = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        fetchData();
+        resolve();
+      }, 2000);
+    });
+  };
+
   return (
     <SafeAreaView className="relative">
       <StatusBar
@@ -103,7 +115,10 @@ const Home = () => {
       { loading && <View className="z-10 w-full p-2 top-[40%] absolute ">
       <ActivityIndicator animating={true} color={'#01808c7a'} size={wp(10)} />
       </View> }
-      <ScrollView
+
+
+      <PTRView 
+        onRefresh={refresh}
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
         style={{ backgroundColor: '#fff', height: hp(100), opacity:loading?0.5:1 }}
@@ -171,7 +186,7 @@ const Home = () => {
         </Modal>
 
 
-      </ScrollView>
+      </PTRView>
 
 
     </SafeAreaView>
