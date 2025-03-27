@@ -483,3 +483,785 @@ export default Sheet;
 const styles = StyleSheet.create({
   // Add any custom styles if needed
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // // 2nd try 
+
+
+// import React, { useEffect, useState, useRef } from 'react';
+// import {
+//   Alert,
+//   Modal,
+//   PermissionsAndroid,
+//   Pressable,
+//   SafeAreaView,
+//   StyleSheet,
+//   Switch,
+//   Text,
+//   TouchableOpacity,
+//   TouchableWithoutFeedback,
+//   View,
+//   ToastAndroid,
+//   ActivityIndicator,
+//   ScrollView,
+//   Platform
+// } from 'react-native';
+// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+// import { CpuChipIcon, PencilSquareIcon, XMarkIcon } from 'react-native-heroicons/outline';
+// import { theme } from '../../theme';
+// import { ProgressBar, RadioButton } from 'react-native-paper';
+// import axios from 'axios';
+// import { useAuth } from '../../utils/auth';
+// import GetLocation from 'react-native-get-location';
+// import RNHTMLtoPDF from 'react-native-html-to-pdf';
+// import RNFS from 'react-native-fs';
+// import { BASE_URL } from '../../constants/constants';
+
+// const AttendanceSheet = ({ navigation, route }) => {
+//   // State management
+//   const { loading, setLoading } = useAuth();
+//   const [studentData, setStudentData] = useState([]);
+//   const [attendanceRecords, setAttendanceRecords] = useState([]);
+//   const [presentCount, setPresentCount] = useState(0);
+//   const [absentCount, setAbsentCount] = useState(0);
+//   const [range, setRange] = useState(3000);
+  
+//   // Modal states
+//   const [showRangeModal, setShowRangeModal] = useState(false);
+//   const [showTimeModal, setShowTimeModal] = useState(false);
+//   const [showOTPModal, setShowOTPModal] = useState(false);
+  
+//   // Attendance session states
+//   const [otp, setOtp] = useState('');
+//   const [timeRemaining, setTimeRemaining] = useState(0);
+//   const [sessionDuration, setSessionDuration] = useState(0);
+  
+//   // WebSocket reference
+//   const socketRef = useRef(null);
+
+//   // Initialize student data
+//   useEffect(() => {
+//     if (route.params?.jsonGlobalData) {
+//       setStudentData(route.params.jsonGlobalData);
+//     }
+//   }, [route.params]);
+
+//   // Initialize attendance records
+//   useEffect(() => {
+//     if (studentData.length > 0) {
+//       const initialRecords = studentData.map(student => ({
+//         rollNumber: student.rollNumber,
+//         is_present: false
+//       }));
+//       setAttendanceRecords(initialRecords);
+//     }
+//   }, [studentData]);
+
+//   // Calculate attendance stats
+//   useEffect(() => {
+//     const present = attendanceRecords.filter(record => record.is_present).length;
+//     setPresentCount(present);
+//     setAbsentCount(attendanceRecords.length - present);
+//   }, [attendanceRecords]);
+
+//   // WebSocket management
+//   useEffect(() => {
+//     // Initialize WebSocket connection
+//     socketRef.current = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+
+//     socketRef.current.onopen = () => {
+//       console.log('WebSocket connected');
+//     };
+
+//     socketRef.current.onmessage = (event) => {
+//       const data = JSON.parse(event.data);
+      
+//       if (data.type === 'attendance2') {
+//         // Update attendance when student marks themselves present
+//         setAttendanceRecords(prevRecords =>
+//           prevRecords.map(record =>
+//             record.rollNumber === data.rollNumber 
+//               ? { ...record, is_present: true } 
+//               : record
+//           )
+//         );
+//       }
+//     };
+
+//     socketRef.current.onerror = (error) => {
+//       console.log('WebSocket error:', error);
+//     };
+
+//     socketRef.current.onclose = () => {
+//       console.log('WebSocket disconnected');
+//     };
+
+//     return () => {
+//       if (socketRef.current) {
+//         socketRef.current.close();
+//       }
+//     };
+//   }, []);
+
+//   // Handle attendance submission
+//   const submitAttendance = async () => {
+//     try {
+//       setLoading(true);
+      
+//       const response = await axios.post(`${BASE_URL}/api/attendance/createAttendance`, {
+//         class_id: route.params.id,
+//         date: new Date().toISOString().split('T')[0],
+//         records: attendanceRecords
+//       });
+
+//       ToastAndroid.show('Attendance saved successfully!', ToastAndroid.LONG);
+//       generateReport();
+//       navigation.goBack();
+//     } catch (error) {
+//       console.error('Attendance submission error:', error);
+//       ToastAndroid.show('Failed to save attendance', ToastAndroid.LONG);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Start attendance session
+//   const startAttendanceSession = async (duration) => {
+//     const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+//     setOtp(generatedOTP);
+//     setSessionDuration(duration);
+//     setTimeRemaining(duration);
+//     setShowTimeModal(false);
+//     setShowOTPModal(true);
+
+//     try {
+//       // Send OTP to server
+//       await axios.post(`${BASE_URL}/setAttendance`, {
+//         otp: generatedOTP,
+//         time: duration
+//       });
+
+//       // Start session timer
+//       startSessionTimer(duration);
+//     } catch (error) {
+//       console.error('Error starting session:', error);
+//       ToastAndroid.show('Failed to start attendance session', ToastAndroid.LONG);
+//     }
+//   };
+
+//   // Session timer
+//   const startSessionTimer = (duration) => {
+//     let timer = duration;
+//     const interval = setInterval(() => {
+//       timer -= 1;
+//       setTimeRemaining(timer);
+
+//       // Send time updates to students
+//       if (socketRef.current?.readyState === WebSocket.OPEN) {
+//         socketRef.current.send(JSON.stringify({ 
+//           type: 'time_update', 
+//           time: timer 
+//         }));
+//       }
+
+//       if (timer <= 0) {
+//         clearInterval(interval);
+//         setShowOTPModal(false);
+//       }
+//     }, 1000);
+//   };
+
+//   // Location permission handling
+//   const requestLocationPermission = async () => {
+//     if (Platform.OS === 'android') {
+//       try {
+//         const granted = await PermissionsAndroid.request(
+//           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+//           {
+//             title: "Location Permission",
+//             message: "This app needs access to your location",
+//             buttonPositive: "OK"
+//           }
+//         );
+        
+//         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+//           getTeacherLocation();
+//         } else {
+//           ToastAndroid.show('Location permission denied', ToastAndroid.LONG);
+//         }
+//       } catch (err) {
+//         console.warn('Location permission error:', err);
+//       }
+//     } else {
+//       getTeacherLocation();
+//     }
+//   };
+
+//   // Get teacher location
+//   const getTeacherLocation = () => {
+//     GetLocation.getCurrentPosition({
+//       enableHighAccuracy: true,
+//       timeout: 15000
+//     })
+//     .then(location => {
+//       if (socketRef.current?.readyState === WebSocket.OPEN) {
+//         socketRef.current.send(JSON.stringify({
+//           type: 'teacherLoc',
+//           location: location,
+//           range: range
+//         }));
+//       }
+//       setShowRangeModal(false);
+//       setShowTimeModal(true);
+//     })
+//     .catch(error => {
+//       console.warn('Location error:', error);
+//       ToastAndroid.show('Failed to get location', ToastAndroid.LONG);
+//     });
+//   };
+
+//   // Mark all students present/absent
+//   const markAllStudents = (status) => {
+//     setAttendanceRecords(prevRecords =>
+//       prevRecords.map(record => ({ ...record, is_present: status }))
+//     );
+//   };
+
+//   // Generate attendance report
+//   const generateReport = async () => {
+//     const htmlContent = `
+//       <h1>Attendance Report - ${new Date().toISOString().split('T')[0]}</h1>
+//       <h2>Class: ${route.params.classname}</h2>
+//       <table border="1" style="width:100%; border-collapse:collapse;">
+//         <thead>
+//           <tr>
+//             <th style="padding:8px;">Roll Number</th>
+//             <th style="padding:8px;">Name</th>
+//             <th style="padding:8px;">Status</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           ${attendanceRecords.map(record => `
+//             <tr>
+//               <td style="padding:8px;">${record.rollNumber}</td>
+//               <td style="padding:8px;">
+//                 ${studentData.find(s => s.rollNumber === record.rollNumber)?.name || 'N/A'}
+//               </td>
+//               <td style="padding:8px;color:${record.is_present ? 'green' : 'red'}">
+//                 ${record.is_present ? 'Present' : 'Absent'}
+//               </td>
+//             </tr>
+//           `).join('')}
+//         </tbody>
+//       </table>
+//       <p>Total Present: ${presentCount} | Total Absent: ${absentCount}</p>
+//     `;
+
+//     try {
+//       const options = {
+//         html: htmlContent,
+//         fileName: `Attendance_${route.params.classname}_${new Date().toISOString().split('T')[0]}`,
+//         directory: 'Documents',
+//       };
+
+//       const file = await RNHTMLtoPDF.convert(options);
+//       Alert.alert(
+//         'Report Generated',
+//         `Attendance report saved to: ${file.filePath}`,
+//         [{ text: 'OK' }]
+//       );
+//     } catch (error) {
+//       console.error('Report generation error:', error);
+//       ToastAndroid.show('Failed to generate report', ToastAndroid.LONG);
+//     }
+//   };
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       {/* Header */}
+//       <View style={styles.header}>
+//         <TouchableOpacity onPress={() => navigation.goBack()}>
+//           <XMarkIcon size={wp(8)} color={theme.maincolor} />
+//         </TouchableOpacity>
+//         <TouchableOpacity 
+//           style={styles.saveButton}
+//           onPress={submitAttendance}
+//           disabled={loading}
+//         >
+//           {loading ? (
+//             <ActivityIndicator color="white" />
+//           ) : (
+//             <Text style={styles.saveButtonText}>Save</Text>
+//           )}
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* Class Info */}
+//       <View style={styles.classInfo}>
+//         <View style={styles.classHeader}>
+//           <CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} />
+//           <Text style={styles.className}>
+//             {route.params.classname?.length > 10 
+//               ? `${route.params.classname.substring(0, 10)}...` 
+//               : route.params.classname}
+//           </Text>
+//         </View>
+//         <Text style={styles.teacherName}>
+//           {route.params.teacherName?.length > 25 
+//             ? `${route.params.teacherName.substring(0, 25)}...` 
+//             : route.params.teacherName}
+//         </Text>
+//         <TouchableOpacity
+//           style={styles.attendanceButton}
+//           onPress={() => setShowRangeModal(true)}
+//         >
+//           <PencilSquareIcon size={wp(6)} color="white" />
+//           <Text style={styles.attendanceButtonText}>Take Attendance</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* Quick Actions */}
+//       <View style={styles.quickActions}>
+//         <TouchableOpacity
+//           style={[styles.actionButton, styles.markPresent]}
+//           onPress={() => markAllStudents(true)}
+//         >
+//           <Text style={styles.actionButtonText}>Mark All Present</Text>
+//         </TouchableOpacity>
+//         <TouchableOpacity
+//           style={[styles.actionButton, styles.markAbsent]}
+//           onPress={() => markAllStudents(false)}
+//         >
+//           <Text style={styles.actionButtonText}>Mark All Absent</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* Attendance Stats */}
+//       <View style={styles.statsContainer}>
+//         <Text style={styles.statText}>Total Students: {presentCount + absentCount}</Text>
+//         <View>
+//           <Text style={styles.statText}>Present: {presentCount}</Text>
+//           <Text style={styles.statText}>Absent: {absentCount}</Text>
+//         </View>
+//       </View>
+
+//       {/* Student List Header */}
+//       <View style={styles.listHeader}>
+//         <Text style={styles.headerText}>Roll Number</Text>
+//         <Text style={[styles.headerText, styles.nameHeader]}>Name</Text>
+//         <Text style={styles.headerText}>Attendance</Text>
+//       </View>
+
+//       {/* Student List */}
+//       <ScrollView style={styles.studentList}>
+//         {studentData.length > 0 ? (
+//           studentData.map((student, index) => (
+//             <View key={student.rollNumber} style={styles.studentRow}>
+//               <Text style={styles.rollNumber}>{student.rollNumber}</Text>
+//               <Text style={styles.studentName}>{student.name}</Text>
+//               <View style={styles.attendanceToggle}>
+//                 <Switch
+//                   value={attendanceRecords[index]?.is_present || false}
+//                   onValueChange={() => {
+//                     const newRecords = [...attendanceRecords];
+//                     newRecords[index].is_present = !newRecords[index].is_present;
+//                     setAttendanceRecords(newRecords);
+//                   }}
+//                   thumbColor={attendanceRecords[index]?.is_present ? '#4CAF50' : '#F44336'}
+//                   trackColor={{ false: '#FFCDD2', true: '#C8E6C9' }}
+//                 />
+//                 <Text style={styles.attendanceStatus}>
+//                   {attendanceRecords[index]?.is_present ? 'P' : 'A'}
+//                 </Text>
+//               </View>
+//             </View>
+//           ))
+//         ) : (
+//           <Text style={styles.emptyMessage}>No students found</Text>
+//         )}
+//       </ScrollView>
+
+//       {/* Range Selection Modal */}
+//       <Modal
+//         animationType="fade"
+//         transparent={true}
+//         visible={showRangeModal}
+//         onRequestClose={() => setShowRangeModal(false)}
+//       >
+//         <TouchableWithoutFeedback onPress={() => setShowRangeModal(false)}>
+//           <View style={styles.modalOverlay}>
+//             <TouchableWithoutFeedback>
+//               <View style={styles.modalContent}>
+//                 <Text style={styles.modalTitle}>Select Range</Text>
+//                 <RadioButton.Group
+//                   onValueChange={value => {
+//                     setRange(parseInt(value));
+//                     requestLocationPermission();
+//                   }}
+//                   value={range.toString()}
+//                 >
+//                   {[5, 10, 20, 30, 40, 50, 100, 500, 1000].map(value => (
+//                     <RadioButton.Item
+//                       key={value}
+//                       label={`${value}m`}
+//                       value={value.toString()}
+//                       labelStyle={styles.radioLabel}
+//                     />
+//                   ))}
+//                 </RadioButton.Group>
+//               </View>
+//             </TouchableWithoutFeedback>
+//           </View>
+//         </TouchableWithoutFeedback>
+//       </Modal>
+
+//       {/* Time Selection Modal */}
+//       <Modal
+//         animationType="fade"
+//         transparent={true}
+//         visible={showTimeModal}
+//         onRequestClose={() => setShowTimeModal(false)}
+//       >
+//         <TouchableWithoutFeedback onPress={() => setShowTimeModal(false)}>
+//           <View style={styles.modalOverlay}>
+//             <TouchableWithoutFeedback>
+//               <View style={styles.modalContent}>
+//                 <Text style={styles.modalTitle}>Select Duration</Text>
+//                 <RadioButton.Group
+//                   onValueChange={value => startAttendanceSession(parseInt(value))}
+//                 >
+//                   {[
+//                     { label: '10 Seconds', value: '10' },
+//                     { label: '20 Seconds', value: '20' },
+//                     { label: '30 Seconds', value: '30' },
+//                     { label: '1 Minute', value: '60' },
+//                     { label: '2 Minutes', value: '120' }
+//                   ].map(item => (
+//                     <RadioButton.Item
+//                       key={item.value}
+//                       label={item.label}
+//                       value={item.value}
+//                       labelStyle={styles.radioLabel}
+//                     />
+//                   ))}
+//                 </RadioButton.Group>
+//               </View>
+//             </TouchableWithoutFeedback>
+//           </View>
+//         </TouchableWithoutFeedback>
+//       </Modal>
+
+//       {/* OTP Modal */}
+//       <Modal
+//         animationType="fade"
+//         transparent={true}
+//         visible={showOTPModal}
+//         onRequestClose={() => {
+//           setShowOTPModal(false);
+//           setTimeRemaining(0);
+//         }}
+//       >
+//         <TouchableWithoutFeedback onPress={() => {
+//           setShowOTPModal(false);
+//           setTimeRemaining(0);
+//         }}>
+//           <View style={styles.modalOverlay}>
+//             <TouchableWithoutFeedback>
+//               <View style={styles.modalContent}>
+//                 <Text style={styles.otpTitle}>Attendance Session</Text>
+//                 <Text style={styles.otpCode}>OTP: {otp}</Text>
+//                 <Text style={styles.timeRemaining}>
+//                   Time Remaining: {timeRemaining} seconds
+//                 </Text>
+//                 <ProgressBar
+//                   progress={timeRemaining / sessionDuration}
+//                   color={theme.maincolor}
+//                   style={styles.progressBar}
+//                 />
+//                 <Pressable
+//                   style={styles.cancelButton}
+//                   onPress={() => {
+//                     setShowOTPModal(false);
+//                     setTimeRemaining(0);
+//                   }}
+//                 >
+//                   <Text style={styles.cancelButtonText}>End Session</Text>
+//                 </Pressable>
+//               </View>
+//             </TouchableWithoutFeedback>
+//           </View>
+//         </TouchableWithoutFeedback>
+//       </Modal>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     alignItems: 'center',
+//     backgroundColor: '#fff',
+//   },
+//   header: {
+//     width: '100%',
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     padding: 16,
+//     paddingBottom: 0,
+//   },
+//   saveButton: {
+//     backgroundColor: theme.maincolor,
+//     borderRadius: 8,
+//     paddingVertical: 12,
+//     paddingHorizontal: 20,
+//   },
+//   saveButtonText: {
+//     color: '#fff',
+//     fontSize: wp(3.5),
+//     fontWeight: '700',
+//   },
+//   classInfo: {
+//     width: '95%',
+//     backgroundColor: '#01808c2e',
+//     padding: 8,
+//     paddingHorizontal: 12,
+//     borderRadius: 8,
+//     borderWidth: 2,
+//     borderColor: '#01808c7a',
+//     margin: 16,
+//     marginBottom: 12,
+//   },
+//   classHeader: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   className: {
+//     fontSize: wp(5),
+//     color: '#01808cb9',
+//     fontWeight: '500',
+//     marginLeft: 4,
+//   },
+//   teacherName: {
+//     color: '#6a6a6a',
+//     fontSize: wp(3.5),
+//   },
+//   attendanceButton: {
+//     flexDirection: 'column',
+//     alignItems: 'center',
+//     backgroundColor: '#01808cb9',
+//     padding: 8,
+//     borderRadius: 8,
+//     borderWidth: 2,
+//     borderColor: '#01808c7a',
+//     alignSelf: 'flex-end',
+//     marginTop: 8,
+//   },
+//   attendanceButtonText: {
+//     color: 'white',
+//     fontSize: wp(3.2),
+//     fontWeight: '500',
+//   },
+//   quickActions: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     width: '100%',
+//     paddingHorizontal: 12,
+//     marginBottom: 12,
+//   },
+//   actionButton: {
+//     flex: 1,
+//     paddingVertical: 8,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//   },
+//   markPresent: {
+//     backgroundColor: '#258a4ac4',
+//     marginRight: 8,
+//   },
+//   markAbsent: {
+//     backgroundColor: '#c41111c4',
+//     marginLeft: 8,
+//   },
+//   actionButtonText: {
+//     color: 'white',
+//     fontWeight: '600',
+//   },
+//   statsContainer: {
+//     width: '100%',
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     paddingHorizontal: 16,
+//     marginBottom: 8,
+//   },
+//   statText: {
+//     fontSize: wp(3.2),
+//     color: '#6a6a6a',
+//   },
+//   listHeader: {
+//     width: '95%',
+//     backgroundColor: '#01808c2e',
+//     padding: 8,
+//     borderTopWidth: 2,
+//     borderRightWidth: 2,
+//     borderLeftWidth: 2,
+//     borderColor: '#01808c7a',
+//     borderTopLeftRadius: 8,
+//     borderTopRightRadius: 8,
+//     flexDirection: 'row',
+//   },
+//   headerText: {
+//     color: '#7c7c7c',
+//     fontSize: wp(3.5),
+//   },
+//   nameHeader: {
+//     flex: 1,
+//     textAlign: 'center',
+//   },
+//   studentList: {
+//     width: '95%',
+//     borderBottomWidth: 2,
+//     borderRightWidth: 2,
+//     borderLeftWidth: 2,
+//     borderColor: '#01808c7a',
+//     borderBottomLeftRadius: 8,
+//     borderBottomRightRadius: 8,
+//   },
+//   studentRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingVertical: 12,
+//     paddingHorizontal: 8,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#e0e0e0',
+//   },
+//   rollNumber: {
+//     width: '25%',
+//     color: theme.maincolor,
+//   },
+//   studentName: {
+//     width: '50%',
+//     color: theme.maincolor,
+//     textAlign: 'center',
+//   },
+//   attendanceToggle: {
+//     width: '25%',
+//     flexDirection: 'row',
+//     justifyContent: 'flex-end',
+//     alignItems: 'center',
+//   },
+//   attendanceStatus: {
+//     color: '#6a6a6a',
+//     fontWeight: '600',
+//     marginLeft: 8,
+//   },
+//   emptyMessage: {
+//     textAlign: 'center',
+//     padding: 16,
+//     color: '#6a6a6a',
+//   },
+//   modalOverlay: {
+//     flex: 1,
+//     backgroundColor: 'rgba(0,0,0,0.5)',
+//     justifyContent: 'center',
+//   },
+//   modalContent: {
+//     backgroundColor: 'white',
+//     marginHorizontal: 20,
+//     borderRadius: 8,
+//     padding: 20,
+//     shadowColor: '#000',
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.25,
+//     shadowRadius: 4,
+//     elevation: 5,
+//   },
+//   modalTitle: {
+//     fontSize: wp(4.5),
+//     fontWeight: '600',
+//     marginBottom: 16,
+//     color: '#333',
+//     textAlign: 'center',
+//   },
+//   radioLabel: {
+//     color: '#6a6a6a',
+//   },
+//   otpTitle: {
+//     fontSize: wp(5),
+//     fontWeight: '600',
+//     textAlign: 'center',
+//     marginBottom: 8,
+//     color: '#333',
+//   },
+//   otpCode: {
+//     fontSize: wp(4),
+//     textAlign: 'center',
+//     marginBottom: 16,
+//     color: theme.maincolor,
+//     fontWeight: '600',
+//   },
+//   timeRemaining: {
+//     fontSize: wp(3.8),
+//     textAlign: 'center',
+//     marginBottom: 8,
+//     color: '#6a6a6a',
+//   },
+//   progressBar: {
+//     height: 10,
+//     borderRadius: 5,
+//     marginVertical: 16,
+//   },
+//   cancelButton: {
+//     backgroundColor: '#e74c3c',
+//     padding: 12,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//   },
+//   cancelButtonText: {
+//     color: 'white',
+//     fontWeight: '600',
+//     fontSize: wp(4),
+//   },
+// });
+
+// export default AttendanceSheet;
