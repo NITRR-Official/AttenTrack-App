@@ -38,7 +38,7 @@ import { BASE_URL } from '../../constants/constants';
 const Home = () => {
 
   const [selectedClass, setSelectedClass] = React.useState(null);
-  const { classes, setClasses, loading, setLoading, teacheridG, teacherNameG, teacherEmailG } = useAuth();
+  const { classes, setClasses, loading, setLoading, teacheridG, teacherNameG, refreshing, setRefreshing } = useAuth();
 
   const fetchData = async () => {
     axios.get(`${BASE_URL}/api/teacher/classes-info/${teacheridG}`)
@@ -53,10 +53,12 @@ const Home = () => {
   }
 
   useEffect(() => {
-    setLoading(true);
-    console.log('Teacher ID:', teacheridG, teacherNameG, teacherEmailG);
-    fetchData();
-  }, [])
+    if(refreshing) {
+      setLoading(true);
+      fetchData();
+      setRefreshing(false);
+    }
+  }, [refreshing])
 
   const deleteClass = async () => {
     try {
