@@ -25,6 +25,7 @@ const Report = ({route}) => {
   const [emailList, setEmailList] = React.useState([]);
 
   useEffect(()=>{
+    console.log("Report", route.params);
     const studentsBelowThreshold = route.params.recordG?.filter((item) => (item.noDaysP * 100 / route.params.totG) < thresPerc)
   .map((item) => item.name.replace(/\s+/g, '') + '@gmail.com');
     setEmailList(studentsBelowThreshold);
