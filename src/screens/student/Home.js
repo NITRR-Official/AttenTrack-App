@@ -32,6 +32,8 @@ import { useAuth } from '../../utils/auth';
 import axios from 'axios';
 import { ActivityIndicator } from 'react-native-paper';
 import { BASE_URL } from '../../constants/constants';
+import PTRView from 'react-native-pull-to-refresh';
+
 
 const Home = () => {
 
@@ -73,6 +75,15 @@ const Home = () => {
     getClassInfo();
   }, [studentidG])
 
+  const refresh = () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        getClassInfo();
+        resolve();
+      }, 2000);
+    });
+  };
+
   return (
     <SafeAreaView classItem="relative">
       <StatusBar
@@ -93,7 +104,8 @@ const Home = () => {
       { loading && <View className="z-10 w-full p-2 top-[40%] absolute ">
       <ActivityIndicator animating={true} color={'#01808c7a'} size={wp(10)} />
       </View> }
-      <ScrollView
+      <PTRView
+        onRefresh={refresh}
         scrollEventThrottle={1}
         contentContainerStyle={{ flexGrow: 1 }}
         style={{ backgroundColor: '#fff', height: hp(100), opacity:loading?0.5:1 }}
@@ -124,7 +136,7 @@ const Home = () => {
         }
         {!loading && selectedClass?.length == 0 && <Text className="text-gray-600 text-center pt-4 text-lg">You Have Not Been Added In Any Class</Text>}
 
-      </ScrollView>
+      </PTRView>
 
 
     </SafeAreaView>
