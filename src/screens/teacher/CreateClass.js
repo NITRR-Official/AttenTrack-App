@@ -288,7 +288,7 @@ const CreateClass = () => {
   const [semester, setSemester] = useState('');
   const [jsonLocalData, setJsonLocalData] = useState([]);
   const [students, setStudents] = useState([]);
-  const { setClasses, departmentG, teacheridG, loading, setLoading } = useAuth();
+  const { setClasses, departmentG, teacheridG, loading, setLoading, setRefreshing } = useAuth();
 
   const handleOnFileLoad = async () => {
     try {
@@ -412,6 +412,7 @@ const CreateClass = () => {
 
       ToastAndroid.show('Class Added Successfully!', ToastAndroid.LONG);
       setClasses(prevClasses => [...prevClasses, { id: response.data._id, classname }]);
+      setRefreshing(true);
       navigation.goBack();
     } catch (error) {
       console.error('Error creating class:', error);
@@ -431,7 +432,7 @@ const CreateClass = () => {
           <XMarkIcon size={wp(8)} color={theme.maincolor} />
         </TouchableOpacity>
         <TouchableOpacity 
-          onPress={createClass}
+          onPress={()=>{createClass();}}
           style={styles.saveButton}
           disabled={loading}
         >

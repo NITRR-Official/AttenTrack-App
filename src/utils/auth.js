@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }) => {
     const [index, setIndex] = useState('0');
     const [classes, setClasses] = useState([]);
 
+    const [refreshing, setRefreshing] = useState(true);
+
     const [teacheridG, setTeacheridG] = useState('');
     const [teacherNameG, setTeacherNameG] = useState('');
     const [teacherEmailG, setTeacherEmailG] = useState('');
@@ -25,6 +27,8 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider
             value={{studentidG, setStudentidG, studentNameG, setStudentNameG, studentEmailG, setStudentEmailG,
+                refreshing,
+                setRefreshing,
                 classes,
                 setClasses,
                 index,

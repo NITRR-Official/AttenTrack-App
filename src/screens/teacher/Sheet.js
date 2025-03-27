@@ -153,10 +153,11 @@ const Sheet = ({ navigation, route }) => {
   const createAttendance = async () => {
     try {
         setLoading(true);
+        console.log('Creating attendance with records:', route.params.id, records, new Date());
         const response = await axios.post(`${BASE_URL}/api/attendance/createAttendance`, {
             class_id: route.params.id,
             date: new Date(),
-            records: records
+            records: Object.fromEntries(records.map(item => [item.rollNumber, item.is_present]))
         });
 
         ToastAndroid.show(`Attendance Added Successfully !`, ToastAndroid.LONG);
