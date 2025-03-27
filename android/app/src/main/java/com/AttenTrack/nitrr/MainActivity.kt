@@ -1,4 +1,4 @@
-package com.myproject
+package com.AttenTrack.nitrr
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity
@@ -17,7 +17,7 @@ class MainActivity : ReactActivity() {
     super.onCreate(null)
   }
 
-  override fun getMainComponentName(): String = "myproject"
+  override fun getMainComponentName(): String = "AttenTrack"
 
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
