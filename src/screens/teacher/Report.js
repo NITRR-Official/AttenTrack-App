@@ -8,7 +8,7 @@ import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
 import { RadioButton, TextInput } from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import RNFS from 'react-native-fs'; // For managing files
+import RNFS from 'react-native-fs';
 import email from 'react-native-email';
 
 const Report = ({route}) => {
