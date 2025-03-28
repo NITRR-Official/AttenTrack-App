@@ -33,11 +33,6 @@ import {BASE_URL} from '../../constants/constants';
 
 import PropTypes from 'prop-types';
 
-Sheet.propTypes = {
-  navigation: PropTypes.object.isRequired,
-  route: PropTypes.object.isRequired,
-};
-
 const Sheet = ({navigation, route}) => {
   const {loading, setLoading} = useAuth();
 
@@ -645,6 +640,11 @@ const Sheet = ({navigation, route}) => {
       </ScrollView>
     </SafeAreaView>
   );
+};
+
+Sheet.propTypes = {
+  navigation: PropTypes.object.isRequired,
+  route: PropTypes.object.isRequired,
 };
 
 export default Sheet;

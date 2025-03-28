@@ -307,7 +307,3 @@ MarkAttendance.propTypes = {
 };
 
 export default MarkAttendance;
-
-const styles = StyleSheet.create({
-  // Add any custom styles if needed
-});

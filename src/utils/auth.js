@@ -5,10 +5,6 @@ export const AuthContext = createContext();
 
 import PropTypes from 'prop-types';
 
-AuthProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-};
-
 export const AuthProvider = ({ children }) => {
 
     const [index, setIndex] = useState('0');
@@ -81,6 +77,10 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 }
+
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
 
 export const useAuth = () => {
     return useContext(AuthContext);
