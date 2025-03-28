@@ -1,22 +1,21 @@
-import { Alert, Modal, PermissionsAndroid, Platform, Pressable, SafeAreaView, StyleSheet, Switch, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Modal, ScrollView, PermissionsAndroid, Platform, Pressable, SafeAreaView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { BookOpenIcon, CpuChipIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon } from 'react-native-heroicons/outline';
+import { CpuChipIcon, PencilSquareIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { theme } from '../../theme';
-import { ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
-import {attendanceData} from './attendanceData'
+import { ActivityIndicator, ProgressBar } from 'react-native-paper';
 import axios from 'axios';
 import GetLocation from 'react-native-get-location'
 import { calculateDistance } from './locationTracker';
 import { useAuth } from '../../utils/auth';
 import { BASE_URL } from '../../constants/constants';
+
 const MarkAttendance = ({route}) => {
-  console.log('hi',route.params);
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [modalVisible1, setModalVisible1] = useState(false);
@@ -44,7 +43,7 @@ const MarkAttendance = ({route}) => {
 
   useEffect(() => {
 
-    socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+    const socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {
@@ -85,7 +84,7 @@ const MarkAttendance = ({route}) => {
   }, []);
 
   const handleOtpSubmit = () => {
-    if (receivedOtp === otp) {
+    if (receivedOtp == otp) {
       ToastAndroid.show('OTP Verified !', ToastAndroid.LONG);
       setModalVisible1(false);
       setModalVisible2(true);
@@ -280,7 +279,7 @@ const MarkAttendance = ({route}) => {
         <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
 
           {route.params.attDataG?.map((item, id) => (
-            <View className="flex flex-row justify-between" key={id}>
+            <View className="flex flex-row justify-between" key={item}>
               <Text className={`w-3/4 text-[${theme.maincolor}] `} >{new Date(item.date).toISOString().split('T')[0]}</Text>
               <Text className={`w-1/4 text-[${theme.maincolor}]  text-right`}>{item.is_present?'Present':'Absent'}</Text>
             </View>
@@ -293,6 +292,19 @@ const MarkAttendance = ({route}) => {
     </SafeAreaView>
   )
 }
+MarkAttendance.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      attDataG: PropTypes.arrayOf(
+        PropTypes.shape({
+          date: PropTypes.string.isRequired,
+          is_present: PropTypes.bool.isRequired,
+        })
+      ),
+      className: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
 
 export default MarkAttendance;
 

@@ -2,13 +2,9 @@ import {
   View,
   Text,
   SafeAreaView,
-  Image,
   StatusBar,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  BackHandler,
-  ScrollView,
   TouchableWithoutFeedback,
   Modal,
   ToastAndroid,
@@ -19,9 +15,7 @@ import {
 } from 'react-native-responsive-screen';
 import {theme} from '../../theme';
 import {
-  ComputerDesktopIcon,
   CpuChipIcon,
-  PhoneIcon,
   PlusCircleIcon,
   TrashIcon,
 } from 'react-native-heroicons/outline';
@@ -178,7 +172,7 @@ const Home = () => {
         {classes.map((item, id) => {
           return (
             <TouchableOpacity
-              key={id}
+              key={item.classname}
               disabled={loading}
               className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
               onPress={() => {

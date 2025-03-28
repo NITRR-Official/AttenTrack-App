@@ -2,15 +2,10 @@ import {
   View,
   Text,
   SafeAreaView,
-  Image,
   StatusBar,
   StyleSheet,
-  TextInput,
-  Button,
   TouchableOpacity,
-  BackHandler,
   ScrollView,
-  ToastAndroid,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -18,10 +13,7 @@ import {
 } from 'react-native-responsive-screen';
 import {theme} from '../../theme';
 import {
-  ComputerDesktopIcon,
   CpuChipIcon,
-  PhoneIcon,
-  PlusCircleIcon,
 } from 'react-native-heroicons/outline';
 
 import * as React from 'react';
@@ -51,7 +43,7 @@ const ReportHome = () => {
         recordG2: response.data.report,
       });
     } catch (error) {
-      //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+        ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
       console.error(error);
       setLoading(false);
     } finally {
@@ -103,7 +95,7 @@ const ReportHome = () => {
         {classes.map((item, id) => {
           return (
             <TouchableOpacity
-              key={id}
+              key={item.classname}
               className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
               onPress={() => {
                 getRecord(item.class_id);

@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, StatusBar, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert, StatusBar } from 'react-native';
 import { ActivityIndicator, ProgressBar } from 'react-native-paper';
 import { theme } from '../../theme';
-import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
-import { useNavigation } from '@react-navigation/native';
+import { ArrowDownTrayIcon } from 'react-native-heroicons/outline';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
 import axios from 'axios';
 import { BASE_URL } from '../../constants/constants';
@@ -47,9 +45,6 @@ const StudentReport = () => {
     const lowAttendance = data?.filter((subject) => (((subject.numberOfDatesP * 100) / (subject.numberOfDatesP + subject.numberOfDatesA))?.toFixed(2)) < 75);
     setLowAttendanceSubjects(lowAttendance);
   };
-
-  const series = [123, 321, 123, 789, 537]
-  const sliceColor = ['#01818C', '#01808c7a', '#01808c2e', '#01808cb9', '#01808c37']
 
   const generateHTML = () => {
     // Build HTML content for the report
@@ -171,23 +166,8 @@ const StudentReport = () => {
         </View>}
 
       <ScrollView style={styles.container} className={`opacity-${loading?50:100}`}>
-        {/* 
-      <View className="m-2 mt-4 rounded-md border-[#01808c7a] border-2">
-        <View className="flex flex-row w-full justify-around items-center p-4">
-          <PieChart widthAndHeight={150} series={series} sliceColor={sliceColor} />
-          <View className="flex flex-col gap-y-2">
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[0]}]`}></View><Text className="text-gray-500">Mathematics : {series[0]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">Physics : {series[1]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[2]}]`}></View><Text className="text-gray-500">Chemistry : {series[2]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor[3]}]`}></View><Text className="text-gray-500">Biology : {series[3]}</Text></View>
-            <View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[#01808c62]`}></View><Text className="text-gray-500">English : {series[4]}</Text></View>
-          </View>
-        </View>
-      </View> */}
-
-
         {data?.map((subject, index) => (
-          <View key={index} style={styles.section}>
+          <View key={subject} style={styles.section}>
             <Text style={styles.subHeader}>{subject.class_name}</Text>
 
             <View style={styles.row}>
@@ -224,7 +204,7 @@ const StudentReport = () => {
                 <Text style={styles.tableHeaderText}>Attendance (%)</Text>
               </View>
               {lowAttendanceSubjects?.map((subject, index) => (
-                <View key={index} style={styles.tableRow}>
+                <View key={subject} style={styles.tableRow}>
                   <Text style={styles.tableCell}>{subject.class_name}</Text>
                   <Text style={styles.tableCell}>{((subject.numberOfDatesP * 100) / (subject.numberOfDatesP + subject.numberOfDatesA))?.toFixed(2)}%</Text>
                 </View>

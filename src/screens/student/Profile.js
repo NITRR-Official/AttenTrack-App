@@ -1,6 +1,6 @@
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { CpuChipIcon, EnvelopeIcon, LinkIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon, XMarkIcon } from 'react-native-heroicons/outline';
+import { EnvelopeIcon, LinkIcon, PencilSquareIcon, PhoneIcon, UserCircleIcon } from 'react-native-heroicons/outline';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -8,7 +8,6 @@ import {
 import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
-// import EncryptedStorage from 'react-native-encrypted-storage';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
