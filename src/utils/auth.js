@@ -63,6 +63,7 @@ export const AuthProvider = ({children}) => {
         setDepartmentG(data.department);
         setTeacherNameG(data.fullName);
         setTeacherEmailG(data.email);
+        setRefreshing(true);
         setIndex('1'); // Set index for teacher
       }
     } catch (error) {

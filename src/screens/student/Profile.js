@@ -8,6 +8,7 @@ import {
 import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
+import SInfo from 'react-native-encrypted-storage';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];

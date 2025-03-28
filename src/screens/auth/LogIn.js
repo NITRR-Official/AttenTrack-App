@@ -15,7 +15,7 @@ const LogIn = () => {
   const [isSignUp, setIsSignUp] = React.useState(false);
 
   const { setIndex, setClasses, setTeacheridG, setDepartmentG, loading, setLoading, setRollNumberG, setTeacherNameG, setTeacherEmailG,
-    setStudentidG, setStudentNameG, setStudentEmailG
+    setStudentidG, setStudentNameG, setStudentEmailG, setRefreshing
   } = useAuth();
 
   const handleTeacherLogin = async () => {
@@ -57,6 +57,7 @@ const LogIn = () => {
       setTeacherNameG(data.fullName);
       setTeacherEmailG(data.email);
       setIndex('1'); // Set index for teacher
+      setRefreshing(true);
       setLoading(false);
     } catch (error) {
       console.log(error);
