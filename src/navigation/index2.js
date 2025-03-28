@@ -3,10 +3,6 @@
 import {
     View,
     Text,
-    SafeAreaView,
-    StyleSheet,
-    TouchableOpacity,
-    BackHandler,
   } from "react-native";
   
   // navigation import

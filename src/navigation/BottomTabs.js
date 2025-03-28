@@ -3,10 +3,8 @@
 import * as React from 'react';
 import {
     View,
-    StyleSheet,
     Text,
     Dimensions,
-    ImageBackground,
 } from 'react-native';
 import {
     widthPercentageToDP as wp,
@@ -15,11 +13,9 @@ import {
 
 // Navigator imports
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
 
 // Screens
 import Home from '../screens/teacher/Home';
-import Report from '../screens/teacher/Report';
 import Profile from '../screens/teacher/Profile';
 
 
@@ -27,7 +23,6 @@ import Profile from '../screens/teacher/Profile';
 import HomeIcon from '../components/HomeIcon.js';
 import ProfileIcon from '../components/ProfileIcon.js';
 import ReportIcon from '../components/ReportIcon.js';
-import Sheet from '../screens/teacher/Sheet.js';
 import ReportHome from '../screens/teacher/ReportHome.js';
 
 // size
@@ -41,7 +36,6 @@ const screenOptions = {
     headerShown: false,
 
     tabBarShowLabel: false,
-    headerShown: false,
     tabBarHideOnKeyboard: true,
     tabBarStyle: {
         position: "absolute",
@@ -69,7 +63,6 @@ export default function BottomTabs() {
 
 
     const Tab = createBottomTabNavigator();
-    const navigation = useNavigation();
 
     return (
         <View
