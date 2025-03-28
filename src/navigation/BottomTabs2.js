@@ -3,10 +3,8 @@
 import * as React from 'react';
 import {
     View,
-    StyleSheet,
     Text,
     Dimensions,
-    ImageBackground,
 } from 'react-native';
 import {
     widthPercentageToDP as wp,
@@ -15,7 +13,6 @@ import {
 
 // Navigator imports
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
 
 // Screens
 import Home from '../screens/student/Home';
@@ -39,7 +36,6 @@ const screenOptions = {
     headerShown: false,
 
     tabBarShowLabel: false,
-    headerShown: false,
     tabBarHideOnKeyboard: true,
     tabBarStyle: {
         position: "absolute",
@@ -67,7 +63,6 @@ export default function BottomTabs() {
 
 
     const Tab = createBottomTabNavigator();
-    const navigation = useNavigation();
 
     return (
         <View

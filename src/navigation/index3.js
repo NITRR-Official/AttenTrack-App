@@ -1,9 +1,5 @@
 // This is for login
 import React from 'react';
-import {
-  View,
-  Text,
-} from 'react-native';
 
 // navigation import
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
