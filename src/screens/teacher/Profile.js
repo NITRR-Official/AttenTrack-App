@@ -8,6 +8,7 @@ import {
 import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
+import SInfo from 'react-native-encrypted-storage';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -15,9 +16,9 @@ const Profile = () => {
   const sliceColor = ['#01818C', '#01808c7a', '#01808c2e', '#01808cb9', '#01808c37'];
   const sliceColor2 = ['#258a4ac4', '#c41111c4'];
 
-  const saveData = async (ind) => {
+  const saveData = async () => {
     try {
-      // await EncryptedStorage.setItem('@index', ind)
+      await SInfo.removeItem('token');
     } catch (e) {
       console.error(e);
     }
@@ -37,8 +38,8 @@ const Profile = () => {
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }} >Profile</Text>
         <TouchableOpacity onPress={() => {
+          saveData();
           setIndex('0');
-          saveData('0');
         }} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
             <Text style={{ color: theme.maincolor, fontSize: wp(3.5), fontWeight: '700', marginLeft: 5 }}>Logout</Text>

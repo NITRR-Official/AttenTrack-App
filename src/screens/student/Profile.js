@@ -15,12 +15,12 @@ const Profile = () => {
   const sliceColor = ['#01818C', '#01808c7a', '#01808c2e', '#01808cb9', '#01808c37'];
   const sliceColor2 = ['#258a4ac4', '#c41111c4'];
 
-  const saveData = async (ind) => {
-    try {
-      // await EncryptedStorage.setItem('@index', ind)
-    } catch (e) {
-      console.error(e);
-    }
+  const saveData = async () => {
+      try {
+        await SInfo.removeItem('token');
+      } catch (e) {
+        console.error(e);
+      }
   }
 
   const { setIndex, studentNameG, studentEmailG, rollNumberG } = useAuth();
@@ -38,7 +38,7 @@ const Profile = () => {
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }} >Profile</Text>
         <TouchableOpacity onPress={() => {
           setIndex('0');
-          saveData('0');
+          saveData();
         }} style={{ backgroundColor: 'white' }} className="flex justify-center items-center rounded-lg p-3 px-4" >
           <View className="flex flex-row justify-center items-center">
             <Text style={{ color: theme.maincolor, fontSize: wp(3.5), fontWeight: '700', marginLeft: 5 }}>Logout</Text>
