@@ -2,14 +2,9 @@ import {
   View,
   Text,
   SafeAreaView,
-  Image,
   StatusBar,
   StyleSheet,
-  TextInput,
-  Button,
   TouchableOpacity,
-  BackHandler,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,12 +12,7 @@ import {
 } from 'react-native-responsive-screen';
 import { theme } from '../../theme'
 import {
-  ComputerDesktopIcon,
   CpuChipIcon,
-  PhoneIcon,
-  PlusCircleIcon,
-  SignalIcon,
-  WifiIcon,
 } from "react-native-heroicons/outline";
 
 import * as React from 'react';
@@ -38,7 +28,7 @@ import PTRView from 'react-native-pull-to-refresh';
 const Home = () => {
 
   const navigation = useNavigation();
-  const { rollNumberG, classes, setClasses, loading, setLoading , studentidG} = useAuth();
+  const { rollNumberG, classes, loading, setLoading , studentidG} = useAuth();
   const [selectedClass, setSelectedClass] = React.useState(null);
 
   const getClassInfo = async () => {
@@ -50,7 +40,7 @@ const Home = () => {
       setSelectedClass(response.data.classes);
       console.log(selectedClass)
     } catch (error) {
-      //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+        ToastAndroid.show(`Something went wrong.`, ToastAndroid.LONG);
       console.log(error);
     } finally{
       setLoading(false);
@@ -64,7 +54,7 @@ const Home = () => {
       console.log('Attendance:', response.data);
       navigation.navigate('MarkAttendance', {attDataG:response.data.res, className:name} );
     } catch (error) {
-      //   ToastAndroid.show(`Login failed: ${error}`, ToastAndroid.LONG);
+      ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
       console.log("From get attendance: ",error);
     } finally{
       setLoading(false);
@@ -114,7 +104,7 @@ const Home = () => {
         {
           selectedClass?.map((item, id) => {
             return (
-              <TouchableOpacity key={id}
+              <TouchableOpacity key={item.classname}
                 className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
                 onPress={() => {
                   console.log("From button: ",item);

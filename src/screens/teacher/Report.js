@@ -1,22 +1,17 @@
-import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, SafeAreaView, Modal, TouchableWithoutFeedback, Linking } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { studentsData } from './studentsData'; // Assuming the studentsData is imported from this file
+import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
+import React, { useEffect } from 'react';
 import { theme } from '../../theme';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
 import { useNavigation } from '@react-navigation/native';
-import { ActivityIndicator, Button, ProgressBar, RadioButton, TextInput } from 'react-native-paper';
+import { RadioButton, TextInput } from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs'; // For managing files
-import PieChart from 'react-native-pie-chart';
 import email from 'react-native-email';
 
 const Report = ({route}) => {
-  const sliceColor2 = ['#c41111c4', '#01808cb9', '#258a4ac4'];
-
   const navigation = useNavigation();
 
   const [modalVisible1, setModalVisible1] = React.useState(false);
