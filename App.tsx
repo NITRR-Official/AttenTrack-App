@@ -1,31 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PaperProvider } from 'react-native-paper';
 import { useAuth, AuthProvider } from './src/utils/auth';
 import AppNavigation from './src/navigation';
 import AppNavigation2 from './src/navigation/index2';
 import AppNavigation3 from './src/navigation/index3';
-import EncryptedStorage from 'react-native-encrypted-storage';
 
 const AppContent = () => {
-  const { index, setIndex } = useAuth();
-
-  async function retrieveUserSession() {
-    try {   
-      const userSession = await EncryptedStorage.getItem('userSession');
-      if (userSession) {
-        const sessionData = JSON.parse(userSession);
-        setIndex(sessionData.index);
-      } else {
-        setIndex('0'); 
-      }
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-  useEffect(() => {
-    retrieveUserSession();
-  }, []);
+  const { index } = useAuth();
 
   return (
     <>

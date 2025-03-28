@@ -5,6 +5,7 @@ import { useAuth } from '../../utils/auth';
 import { theme } from '../../theme';
 import { ActivityIndicator } from 'react-native-paper';
 import { BASE_URL } from '../../constants/constants';
+import SInfo from 'react-native-encrypted-storage';
 
 const LogIn = () => {
   const [isStudent, setIsStudent] = React.useState(true);
@@ -45,7 +46,9 @@ const LogIn = () => {
       const data = await response.json();
       ToastAndroid.show(`Login Successful. Welcome ${data.fullName} !`, ToastAndroid.LONG);
       console.log('Login Successful:', data);
-  
+
+
+      SInfo.setItem('token', JSON.stringify({ type: 'teacher', data: data.token }));
       setClasses(data.coursesId.map(classItem => ({
         id: classItem._id,
       })));
@@ -92,6 +95,7 @@ const LogIn = () => {
       console.log('Login successful:', data);
       ToastAndroid.show(`Login Successful. Welcome ${data.fullName} !`, ToastAndroid.LONG);
   
+      SInfo.setItem('token', JSON.stringify({ type: 'student', data: data.token }));
       setRollNumberG(data.rollNumber);
       setIndex('2'); // Set index for student
       setStudentidG(data.id);
