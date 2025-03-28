@@ -1,4 +1,4 @@
-import { Modal, ScrollView, PermissionsAndroid, Platform, Pressable, SafeAreaView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Modal, ScrollView, PermissionsAndroid, Platform, Pressable, SafeAreaView, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -307,7 +307,3 @@ MarkAttendance.propTypes = {
 };
 
 export default MarkAttendance;
-
-const styles = StyleSheet.create({
-  // Add any custom styles if needed
-});

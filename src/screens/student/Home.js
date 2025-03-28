@@ -104,7 +104,7 @@ const Home = () => {
         {
           selectedClass?.map((item, id) => {
             return (
-              <TouchableOpacity key={item.classname}
+              <TouchableOpacity key={item.class_id}
                 className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
                 onPress={() => {
                   console.log("From button: ",item);
