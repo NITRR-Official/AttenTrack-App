@@ -75,7 +75,7 @@ const StudentReport = () => {
           </thead>
           <tbody>`;
 
-    data.forEach(subject => {
+    data?.forEach(subject => {
       const attendancePercentage = ((subject.numberOfDatesP * 100) / (subject.numberOfDatesP + subject.numberOfDatesA)).toFixed(2);
       html += `
         <tr>
