@@ -1,12 +1,13 @@
 import React from 'react';
-import { PaperProvider } from 'react-native-paper';
-import { useAuth, AuthProvider } from './src/utils/auth';
+import {PaperProvider} from 'react-native-paper';
+import {useAuth, AuthProvider} from './src/utils/auth';
 import AppNavigation from './src/navigation';
 import AppNavigation2 from './src/navigation/index2';
 import AppNavigation3 from './src/navigation/index3';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const AppContent = () => {
-  const { index } = useAuth();
+  const {index} = useAuth();
 
   return (
     <>
@@ -20,9 +21,11 @@ const AppContent = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <PaperProvider>
-        <AppContent />
-      </PaperProvider>
+      <GestureHandlerRootView>
+        <PaperProvider>
+          <AppContent />
+        </PaperProvider>
+      </GestureHandlerRootView>
     </AuthProvider>
   );
 }
