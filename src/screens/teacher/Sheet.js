@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -38,6 +38,7 @@ const Sheet = ({navigation, route}) => {
 
   const [student, setStudent] = useState();
   const [range, setRange] = useState(3000);
+  const socket = useMemo(() => new WebSocket('wss://attendancetrackerbackend.onrender.com') , [])
 
   useEffect(() => setStudent(route.params.jsonGlobalData), []);
   console.log(route.params);
@@ -90,7 +91,6 @@ const Sheet = ({navigation, route}) => {
   };
 
   useEffect(() => {
-    const socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
     console.log('Socket from teacher side connected!');
 
     socket.onmessage = event => {

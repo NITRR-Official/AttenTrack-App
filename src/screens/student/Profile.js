@@ -9,6 +9,7 @@ import { theme } from '../../theme';
 import PieChart from 'react-native-pie-chart'
 import { useAuth } from '../../utils/auth';
 import SInfo from 'react-native-encrypted-storage';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -34,6 +35,8 @@ const Profile = () => {
         barStyle={"light-content"}
         hidden={false}
       />
+
+      <ScrollView>
 
       <View style={{ backgroundColor: theme.maincolor, width: wp(100), height: hp(8), justifyContent: 'space-between', alignItems: 'center', display: 'flex', flexDirection: 'row', paddingHorizontal: wp(8) }} >
         <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }} >Profile</Text>
@@ -63,10 +66,10 @@ const Profile = () => {
           <Text className="text-[#01808c] font-medium pt-2">Phone Number: <Text className="text-gray-500">{7717789081}</Text></Text>
         </View>
         <TouchableOpacity
-          // onPress={() => setModalVisible1(true)}
+          onPress={() => setModalVisible1(true)}
           className="bg-[#01808cb9] py-1 px-4 rounded-md border-[#01808c7a] border-2 flex items-center absolute top-2 right-2">
           <PencilSquareIcon size={wp(6)} color="white" />
-          <Text className="text-white text-[13px] font-medium">Edit</Text>
+          <Text className="text-white text-[13px] font-medium">Reset Password</Text>
         </TouchableOpacity>
       </View>
 
@@ -101,6 +104,8 @@ const Profile = () => {
         <TouchableOpacity className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2"><PhoneIcon size={22} color={'#01808cb9'} /></TouchableOpacity>
         <TouchableOpacity className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2"><LinkIcon size={22} color={'#01808cb9'} /></TouchableOpacity>
       </View>
+
+      </ScrollView>
 
     </SafeAreaView>
   )
