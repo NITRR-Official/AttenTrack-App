@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {
   EnvelopeIcon,
   LinkIcon,
@@ -23,6 +23,7 @@ import PieChart from 'react-native-pie-chart';
 import {useAuth} from '../../utils/auth';
 import SInfo from 'react-native-encrypted-storage';
 import {ScrollView} from 'react-native-gesture-handler';
+import ForgotChangePassword from '../../components/ForgotChangePassword';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -45,15 +46,23 @@ const Profile = () => {
   };
 
   const {setIndex, studentNameG, studentEmailG, rollNumberG} = useAuth();
+  const [modalView, setModalView] = useState(false);
+
+  const handleClose = close => {
+    setModalView(close);
+  };
 
   return (
     <ScrollView>
-    <SafeAreaView style={{alignItems: 'center', marginBottom: hp(10)}}>
-      <StatusBar
-        backgroundColor={theme.maincolor}
-        barStyle={'light-content'}
-        hidden={false}
-      />
+      <SafeAreaView style={{alignItems: 'center', marginBottom: hp(10)}}>
+        <StatusBar
+          backgroundColor={theme.maincolor}
+          barStyle={'light-content'}
+          hidden={false}
+        />
+
+        {modalView && <ForgotChangePassword type="student" id={rollNumberG} closeDialog={handleClose} />}
+
         <View
           style={{
             backgroundColor: theme.maincolor,
@@ -129,7 +138,7 @@ const Profile = () => {
             </Text>
           </View>
           <TouchableOpacity
-            onPress={() => setModalVisible1(true)}
+            onPress={() => setModalView(true)}
             className="bg-[#01808cb9] py-1 px-4 rounded-md border-[#01808c7a] border-2 flex items-center absolute top-2 right-2">
             <PencilSquareIcon size={wp(6)} color="white" />
             <Text className="text-white text-[13px] font-medium">
@@ -206,7 +215,7 @@ const Profile = () => {
             <LinkIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
         </View>
-    </SafeAreaView>
+      </SafeAreaView>
     </ScrollView>
   );
 };
