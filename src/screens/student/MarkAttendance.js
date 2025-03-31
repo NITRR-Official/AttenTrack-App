@@ -41,9 +41,9 @@ const MarkAttendance = ({route}) => {
     }
   }; 
 
-  useEffect(() => {
+  const socket = useMemo(() => new WebSocket('wss://attendancetrackerbackend.onrender.com') , [])
 
-    const socket = new WebSocket('wss://attendancetrackerbackend.onrender.com');
+  useEffect(() => {
     console.log('Socket from student side connected!');
 
     socket.onmessage = (event) => {

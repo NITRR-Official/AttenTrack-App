@@ -94,6 +94,8 @@ const Home = () => {
       { loading && <View className="z-10 w-full p-2 top-[40%] absolute ">
       <ActivityIndicator animating={true} color={'#01808c7a'} size={wp(10)} />
       </View> }
+
+      
       <PTRView
         onRefresh={refresh}
         scrollEventThrottle={1}
