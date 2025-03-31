@@ -47,14 +47,14 @@ const Profile = () => {
   const {setIndex, teacherNameG, departmentG, teacherEmailG} = useAuth();
 
   return (
-    <SafeAreaView style={{alignItems: 'center'}}>
-      <StatusBar
-        backgroundColor={theme.maincolor}
-        barStyle={'light-content'}
-        hidden={false}
-      />
+    <ScrollView>
+      <SafeAreaView style={{alignItems: 'center', marginBottom: hp(10)}}>
+        <StatusBar
+          backgroundColor={theme.maincolor}
+          barStyle={'light-content'}
+          hidden={false}
+        />
 
-      <ScrollView>
         <View
           style={{
             backgroundColor: theme.maincolor,
@@ -200,6 +200,8 @@ const Profile = () => {
           </View>
         </View>
 
+        
+
         <View className="flex flex-row justify-around w-full py-3">
           <TouchableOpacity className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <EnvelopeIcon size={22} color={'#01808cb9'} />
@@ -211,8 +213,9 @@ const Profile = () => {
             <LinkIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+        
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
