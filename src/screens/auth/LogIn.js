@@ -180,7 +180,7 @@ const LogIn = () => {
       const data = await response.json();
       console.log('Password resetted:', data);
       ToastAndroid.show(
-        `Password reset please register again using ${data.email}`,
+        `Password reset please register again using your registered ${id}`,
         ToastAndroid.LONG,
       );
     } catch (error) {
@@ -331,9 +331,11 @@ const LogIn = () => {
               <Text className="text-sm">Remember me</Text>
               <TouchableOpacity
                 onPress={
-                  isStudent
-                    ? forgotPassword('student', rollNumber)
-                    : forgotPassword('teacher', email)
+                  () => {
+                    isStudent
+                      ? forgotPassword('student', rollNumber)
+                      : forgotPassword('teacher', email)
+                  }
                 }>
                 <Text className="text-[#01818C] underline">
                   Forgot Password?
