@@ -42,14 +42,11 @@ const screenOptions = {
         bottom: 0,
         right: 0,
         left: 0,
-        // elevation: 4,
         height: hp(9),
 
         shadowOpacity: 1,
         shadowRadius: 16.0,
         elevation: 4,
-        // borderTopLeftRadius: 21,
-        // borderTopRightRadius: 21,
         shadowColor: "#52006A",
 
         shadowOffset: {
@@ -57,6 +54,7 @@ const screenOptions = {
             height: 12,
         },
     },
+    tabBarLabelPosition: "below-icon",
 };
 
 export default function BottomTabs() {
@@ -73,6 +71,7 @@ export default function BottomTabs() {
         >
             <Tab.Navigator
                 initialRouteName="Home_Teacher"
+                
                 screenOptions={screenOptions}>
                 <Tab.Screen
                     name="Profile_Teacher"
