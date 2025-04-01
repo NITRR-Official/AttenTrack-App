@@ -11,7 +11,7 @@ import {
 import PropTypes from 'prop-types';
 import {BASE_URL} from '../constants/constants';
 
-const ForgotChangePassword = ({closeDialog, type, id}) => {
+const ChangePassword = ({closeDialog, type, id}) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -105,13 +105,13 @@ const ForgotChangePassword = ({closeDialog, type, id}) => {
   );
 };
 
-ForgotChangePassword.propTypes = {
+ChangePassword.propTypes = {
   closeDialog: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
 };
 
-export default ForgotChangePassword;
+export default ChangePassword;
 
 const styles = StyleSheet.create({
   overlay: {

@@ -23,7 +23,7 @@ import PieChart from 'react-native-pie-chart';
 import {useAuth} from '../../utils/auth';
 import SInfo from 'react-native-encrypted-storage';
 import {ScrollView} from 'react-native-gesture-handler';
-import ForgotChangePassword from '../../components/ChangePassword';
+import ChangePassword from '../../components/ChangePassword';
 
 const Profile = () => {
   const series = [123, 321, 123, 789, 537];
@@ -62,7 +62,7 @@ const Profile = () => {
           hidden={false}
         />
 
-        {modalView && <ForgotChangePassword type="teacher" id={teacherEmailG} closeDialog={handleClose} />}
+        {modalView && <ChangePassword type="teacher" id={teacherEmailG} closeDialog={handleClose} />}
 
         <View
           style={{
