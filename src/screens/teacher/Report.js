@@ -1,12 +1,19 @@
-import { StyleSheet, Text, View, ScrollView, Alert, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
-import React, { useEffect } from 'react';
-import { theme } from '../../theme';
 import {
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
-import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
-import { useNavigation } from '@react-navigation/native';
-import { RadioButton, TextInput } from 'react-native-paper';
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import React, {useEffect} from 'react';
+import {theme} from '../../theme';
+import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
+import {ArrowDownTrayIcon, XMarkIcon} from 'react-native-heroicons/outline';
+import {useNavigation} from '@react-navigation/native';
+import {RadioButton, TextInput} from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
 import email from 'react-native-email';
@@ -19,13 +26,13 @@ const Report = ({route}) => {
   const [thresPerc, setThresPerc] = React.useState(100);
   const [emailList, setEmailList] = React.useState([]);
 
-  useEffect(()=>{
-    console.log("Report", route.params);
-    const studentsBelowThreshold = route.params.recordG?.filter((item) => (item.noDaysP * 100 / route.params.totG) < thresPerc)
-  .map((item) => item.name.replace(/\s+/g, '') + '@gmail.com');
+  useEffect(() => {
+    console.log('Report', route.params);
+    const studentsBelowThreshold = route.params.recordG
+      ?.filter(item => (item.noDaysP * 100) / route.params.totG < thresPerc)
+      .map(item => item.name.replace(/\s+/g, '') + '@gmail.com');
     setEmailList(studentsBelowThreshold);
-    
-  },[thresPerc])
+  }, [thresPerc]);
 
   const [subject, setSubject] = React.useState('');
   const [body, setBody] = React.useState(
@@ -33,13 +40,14 @@ const Report = ({route}) => {
 
 I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
 
-Please take necessary steps to improve your attendance to meet the required threshold.`);
+Please take necessary steps to improve your attendance to meet the required threshold.`,
+  );
 
-const generateHTML = () => {
-  if (!route.params.recordG) return '';
+  const generateHTML = () => {
+    if (!route.params.recordG) return '';
 
-  // Main styles for the PDF
-  let html = `
+    // Main styles for the PDF
+    let html = `
 <html>
 <head>
   <style>
@@ -60,14 +68,14 @@ const generateHTML = () => {
       <th>Attendance (%)</th>
     </tr>
     ${route.params.recordG
-      ?.filter((item) => (item.noDaysP * 100) / route.params.totG <= thresPerc)
+      ?.filter(item => (item.noDaysP * 100) / route.params.totG <= thresPerc)
       .map(
-        (item) => `
+        item => `
         <tr>
           <td>${item.rollNumber}</td>
           <td>${item.name}</td>
           <td>${(item.noDaysP * 100) / route.params.totG.toFixed(2)}%</td>
-        </tr>`
+        </tr>`,
       )
       .join('')}
   </table>
@@ -80,12 +88,12 @@ const generateHTML = () => {
     </tr>
     ${route.params.recordG2
       ?.map(
-        (dayStat) => `
+        dayStat => `
         <tr>
           <td>${new Date(dayStat.date).toISOString().split('T')[0]}</td>
           <td>${dayStat.presentCount}</td>
           <td>${dayStat.absentCount}</td>
-        </tr>`
+        </tr>`,
       )
       .join('')}
   </table>
@@ -93,8 +101,8 @@ const generateHTML = () => {
 </html>
 `;
 
-  return html;
-};
+    return html;
+  };
 
   // Function to generate and download the PDF
   const downloadReport = async () => {
@@ -111,36 +119,54 @@ const generateHTML = () => {
       // Move file to download directory
       await RNFS.moveFile(file.filePath, newPath);
 
-      Alert.alert('Report Downloaded', `The report has been moved to: ${newPath}`);
+      Alert.alert(
+        'Report Downloaded',
+        `The report has been moved to: ${newPath}`,
+      );
     } catch (error) {
       Alert.alert('Error', 'Failed to download the report.');
     }
   };
 
   if (!route.params.recordG) {
-    return <View className="flex justify-center items-center h-screen">
-      {/* <ActivityIndicator animating={true} color={'black'} /> */}
-      <Text className="text-lg text-gray-500 ">Loading report...</Text></View>;
+    return (
+      <View className="flex justify-center items-center h-screen">
+        {/* <ActivityIndicator animating={true} color={'black'} /> */}
+        <Text className="text-lg text-gray-500 ">Loading report...</Text>
+      </View>
+    );
   }
 
   return (
     <>
       <View className="w-full flex flex-row justify-between items-center p-4">
         <TouchableOpacity>
-          <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
+          <XMarkIcon
+            size={wp(8)}
+            color={theme.maincolor}
+            onPress={() => navigation.goBack()}
+          />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={downloadReport} 
-          style={{ backgroundColor: theme.maincolor }} className="flex justify-center items-center rounded-lg p-3 px-4" >
+          onPress={downloadReport}
+          style={{backgroundColor: theme.maincolor}}
+          className="flex justify-center items-center rounded-lg p-3 px-4">
           <View className="flex flex-row justify-center items-center">
             <ArrowDownTrayIcon color={'white'} size={20} />
-            <Text style={{ color: '#fff', fontSize: wp(3.2), fontWeight: '700', marginLeft: 5 }}>Download Report</Text>
+            <Text
+              style={{
+                color: '#fff',
+                fontSize: wp(3.2),
+                fontWeight: '700',
+                marginLeft: 5,
+              }}>
+              Download Report
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
 
       <ScrollView>
-
         <View style={styles.container}>
           {/* Overall Class Attendance */}
           {/* <View style={styles.section}>
@@ -165,25 +191,47 @@ const generateHTML = () => {
             </View>
           </View> */}
 
-          <View  className="flex flex-row items-center p-1">
-            <Text style={styles.subHeader} className="mr-1">Students with Attendance </Text>
-            <TouchableOpacity className={`border-[${theme.maincolor}] border-2 rounded-lg`} onPress={()=>{setModalVisible2(true)}}>
-              <Text className={` p-2 px-4 text-[15px] text-[${theme.maincolor}] font-bold rounded-lg`}>&lt;= {thresPerc} %</Text>
+          <View className="flex flex-row items-center p-1">
+            <Text style={styles.subHeader} className="mr-1">
+              Students with Attendance{' '}
+            </Text>
+            <TouchableOpacity
+              className={`border-[${theme.maincolor}] border-2 rounded-lg`}
+              onPress={() => {
+                setModalVisible2(true);
+              }}>
+              <Text
+                className={` p-2 px-4 text-[15px] text-[${theme.maincolor}] font-bold rounded-lg`}>
+                &lt;= {thresPerc} %
+              </Text>
             </TouchableOpacity>
           </View>
-          <View><TouchableOpacity className={`bg-[${theme.maincolor}] p-2 rounded-lg w-[120px]`} onPress={()=>setModalVisible1(true)}><Text className={`text-white font-bold text-center`}>Send Email</Text></TouchableOpacity></View>
+          <View>
+            <TouchableOpacity
+              className={`bg-[${theme.maincolor}] p-2 rounded-lg w-[120px]`}
+              onPress={() => setModalVisible1(true)}>
+              <Text className={`text-white font-bold text-center`}>
+                Send Email
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               <Text style={styles.tableHeaderText}>Roll Number</Text>
               <Text style={styles.tableHeaderText}>Name</Text>
               <Text style={styles.tableHeaderText}>Attendance (%)</Text>
             </View>
-            {route.params.recordG?.filter((item) => (item.noDaysP * 100 / route.params.totG) <= thresPerc)
+            {route.params.recordG
+              ?.filter(
+                item => (item.noDaysP * 100) / route.params.totG <= thresPerc,
+              )
               .map((item, index) => (
                 <View key={index} style={styles.tableRow}>
                   <Text style={styles.tableCell}>{item.rollNumber}</Text>
                   <Text style={styles.tableCell1}>{item.name}</Text>
-                  <Text style={styles.tableCell2}>{(item.noDaysP * 100 / route.params.totG).toFixed(2)}%</Text>
+                  <Text style={styles.tableCell2}>
+                    {((item.noDaysP * 100) / route.params.totG).toFixed(2)}%
+                  </Text>
                 </View>
               ))}
           </View>
@@ -197,21 +245,57 @@ const generateHTML = () => {
             <TouchableWithoutFeedback onPress={() => setModalVisible2(false)}>
               <View className="w-full flex-1 bg-[#00000050] flex justify-center">
                 <TouchableWithoutFeedback>
-
                   <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                    <RadioButton.Group onValueChange={value => {
-                      setModalVisible2(false);
-                      setThresPerc(parseInt(value));
-                    }}>
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 10%" value="10" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 20%" value="20" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 30%" value="30" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 40%" value="40" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 50%" value="50" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 60%" value="60" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 70%" value="70" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 75%" value="75" />
-                      <RadioButton.Item labelStyle={{ color: "#6a6a6a" }} label="<= 100%" value="100" />
+                    <RadioButton.Group
+                      onValueChange={value => {
+                        setModalVisible2(false);
+                        setThresPerc(parseInt(value));
+                      }}>
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 10%"
+                        value="10"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 20%"
+                        value="20"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 30%"
+                        value="30"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 40%"
+                        value="40"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 50%"
+                        value="50"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 60%"
+                        value="60"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 70%"
+                        value="70"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 75%"
+                        value="75"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="<= 100%"
+                        value="100"
+                      />
                     </RadioButton.Group>
                   </View>
                 </TouchableWithoutFeedback>
@@ -230,7 +314,6 @@ const generateHTML = () => {
           <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
             <View className="w-full flex-1 bg-[#00000050] flex justify-center">
               <TouchableWithoutFeedback>
-
                 <View className="bg-white p-4 m-4 rounded-3xl">
                   {/* <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">yoyo</Text> */}
                   <TextInput
@@ -246,16 +329,24 @@ const generateHTML = () => {
                     placeholder="Enter Body Here"
                     multiline={true}
                     numberOfLines={6} // Adjust this value to control the height of the text area
-                    style={{ textAlignVertical: 'top' }} // Ensures the text starts at the top
+                    style={{textAlignVertical: 'top'}} // Ensures the text starts at the top
                   />
                   <View className="flex flex-row justify-between mt-5">
-                    <TouchableOpacity className=" bg-red-400  p-3 w-[100px] rounded-2xl " onPress={() => setModalVisible1(false)}><Text className="text-white font-bold text-center">Cancel</Text></TouchableOpacity>
-                    <TouchableOpacity className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl " onPress={() => {
-                      email(emailList, {
-                        // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
-                        // bcc: 'mee@mee.com',
-                        subject: 'Short Attendance Notice',
-                        body: `Dear Student,
+                    <TouchableOpacity
+                      className=" bg-red-400  p-3 w-[100px] rounded-2xl "
+                      onPress={() => setModalVisible1(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl "
+                      onPress={() => {
+                        email(emailList, {
+                          // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
+                          // bcc: 'mee@mee.com',
+                          subject: 'Short Attendance Notice',
+                          body: `Dear Student,
 
 I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
 
@@ -265,9 +356,13 @@ Best regards,
 [Your Name]
 [Your Position/Role]
 [Your Contact Information]`,
-                        checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
-                      }).catch(console.error);
-                    }}><Text className="text-white font-bold text-center">Send</Text></TouchableOpacity>
+                          checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
+                        }).catch(console.error);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Send
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </TouchableWithoutFeedback>
@@ -275,28 +370,26 @@ Best regards,
           </TouchableWithoutFeedback>
         </Modal>
 
-
-          {/* Daily Statistics */}
-          <View style={styles.section}>
-            <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
-            <View style={styles.table}>
-              <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderText1}>Date</Text>
-                <Text style={styles.tableHeaderText2}>Present</Text>
-                <Text style={styles.tableHeaderText2}>Absent</Text>
-              </View>
-              {route.params.recordG2?.map((dayStat, index) => (
-                <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell1}>{new Date(dayStat.date).toISOString().split('T')[0]}</Text>
-                  <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
-                  <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
-                </View>
-              ))}
+        {/* Daily Statistics */}
+        <View style={styles.section}>
+          <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.tableHeaderText1}>Date</Text>
+              <Text style={styles.tableHeaderText2}>Present</Text>
+              <Text style={styles.tableHeaderText2}>Absent</Text>
             </View>
+            {route.params.recordG2?.map((dayStat, index) => (
+              <View key={index} style={styles.tableRow}>
+                <Text style={styles.tableCell1}>
+                  {new Date(dayStat.date).toISOString().split('T')[0]}
+                </Text>
+                <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
+                <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
+              </View>
+            ))}
           </View>
-
-
-
+        </View>
       </ScrollView>
     </>
   );
@@ -431,5 +524,4 @@ const styles = StyleSheet.create({
     color: 'gray',
     width: wp(30),
   },
-
 });

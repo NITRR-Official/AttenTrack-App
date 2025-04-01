@@ -147,7 +147,7 @@ const Profile = () => {
             className="bg-[#01808cb9] py-1 px-4 rounded-md border-[#01808c7a] border-2 flex items-center absolute top-2 right-2">
             <PencilSquareIcon size={wp(6)} color="white" />
             <Text className="text-white text-[13px] font-medium">
-              Reset Password
+              Change Password
             </Text>
           </TouchableOpacity>
         </View>

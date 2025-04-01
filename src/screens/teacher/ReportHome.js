@@ -12,11 +12,10 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {theme} from '../../theme';
-import {
-  CpuChipIcon,
-} from 'react-native-heroicons/outline';
+import {CpuChipIcon} from 'react-native-heroicons/outline';
 
 import * as React from 'react';
+import {useState, useEffect} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../utils/auth';
@@ -27,8 +26,9 @@ import {BASE_URL} from '../../constants/constants';
 const ReportHome = () => {
   const navigation = useNavigation();
   const {classes, setLoading, loading} = useAuth();
+  const [indev, setIndev] = useState(true);
 
-  const getRecord = async (id) => {
+  const getRecord = async id => {
     setLoading(true);
     try {
       const response = await axios.post(`${BASE_URL}/api/teacher/records`, {
@@ -43,7 +43,7 @@ const ReportHome = () => {
         recordG2: response.data.report,
       });
     } catch (error) {
-        ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
+      ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
       console.error(error);
       setLoading(false);
     } finally {
@@ -51,7 +51,28 @@ const ReportHome = () => {
     }
   };
 
-  return (
+  useEffect(() => {
+    setIndev(true);
+  }, [])
+  
+
+  return indev ? (
+    <View
+      style={{
+        backgroundColor: theme.maincolor,
+        width: wp(100),
+        height: hp(8),
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        display: 'flex',
+        flexDirection: 'row',
+        paddingHorizontal: wp(8),
+      }}>
+      <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
+        Attendance Record (Coming soon)
+      </Text>
+    </View>
+  ) : (
     <SafeAreaView className="relative">
       <StatusBar
         backgroundColor={theme.maincolor}
