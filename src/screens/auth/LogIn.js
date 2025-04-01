@@ -16,6 +16,7 @@ import {theme} from '../../theme';
 import {ActivityIndicator} from 'react-native-paper';
 import {BASE_URL} from '../../constants/constants';
 import SInfo from 'react-native-encrypted-storage';
+import ForgotPassword from '../../components/ForgotPassword';
 
 const LogIn = () => {
   const [isStudent, setIsStudent] = React.useState(true);
@@ -24,6 +25,7 @@ const LogIn = () => {
   const [password, setPassword] = React.useState('');
   const [isSignUp, setIsSignUp] = React.useState(false);
   const [otpToken, setOtpToken] = React.useState(null);
+  const [dialog, setDialog] = React.useState(false);
 
   const {
     setIndex,
@@ -208,50 +210,12 @@ const LogIn = () => {
           );
         }
       }
-    };
-
-  const forgotPassword = async (type, id) => {
-    if (!id) {
-      ToastAndroid.show('Roll Number or Email Should Not Be Empty', ToastAndroid.LONG);
-      return;
-    }
-    try {
-      console.log('Forgot password request:', type, id);
-      const response = await fetch(`${BASE_URL}/api/${type}/forgot`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${otpToken}`
-        },
-        body:
-          type == 'student'
-            ? JSON.stringify({
-                rollNumber: id,
-              })
-            : JSON.stringify({
-                email: id,
-              }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Request failed');
-      }
-
-      const data = await response.json();
-      console.log('Password resetted:', data);
-      ToastAndroid.show(
-        `Password reset please register again using your registered ${id}`,
-        ToastAndroid.LONG,
-      );
-    } catch (error) {
-      console.log(error);
-      ToastAndroid.show(
-        `Request failed: ${error.message || 'Unknown error'}`,
-        ToastAndroid.LONG,
-      );
-    }
   };
+
+  const handleClose = close => {
+    setDialog(close);
+  }
+
 
   return (
     <KeyboardAvoidingView>
@@ -265,6 +229,10 @@ const LogIn = () => {
           <SignUp setIsSignUp={setIsSignUp} setIsStudent={setIsStudent} />
         ) : (
           <View className="h-screen flex justify-center items-center gap-y-4 relative">
+            {dialog && 
+              isStudent ? (<ForgotPassword closeDialog={handleClose} type={"student"} id={rollNumber} otpToken={otpToken} />) :
+              (<ForgotPassword closeDialog={handleClose} type={"teacher"} id={email} otpToken={otpToken} />)
+            }
             <View className="h-28 w-28 bg-[#01818C] absolute top-0 left-0 rounded-br-full"></View>
             <View className="h-36 w-36 bg-[#01808c87] absolute top-0 left-0 rounded-br-full"></View>
             <View className="h-20 w-20 bg-[#01808c87] absolute bottom-0 right-0 rounded-tl-full"></View>
@@ -396,9 +364,6 @@ const LogIn = () => {
                     isStudent
                       ? handleSendOtp('student', rollNumber)
                       : handleSendOtp('teacher', email)
-                    isStudent
-                      ? forgotPassword('student', rollNumber)
-                      : forgotPassword('teacher', email)
                   }
                 }>
                 <Text className="text-[#01818C] underline">
