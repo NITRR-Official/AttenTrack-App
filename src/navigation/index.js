@@ -22,7 +22,7 @@ export default function AppNavigation() {
           },
           headerShown: false,
         }}
-        initialRouteName={BottomTabs}
+        initialRouteName={"BottomTabs"}
       >
       {/* <Stack.Screen name="LogIn" component={Login} /> */}
         <Stack.Screen name="BottomTabs" component={BottomTabs} />

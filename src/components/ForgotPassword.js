@@ -31,7 +31,7 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
           Authorization: `Bearer ${otpToken}`,
         },
         body: JSON.stringify({
-            otp: otp,
+            otp: Number.parseInt(otp, 10),
             ...(type === 'student'
               ? { rollNumber: id }
               : { email: id }),
