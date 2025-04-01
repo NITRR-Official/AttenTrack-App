@@ -154,9 +154,10 @@ const LogIn = () => {
   };
 
   const handleSendOtp = async (type, id) => {
+    console.log('Sending OTP:', type, id);
       try {
         setLoading(true);
-        if (!email) {
+        if (!id) {
           ToastAndroid.show('Email or Rollnumber is required', ToastAndroid.LONG);
           setLoading(false);
           return;
@@ -182,8 +183,9 @@ const LogIn = () => {
         const data = await response.json();
     
         if (response.ok) {
-          console.log('response', response.status, otpSent);
+          console.log('response', response.status);
           ToastAndroid.show('OTP sent to your email', ToastAndroid.LONG);
+          setDialog(true);
     
           // Store the OTP token (if returned by the backend)
           if (data.otpToken) {
@@ -209,6 +211,8 @@ const LogIn = () => {
             ToastAndroid.LONG
           );
         }
+      } finally {
+        setLoading(false);
       }
   };
 
@@ -229,9 +233,10 @@ const LogIn = () => {
           <SignUp setIsSignUp={setIsSignUp} setIsStudent={setIsStudent} />
         ) : (
           <View className="h-screen flex justify-center items-center gap-y-4 relative">
-            {dialog && 
+            {dialog && (
               isStudent ? (<ForgotPassword closeDialog={handleClose} type={"student"} id={rollNumber} otpToken={otpToken} />) :
-              (<ForgotPassword closeDialog={handleClose} type={"teacher"} id={email} otpToken={otpToken} />)
+              (<ForgotPassword closeDialog={handleClose} type={"teacher"} id={email} otpToken={otpToken} />
+              ))
             }
             <View className="h-28 w-28 bg-[#01818C] absolute top-0 left-0 rounded-br-full"></View>
             <View className="h-36 w-36 bg-[#01808c87] absolute top-0 left-0 rounded-br-full"></View>
