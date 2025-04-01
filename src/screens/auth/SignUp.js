@@ -91,6 +91,10 @@ const SignUp = props => {
       setLoading(false);
     }
   };
+
+
+
+  
   // Function to verify OTP and register
   const handleVerifyOtpAndRegister = async () => {
     try {

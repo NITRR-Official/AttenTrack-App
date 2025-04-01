@@ -23,6 +23,7 @@ const LogIn = () => {
   const [rollNumber, setRollNumber] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [isSignUp, setIsSignUp] = React.useState(false);
+  const [otpToken, setOtpToken] = React.useState(null);
 
   const {
     setIndex,
@@ -150,6 +151,65 @@ const LogIn = () => {
     }
   };
 
+  const handleSendOtp = async (type, id) => {
+      try {
+        setLoading(true);
+        if (!email) {
+          ToastAndroid.show('Email or Rollnumber is required', ToastAndroid.LONG);
+          setLoading(false);
+          return;
+        }
+    
+        const response = await fetch(
+          `${BASE_URL}/api/${type}/otp-generate`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: type == 'student'
+            ? JSON.stringify({
+                rollNumber: id,
+              })
+            : JSON.stringify({
+                email: id,
+              }),
+          }
+        );
+    
+        const data = await response.json();
+    
+        if (response.ok) {
+          console.log('response', response.status, otpSent);
+          ToastAndroid.show('OTP sent to your email', ToastAndroid.LONG);
+    
+          // Store the OTP token (if returned by the backend)
+          if (data.otpToken) {
+            setOtpToken(data.otpToken); // Store the OTP token
+            console.log('OTP Token:', data.otpToken);
+          }
+        } else {
+          ToastAndroid.show(
+            data.error || 'Failed to send OTP',
+            ToastAndroid.LONG
+          );
+        }
+      } catch (error) {
+        console.log(error);
+        if (error.name === 'TypeError' && error.message.includes('Network request failed')) {
+          ToastAndroid.show(
+            'Network error. Please check your connection.',
+            ToastAndroid.LONG
+          );
+        } else {
+          ToastAndroid.show(
+            'Failed to send OTP. Please try again.',
+            ToastAndroid.LONG
+          );
+        }
+      }
+    };
+
   const forgotPassword = async (type, id) => {
     if (!id) {
       ToastAndroid.show('Roll Number or Email Should Not Be Empty', ToastAndroid.LONG);
@@ -161,6 +221,7 @@ const LogIn = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${otpToken}`
         },
         body:
           type == 'student'
@@ -332,6 +393,9 @@ const LogIn = () => {
               <TouchableOpacity
                 onPress={
                   () => {
+                    isStudent
+                      ? handleSendOtp('student', rollNumber)
+                      : handleSendOtp('teacher', email)
                     isStudent
                       ? forgotPassword('student', rollNumber)
                       : forgotPassword('teacher', email)
