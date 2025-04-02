@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ToastAndroid
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -45,12 +46,16 @@ const Profile = () => {
     }
   };
 
-  const {setIndex, studentNameG, studentEmailG, rollNumberG} = useAuth();
+  const {setIndex, studentNameG, studentEmailG, rollNumberG, branch, semester, pass, enroll, phone} = useAuth();
   const [modalView, setModalView] = useState(false);
 
   const handleClose = close => {
     setModalView(close);
   };
+
+  const alert = () => {
+    ToastAndroid.show('This feature is not available yet!', ToastAndroid.SHORT);
+  }
 
   return (
     <ScrollView>
@@ -115,17 +120,17 @@ const Profile = () => {
             <Text className="text-[#01808c] font-medium pt-2">
               Branch:{' '}
               <Text className="text-gray-500">
-                {'Electronics & Communication Engineering'}
+                {branch}
               </Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
-              Semester: <Text className="text-gray-500">{'4th'}</Text>
+              Semester: <Text className="text-gray-500">{semester}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
-              Graduation Year: <Text className="text-gray-500">{2025}</Text>
+              Graduation Year: <Text className="text-gray-500">{pass}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
-              Enrollment Number: <Text className="text-gray-500">{211061}</Text>
+              Enrollment Number: <Text className="text-gray-500">{enroll}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
               College:{' '}
@@ -134,7 +139,7 @@ const Profile = () => {
               </Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
-              Phone Number: <Text className="text-gray-500">{7717789081}</Text>
+              Phone Number: <Text className="text-gray-500">{phone}</Text>
             </Text>
           </View>
           <TouchableOpacity
@@ -142,7 +147,7 @@ const Profile = () => {
             className="bg-[#01808cb9] py-1 px-4 rounded-md border-[#01808c7a] border-2 flex items-center absolute top-2 right-2">
             <PencilSquareIcon size={wp(6)} color="white" />
             <Text className="text-white text-[13px] font-medium">
-              Change Password
+              Update Profile
             </Text>
           </TouchableOpacity>
         </View>
@@ -205,13 +210,13 @@ const Profile = () => {
         </View>
 
         <View className="flex flex-row justify-around w-full py-3">
-          <TouchableOpacity className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <EnvelopeIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
-          <TouchableOpacity className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <PhoneIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
-          <TouchableOpacity className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <LinkIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
         </View>

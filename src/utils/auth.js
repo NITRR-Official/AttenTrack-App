@@ -26,6 +26,15 @@ export const AuthProvider = ({children}) => {
   const [studentidG, setStudentidG] = useState('');
   const [studentNameG, setStudentNameG] = useState('');
   const [studentEmailG, setStudentEmailG] = useState('');
+  const [eduQualification, setEduQualification] = useState('Not Set');
+  const [telephone, setTelephone] = useState('Not Set');
+  const [interest, setInterest] = useState('Not Set');
+
+  const [branch, setBranch] = useState('Not Set');
+  const [semester, setSemester] = useState('Not Set');
+  const [pass, setPass] = useState('Not Set');
+  const [enroll, setEnroll] = useState('Not Set');
+  const [phone, setPhone] = useState('Not Set');
 
   const directLogin = async () => {
     try {
@@ -52,6 +61,11 @@ export const AuthProvider = ({children}) => {
         setStudentidG(data.id);
         setStudentNameG(data.fullName);
         setStudentEmailG(data.email);
+        setPass(data.batch);
+        setBranch(data.branch);
+        setSemester(data.semester);
+        setEnroll(data.enroll);
+        setPhone(data.phone);
         setIndex('2'); // Set index for student
       } else {
         setClasses(
@@ -63,6 +77,9 @@ export const AuthProvider = ({children}) => {
         setDepartmentG(data.department);
         setTeacherNameG(data.fullName);
         setTeacherEmailG(data.email);
+        setInterest(data.interest);
+        setEduQualification(data.eduQualification);
+        setTelephone(data.telephone);
         setRefreshing(true);
         setIndex('1'); // Set index for teacher
       }
@@ -104,6 +121,22 @@ export const AuthProvider = ({children}) => {
       setRollNumberG,
       classId,
       setClassId,
+      eduQualification,
+      setEduQualification,
+      interest,
+      setInterest,
+      telephone,
+      setTelephone,
+      branch,
+      setBranch,
+      semester,
+      setSemester,
+      pass,
+      setPass,
+      enroll,
+      setEnroll,
+      phone,
+      setPhone
     }),
     [
       studentidG,
@@ -132,6 +165,22 @@ export const AuthProvider = ({children}) => {
       setRollNumberG,
       classId,
       setClassId,
+      eduQualification,
+      setEduQualification,
+      interest,
+      setInterest,
+      telephone,
+      setTelephone,
+      branch,
+      setBranch,
+      semester,
+      setSemester,
+      pass,
+      setPass,
+      enroll,
+      setEnroll,
+      phone,
+      setPhone
     ],
   );
   return (

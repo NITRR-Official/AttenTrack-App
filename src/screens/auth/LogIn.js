@@ -41,6 +41,14 @@ const LogIn = () => {
     setStudentNameG,
     setStudentEmailG,
     setRefreshing,
+    setInterest,
+    setEduQualification,
+    setTelephone,
+    setBranch,
+    setSemester,
+    setPass,
+    setEnroll,
+    setPhone
   } = useAuth();
 
   const handleTeacherLogin = async () => {
@@ -88,6 +96,9 @@ const LogIn = () => {
       setDepartmentG(data.department);
       setTeacherNameG(data.fullName);
       setTeacherEmailG(data.email);
+      setInterest(data.interest);
+      setEduQualification(data.eduQualification);
+      setTelephone(data.telephone);
       setIndex('1'); // Set index for teacher
       setRefreshing(true);
       setLoading(false);
@@ -142,6 +153,11 @@ const LogIn = () => {
       setStudentidG(data.id);
       setStudentNameG(data.fullName);
       setStudentEmailG(data.email);
+      setBranch(data.branch);
+      setSemester(data.semester);
+      setPass(data.batch);
+      setEnroll(data.enroll);
+      setPhone(data.phone);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -155,71 +171,71 @@ const LogIn = () => {
 
   const handleSendOtp = async (type, id) => {
     console.log('Sending OTP:', type, id);
-      try {
-        setLoading(true);
-        if (!id) {
-          ToastAndroid.show('Email or Rollnumber is required', ToastAndroid.LONG);
-          setLoading(false);
-          return;
-        }
-    
-        const response = await fetch(
-          `${BASE_URL}/api/${type}/otp-generate`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: type == 'student'
+    try {
+      setLoading(true);
+      if (!id) {
+        ToastAndroid.show('Email or Rollnumber is required', ToastAndroid.LONG);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${BASE_URL}/api/${type}/otp-generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body:
+          type == 'student'
             ? JSON.stringify({
                 rollNumber: id,
               })
             : JSON.stringify({
                 email: id,
               }),
-          }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('response', response.status);
+        ToastAndroid.show('OTP sent to your email', ToastAndroid.LONG);
+        setDialog(true);
+
+        // Store the OTP token (if returned by the backend)
+        if (data.otpToken) {
+          setOtpToken(data.otpToken); // Store the OTP token
+          console.log('OTP Token:', data.otpToken);
+        }
+      } else {
+        ToastAndroid.show(
+          data.error || 'Failed to send OTP',
+          ToastAndroid.LONG,
         );
-    
-        const data = await response.json();
-    
-        if (response.ok) {
-          console.log('response', response.status);
-          ToastAndroid.show('OTP sent to your email', ToastAndroid.LONG);
-          setDialog(true);
-    
-          // Store the OTP token (if returned by the backend)
-          if (data.otpToken) {
-            setOtpToken(data.otpToken); // Store the OTP token
-            console.log('OTP Token:', data.otpToken);
-          }
-        } else {
-          ToastAndroid.show(
-            data.error || 'Failed to send OTP',
-            ToastAndroid.LONG
-          );
-        }
-      } catch (error) {
-        console.log(error);
-        if (error.name === 'TypeError' && error.message.includes('Network request failed')) {
-          ToastAndroid.show(
-            'Network error. Please check your connection.',
-            ToastAndroid.LONG
-          );
-        } else {
-          ToastAndroid.show(
-            'Failed to send OTP. Please try again.',
-            ToastAndroid.LONG
-          );
-        }
-      } finally {
-        setLoading(false);
       }
+    } catch (error) {
+      console.log(error);
+      if (
+        error.name === 'TypeError' &&
+        error.message.includes('Network request failed')
+      ) {
+        ToastAndroid.show(
+          'Network error. Please check your connection.',
+          ToastAndroid.LONG,
+        );
+      } else {
+        ToastAndroid.show(
+          'Failed to send OTP. Please try again.',
+          ToastAndroid.LONG,
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = close => {
     setDialog(close);
-  }
-
+  };
 
   return (
     <KeyboardAvoidingView>
@@ -233,11 +249,22 @@ const LogIn = () => {
           <SignUp setIsSignUp={setIsSignUp} setIsStudent={setIsStudent} />
         ) : (
           <View className="h-screen flex justify-center items-center gap-y-4 relative">
-            {dialog && (
-              isStudent ? (<ForgotPassword closeDialog={handleClose} type={"student"} id={rollNumber} otpToken={otpToken} />) :
-              (<ForgotPassword closeDialog={handleClose} type={"teacher"} id={email} otpToken={otpToken} />
-              ))
-            }
+            {dialog &&
+              (isStudent ? (
+                <ForgotPassword
+                  closeDialog={handleClose}
+                  type={'student'}
+                  id={rollNumber}
+                  otpToken={otpToken}
+                />
+              ) : (
+                <ForgotPassword
+                  closeDialog={handleClose}
+                  type={'teacher'}
+                  id={email}
+                  otpToken={otpToken}
+                />
+              ))}
             <View className="h-28 w-28 bg-[#01818C] absolute top-0 left-0 rounded-br-full"></View>
             <View className="h-36 w-36 bg-[#01808c87] absolute top-0 left-0 rounded-br-full"></View>
             <View className="h-20 w-20 bg-[#01808c87] absolute bottom-0 right-0 rounded-tl-full"></View>
@@ -364,13 +391,11 @@ const LogIn = () => {
             <View className="flex flex-row justify-between w-[70%]">
               <Text className="text-sm">Remember me</Text>
               <TouchableOpacity
-                onPress={
-                  () => {
-                    isStudent
-                      ? handleSendOtp('student', rollNumber)
-                      : handleSendOtp('teacher', email)
-                  }
-                }>
+                onPress={() => {
+                  isStudent
+                    ? handleSendOtp('student', rollNumber)
+                    : handleSendOtp('teacher', email);
+                }}>
                 <Text className="text-[#01818C] underline">
                   Forgot Password?
                 </Text>
