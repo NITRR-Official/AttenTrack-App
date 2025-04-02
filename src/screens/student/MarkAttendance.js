@@ -1,5 +1,5 @@
 import { Modal, ScrollView, PermissionsAndroid, Platform, Pressable, SafeAreaView, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import {
   widthPercentageToDP as wp,

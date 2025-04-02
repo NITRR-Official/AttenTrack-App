@@ -72,6 +72,7 @@ export default function BottomTabs() {
                   <View
                     style={{
                       width: wp(16),
+                      top: 15,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
@@ -101,6 +102,7 @@ export default function BottomTabs() {
                   <View
                     style={{
                       width: wp(16),
+                      top: 15,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
@@ -118,14 +120,6 @@ export default function BottomTabs() {
                   //  </TouchableOpacity>
                 );
               },
-
-              headerShown: false,
-              presentation: 'modal',
-              animationTypeForReplace: 'push',
-              animation: 'slide_from_right',
-              // animation: 'flip'
-              // animation: 'none'
-              // animation: 'slide_from_right'
             }}
           />
           <Tab.Screen
@@ -138,6 +132,7 @@ export default function BottomTabs() {
                   <View
                     style={{
                       width: wp(16),
+                      top: 15,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
