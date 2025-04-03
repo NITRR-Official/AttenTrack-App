@@ -5,7 +5,9 @@ import {
   Text,
   ToastAndroid,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
+  Modal,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -46,8 +48,17 @@ const Profile = () => {
     }
   };
 
-  const {setIndex, teacherNameG, departmentG, teacherEmailG, eduQualification, telephone, interest} = useAuth();
+  const {
+    setIndex,
+    teacherNameG,
+    departmentG,
+    teacherEmailG,
+    eduQualification,
+    telephone,
+    interest,
+  } = useAuth();
   const [modalView, setModalView] = useState(false);
+  const [modalVisible1, setModalVisible1] = React.useState(false);
 
   const handleClose = close => {
     setModalView(close);
@@ -55,8 +66,7 @@ const Profile = () => {
 
   const alert = () => {
     ToastAndroid.show('This feature is not available yet!', ToastAndroid.SHORT);
-  }
-  
+  };
 
   return (
     <ScrollView>
@@ -67,7 +77,13 @@ const Profile = () => {
           hidden={false}
         />
 
-        {modalView && <ChangePassword type="teacher" id={teacherEmailG} closeDialog={handleClose} />}
+        {modalView && (
+          <ChangePassword
+            type="teacher"
+            id={teacherEmailG}
+            closeDialog={handleClose}
+          />
+        )}
 
         <View
           style={{
@@ -85,8 +101,7 @@ const Profile = () => {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              saveData();
-              setIndex('0');
+              setModalVisible1(true);
             }}
             style={{backgroundColor: 'white'}}
             className="flex justify-center items-center rounded-lg p-3 px-4">
@@ -118,7 +133,7 @@ const Profile = () => {
             <Text className="text-[#01808c] font-medium pt-2">
               Email ID: <Text className="text-gray-500">{teacherEmailG}</Text>
             </Text>
-            
+
             <Text className="text-[#01808c] font-medium pt-2">
               College:{' '}
               <Text className="text-gray-500">
@@ -130,14 +145,11 @@ const Profile = () => {
               <Text className="text-gray-500">{eduQualification}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
-              Contact Number:{' '}
-              <Text className="text-gray-500">{telephone}</Text>
+              Contact Number: <Text className="text-gray-500">{telephone}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
               Areas of Interest:{' '}
-              <Text className="text-gray-500">
-                { interest }
-              </Text>
+              <Text className="text-gray-500">{interest}</Text>
             </Text>
           </View>
           <TouchableOpacity
@@ -208,16 +220,62 @@ const Profile = () => {
         </View>
 
         <View className="flex flex-row justify-around w-full py-3">
-          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity
+            onPress={alert}
+            className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <EnvelopeIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity
+            onPress={alert}
+            className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <PhoneIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity
+            onPress={alert}
+            className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <LinkIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
         </View>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible1}
+          onRequestClose={() => {
+            setModalVisible1(!modalVisible1);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Do You Really Want to logout from : {teacherEmailG}
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        saveData();
+                        setIndex('0');
+                        setModalVisible1(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setModalVisible1(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </SafeAreaView>
     </ScrollView>
   );
