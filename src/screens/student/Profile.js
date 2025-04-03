@@ -5,7 +5,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ToastAndroid
+  ToastAndroid,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -46,8 +48,19 @@ const Profile = () => {
     }
   };
 
-  const {setIndex, studentNameG, studentEmailG, rollNumberG, branch, semester, pass, enroll, phone} = useAuth();
+  const {
+    setIndex,
+    studentNameG,
+    studentEmailG,
+    rollNumberG,
+    branch,
+    semester,
+    pass,
+    enroll,
+    phone,
+  } = useAuth();
   const [modalView, setModalView] = useState(false);
+  const [modalVisible1, setModalVisible1] = useState(false);
 
   const handleClose = close => {
     setModalView(close);
@@ -55,7 +68,7 @@ const Profile = () => {
 
   const alert = () => {
     ToastAndroid.show('This feature is not available yet!', ToastAndroid.SHORT);
-  }
+  };
 
   return (
     <ScrollView>
@@ -66,7 +79,13 @@ const Profile = () => {
           hidden={false}
         />
 
-        {modalView && <ChangePassword type="student" id={rollNumberG} closeDialog={handleClose} />}
+        {modalView && (
+          <ChangePassword
+            type="student"
+            id={rollNumberG}
+            closeDialog={handleClose}
+          />
+        )}
 
         <View
           style={{
@@ -84,8 +103,7 @@ const Profile = () => {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              setIndex('0');
-              saveData();
+              setModalVisible1(true);
             }}
             style={{backgroundColor: 'white'}}
             className="flex justify-center items-center rounded-lg p-3 px-4">
@@ -118,10 +136,7 @@ const Profile = () => {
               Email: <Text className="text-gray-500">{studentEmailG}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
-              Branch:{' '}
-              <Text className="text-gray-500">
-                {branch}
-              </Text>
+              Branch: <Text className="text-gray-500">{branch}</Text>
             </Text>
             <Text className="text-[#01808c] font-medium pt-2">
               Semester: <Text className="text-gray-500">{semester}</Text>
@@ -210,16 +225,62 @@ const Profile = () => {
         </View>
 
         <View className="flex flex-row justify-around w-full py-3">
-          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity
+            onPress={alert}
+            className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <EnvelopeIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity
+            onPress={alert}
+            className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <PhoneIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={alert} className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
+          <TouchableOpacity
+            onPress={alert}
+            className="bg-[#01808c1f] p-2 rounded-full border-[#01808c7a] border-2">
             <LinkIcon size={22} color={'#01808cb9'} />
           </TouchableOpacity>
         </View>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible1}
+          onRequestClose={() => {
+            setModalVisible1(!modalVisible1);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Do You Really Want to logout from : {rollNumberG}
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        setIndex('0');
+                        saveData();
+                        setModalVisible1(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setModalVisible1(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </SafeAreaView>
     </ScrollView>
   );

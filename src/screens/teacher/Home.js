@@ -198,6 +198,20 @@ const Home = () => {
             </TouchableOpacity>
           );
         })}
+
+        <View
+          style={{
+            backgroundColor: '#fff',
+            width: wp(100),
+            height: hp(8),
+            marginTop: hp(15),
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'row',
+            paddingHorizontal: wp(8),
+          }}></View>
+
         {classes.length == 0 && (
           <Text className="text-gray-600 text-center pt-4 text-lg">
             No Class is Created Yet
