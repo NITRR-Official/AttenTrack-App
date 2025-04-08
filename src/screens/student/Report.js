@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  ScrollView,
+  ProgressBar
 } from 'react-native';
 import {ActivityIndicator} from 'react-native-paper';
 import {theme} from '../../theme';
@@ -24,11 +26,8 @@ const StudentReport = () => {
   const [lowAttendanceSubjects, setLowAttendanceSubjects] = useState([]);
   const {rollNumberG, studentNameG, loading, setLoading} = useAuth();
   const [data, setData] = useState([]);
-  const [indev, setIndev] = useState(true);
 
-
-   useEffect(() => {
-    setIndev(true);
+  useEffect(() => {
     const getStudentReport = async () => {
       setLoading(true);
       try {
@@ -48,12 +47,11 @@ const StudentReport = () => {
     };
 
     getStudentReport();
-  }, []); 
-  
-  console.log(data)
+  }, []);
+
+  console.log(data);
 
   useEffect(() => generateAttendanceReport(), [data]);
-
 
   const generateAttendanceReport = () => {
     // Find subjects with attendance less than 75%
@@ -172,22 +170,7 @@ const StudentReport = () => {
   };
 
   return (
-    indev ? (<View
-      style={{
-        backgroundColor: theme.maincolor,
-        width: wp(100),
-        height: hp(8),
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: 'row',
-        paddingHorizontal: wp(8),
-      }}>
-      <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
-        Student's Report (Coming soon)
-      </Text>
-    </View>) : (<>
-    
+    <>
       <StatusBar
         backgroundColor={theme.maincolor}
         barStyle={'light-content'}
@@ -236,7 +219,87 @@ const StudentReport = () => {
           />
         </View>
       )}
-    </>)
+
+      <ScrollView
+        style={styles.container}
+        className={`opacity-${loading ? 50 : 100}`}>
+        {data?.map((subject, index) => (
+          <View key={subject} style={styles.section}>
+            <Text style={styles.subHeader}>{subject.class_name}</Text>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Total Classes:</Text>
+              <Text style={styles.value}>
+                {subject.numberOfDatesA + subject.numberOfDatesP}
+              </Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Classes Attended:</Text>
+              <Text style={styles.value}>{subject.numberOfDatesP}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Classes Unattended:</Text>
+              <Text style={styles.value}>{subject.numberOfDatesA}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Attendance Percentage:</Text>
+              <Text style={styles.value}>
+                {(
+                  (subject.numberOfDatesP * 100) /
+                  (subject.numberOfDatesP + subject.numberOfDatesA)
+                )?.toFixed(2)}
+                %
+              </Text>
+            </View>
+
+            <ProgressBar
+              progress={
+                subject.numberOfDatesP /
+                (subject.numberOfDatesP + subject.numberOfDatesA)
+              }
+              color={theme.maincolor}
+              style={styles.progressBar}
+            />
+          </View>
+        ))}
+
+        {/* Subjects with attendance less than 75% */}
+        {data && (
+          <View style={styles.lowAttendanceSection}>
+            <Text style={styles.subHeader}>
+              Subjects with Attendance Less Than 75%
+            </Text>
+            {lowAttendanceSubjects?.length > 0 ? (
+              <View style={styles.table}>
+                <View style={styles.tableHeader}>
+                  <Text style={styles.tableHeaderText}>Subject Name</Text>
+                  <Text style={styles.tableHeaderText}>Attendance (%)</Text>
+                </View>
+                {lowAttendanceSubjects?.map((subject, index) => (
+                  <View key={subject} style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{subject.class_name}</Text>
+                    <Text style={styles.tableCell}>
+                      {(
+                        (subject.numberOfDatesP * 100) /
+                        (subject.numberOfDatesP + subject.numberOfDatesA)
+                      )?.toFixed(2)}
+                      %
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.noLowAttendanceText}>
+                All subjects have attendance above 75%.
+              </Text>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </>
   );
 };
 

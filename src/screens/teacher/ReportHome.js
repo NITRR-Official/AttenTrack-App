@@ -26,7 +26,6 @@ import {BASE_URL} from '../../constants/constants';
 const ReportHome = () => {
   const navigation = useNavigation();
   const {classes, setLoading, loading} = useAuth();
-  const [indev, setIndev] = useState(true);
 
   const getRecord = async id => {
     setLoading(true);
@@ -37,6 +36,7 @@ const ReportHome = () => {
         endDate: new Date().toDateString(),
       });
       setLoading(false);
+      console.log(response.data);
       navigation.navigate('Report', {
         recordG: response.data.class_id,
         totG: response.data.totalDays,
@@ -50,29 +50,10 @@ const ReportHome = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    setIndev(true);
-  }, [])
   
 
-  return indev ? (
-    <View
-      style={{
-        backgroundColor: theme.maincolor,
-        width: wp(100),
-        height: hp(8),
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: 'row',
-        paddingHorizontal: wp(8),
-      }}>
-      <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
-        Attendance Record (Coming soon)
-      </Text>
-    </View>
-  ) : (
+  return (
+    
     <SafeAreaView className="relative">
       <StatusBar
         backgroundColor={theme.maincolor}
@@ -105,6 +86,7 @@ const ReportHome = () => {
           />
         </View>
       )}
+
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{flexGrow: 1}}
@@ -113,6 +95,7 @@ const ReportHome = () => {
           height: hp(100),
           opacity: loading ? 0.5 : 1,
         }}>
+
         {classes.map((item, id) => {
           return (
             <TouchableOpacity
@@ -134,7 +117,7 @@ const ReportHome = () => {
         })}
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 };
 
 export default ReportHome;

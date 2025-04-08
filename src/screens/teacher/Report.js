@@ -25,14 +25,22 @@ const Report = ({route}) => {
   const [modalVisible2, setModalVisible2] = React.useState(false);
   const [thresPerc, setThresPerc] = React.useState(100);
   const [emailList, setEmailList] = React.useState([]);
+  let formattedData;
 
   useEffect(() => {
     console.log('Report', route.params);
-    const studentsBelowThreshold = route.params.recordG
-      ?.filter(item => (item.noDaysP * 100) / route.params.totG < thresPerc)
-      .map(item => item.name.replace(/\s+/g, '') + '@gmail.com');
-    setEmailList(studentsBelowThreshold);
-  }, [thresPerc]);
+    // const studentsBelowThreshold = route.params.recordG
+    //   ?.filter(item => (item.noDaysP * 100) / route.params.totG < thresPerc)
+    //   .map(item => item.name.replace(/\s+/g, '') + '@gmail.com');
+    // setEmailList(studentsBelowThreshold);
+    // formattedData = Object.entries(route.params.report).map(
+    //   ([rollNumber, record]) => ({
+    //     rollNumber: rollNumber,
+    //     name: 'Unknown', // replace with actual names if you have them
+    //     noDaysP: record.presentCount,
+    //   }),
+    // );
+  }, []);
 
   const [subject, setSubject] = React.useState('');
   const [body, setBody] = React.useState(
@@ -67,15 +75,18 @@ Please take necessary steps to improve your attendance to meet the required thre
       <th>Name</th>
       <th>Attendance (%)</th>
     </tr>
-    ${route.params.recordG
-      ?.filter(item => (item.noDaysP * 100) / route.params.totG <= thresPerc)
+    ${Object.entries(route.params.recordG2 || {})
+      .filter(
+        ([_, item]) =>
+          (item.presentCount * 100) / route.params.totG <= thresPerc,
+      )
       .map(
-        item => `
-        <tr>
-          <td>${item.rollNumber}</td>
-          <td>${item.name}</td>
-          <td>${(item.noDaysP * 100) / route.params.totG.toFixed(2)}%</td>
-        </tr>`,
+        ([rollNumber, item]) => `
+      <tr>
+        <td>${rollNumber}</td>
+        <td>${item.name || ''}</td>
+        <td>${((item.presentCount * 100) / route.params.totG).toFixed(2)}%</td>
+      </tr>`,
       )
       .join('')}
   </table>
@@ -86,14 +97,18 @@ Please take necessary steps to improve your attendance to meet the required thre
       <th>Present</th>
       <th>Absent</th>
     </tr>
-    ${route.params.recordG2
-      ?.map(
-        dayStat => `
-        <tr>
-          <td>${new Date(dayStat.date).toISOString().split('T')[0]}</td>
-          <td>${dayStat.presentCount}</td>
-          <td>${dayStat.absentCount}</td>
-        </tr>`,
+    ${Object.entries(route.params.recordG2 || {})
+      .map(
+        ([rollNumber, dayStat]) => `
+      <tr>
+        <td>${
+          dayStat.date
+            ? new Date(dayStat.date).toISOString().split('T')[0]
+            : '-'
+        }</td>
+        <td>${dayStat.presentCount}</td>
+        <td>${dayStat.totalDays - dayStat.presentCount}</td>
+      </tr>`,
       )
       .join('')}
   </table>
@@ -221,19 +236,20 @@ Please take necessary steps to improve your attendance to meet the required thre
               <Text style={styles.tableHeaderText}>Name</Text>
               <Text style={styles.tableHeaderText}>Attendance (%)</Text>
             </View>
-            {route.params.recordG
-              ?.filter(
-                item => (item.noDaysP * 100) / route.params.totG <= thresPerc,
-              )
-              .map((item, index) => (
+            {Object.entries(route.params.recordG2).map(
+              ([rollNumber, data], index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{item.rollNumber}</Text>
-                  <Text style={styles.tableCell1}>{item.name}</Text>
+                  <Text style={styles.tableCell}>{rollNumber}</Text>
+                  <Text style={styles.tableCell1}>
+                    {/* Name daalo yahan agar available ho */}
+                  </Text>
                   <Text style={styles.tableCell2}>
-                    {((item.noDaysP * 100) / route.params.totG).toFixed(2)}%
+                    {((data.presentCount * 100) / route.params.totG).toFixed(2)}
+                    %
                   </Text>
                 </View>
-              ))}
+              ),
+            )}
           </View>
           <Modal
             animationType="fade"
@@ -379,15 +395,17 @@ Best regards,
               <Text style={styles.tableHeaderText2}>Present</Text>
               <Text style={styles.tableHeaderText2}>Absent</Text>
             </View>
-            {route.params.recordG2?.map((dayStat, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.tableCell1}>
-                  {new Date(dayStat.date).toISOString().split('T')[0]}
-                </Text>
-                <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
-                <Text style={styles.tableCell2}>{dayStat.absentCount}</Text>
-              </View>
-            ))}
+            {Object.entries(route.params.recordG2 || {}).map(
+              ([rollNumber, dayStat], index) => (
+                <View key={index} style={styles.tableRow}>
+                  <Text style={styles.tableCell1}>{rollNumber}</Text>
+                  <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
+                  <Text style={styles.tableCell2}>
+                    {dayStat.totalDays - dayStat.presentCount}
+                  </Text>
+                </View>
+              ),
+            )}
           </View>
         </View>
       </ScrollView>
