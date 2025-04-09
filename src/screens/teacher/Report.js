@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import React, {useEffect} from 'react';
+import PropTypes from 'prop-types';
 import {theme} from '../../theme';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import {ArrowDownTrayIcon, XMarkIcon} from 'react-native-heroicons/outline';
@@ -25,22 +26,21 @@ const Report = ({route}) => {
   const [modalVisible2, setModalVisible2] = React.useState(false);
   const [thresPerc, setThresPerc] = React.useState(100);
   const [emailList, setEmailList] = React.useState([]);
-  let formattedData;
+  const [studentsBelowThreshold, setStudentsBelowThreshold] = React.useState(
+    [],
+  );
 
   useEffect(() => {
-    console.log('Report', route.params);
-    // const studentsBelowThreshold = route.params.recordG
-    //   ?.filter(item => (item.noDaysP * 100) / route.params.totG < thresPerc)
-    //   .map(item => item.name.replace(/\s+/g, '') + '@gmail.com');
-    // setEmailList(studentsBelowThreshold);
-    // formattedData = Object.entries(route.params.report).map(
-    //   ([rollNumber, record]) => ({
-    //     rollNumber: rollNumber,
-    //     name: 'Unknown', // replace with actual names if you have them
-    //     noDaysP: record.presentCount,
-    //   }),
-    // );
-  }, []);
+    setStudentsBelowThreshold(
+      Object.entries(route.params.recordG2 || {})?.filter(
+        ([, student]) =>
+          (student.presentCount * 100) / route.params.totG < thresPerc,
+      ),
+    );
+
+    setEmailList(studentsBelowThreshold);
+    console.log('Email List:', studentsBelowThreshold);
+  }, [thresPerc]);
 
   const [subject, setSubject] = React.useState('');
   const [body, setBody] = React.useState(
@@ -75,20 +75,14 @@ Please take necessary steps to improve your attendance to meet the required thre
       <th>Name</th>
       <th>Attendance (%)</th>
     </tr>
-    ${Object.entries(route.params.recordG2 || {})
-      .filter(
-        ([_, item]) =>
-          (item.presentCount * 100) / route.params.totG <= thresPerc,
-      )
-      .map(
+      ${studentsBelowThreshold.map(
         ([rollNumber, item]) => `
       <tr>
         <td>${rollNumber}</td>
-        <td>${item.name || ''}</td>
+        <td>${item.name || 'Unknown'}</td>
         <td>${((item.presentCount * 100) / route.params.totG).toFixed(2)}%</td>
       </tr>`,
-      )
-      .join('')}
+      )}
   </table>
   <h3>Daily Attendance Statistics</h3>
   <table>
@@ -97,20 +91,14 @@ Please take necessary steps to improve your attendance to meet the required thre
       <th>Present</th>
       <th>Absent</th>
     </tr>
-    ${Object.entries(route.params.recordG2 || {})
-      .map(
-        ([rollNumber, dayStat]) => `
-      <tr>
-        <td>${
-          dayStat.date
-            ? new Date(dayStat.date).toISOString().split('T')[0]
-            : '-'
-        }</td>
-        <td>${dayStat.presentCount}</td>
-        <td>${dayStat.totalDays - dayStat.presentCount}</td>
-      </tr>`,
-      )
-      .join('')}
+      ${route.params.recordDate.map(
+        ({date, presentCount, absentCount}) =>
+          `<tr>
+                  <td>${date}</td>
+                  <td>${presentCount}</td>
+                  <td>${absentCount}</td>
+                </tr>`,
+      )}
   </table>
 </body>
 </html>
@@ -183,29 +171,6 @@ Please take necessary steps to improve your attendance to meet the required thre
 
       <ScrollView>
         <View style={styles.container}>
-          {/* Overall Class Attendance */}
-          {/* <View style={styles.section}>
-            <Text style={styles.subHeader}>Overall Class Attendance: {report.overallClassAttendance.toFixed(2)}%</Text>
-          </View>
-          <ProgressBar progress={report.overallClassAttendance.toFixed(0) / 100} color={theme.maincolor} className="mb-4" /> */}
-
-          {/* <View className="rounded-md border-[#01808c7a] border-2 my-2">
-            <View className="flex flex-row w-full justify-around p-4">
-              <PieChart
-                widthAndHeight={150}
-                series={[lowAttStudents, lowAttStudents1, lowAttStudents2]}
-                sliceColor={sliceColor2}
-                coverRadius={0.45}
-                coverFill={'#FFF'}
-              />
-            </View>
-            <View className="flex flex-col items-start p-2">
-              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(1)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[0]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance less than 60% : {lowAttStudents}</Text></View></TouchableOpacity>
-              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(2)}><View className="flex flex-row items-center" ><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[1]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance between 60% & 75%: {lowAttStudents1}</Text></View></TouchableOpacity>
-              <TouchableOpacity className="cursor-pointer p-2 w-full" onPress={() => setPercentage(3)}><View className="flex flex-row items-center"><View className={`w-4 h-4 mr-2 bg-[${sliceColor2[2]}]`}></View><Text className="text-gray-500 text-[14px]">Attendance more than 75% : {lowAttStudents2}</Text></View></TouchableOpacity>
-            </View>
-          </View> */}
-
           <View className="flex flex-row items-center p-1">
             <Text style={styles.subHeader} className="mr-1">
               Students with Attendance{' '}
@@ -236,20 +201,15 @@ Please take necessary steps to improve your attendance to meet the required thre
               <Text style={styles.tableHeaderText}>Name</Text>
               <Text style={styles.tableHeaderText}>Attendance (%)</Text>
             </View>
-            {Object.entries(route.params.recordG2).map(
-              ([rollNumber, data], index) => (
-                <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{rollNumber}</Text>
-                  <Text style={styles.tableCell1}>
-                    {/* Name daalo yahan agar available ho */}
-                  </Text>
-                  <Text style={styles.tableCell2}>
-                    {((data.presentCount * 100) / route.params.totG).toFixed(2)}
-                    %
-                  </Text>
-                </View>
-              ),
-            )}
+            {studentsBelowThreshold.map(([rollNumber, data], index) => (
+              <View key={index} style={styles.tableRow}>
+                <Text style={styles.tableCell}>{rollNumber}</Text>
+                <Text style={styles.tableCell1}>{data.name || 'Unknown'}</Text>
+                <Text style={styles.tableCell2}>
+                  {((data.presentCount * 100) / route.params.totG).toFixed(2)}%
+                </Text>
+              </View>
+            ))}
           </View>
           <Modal
             animationType="fade"
@@ -395,14 +355,12 @@ Best regards,
               <Text style={styles.tableHeaderText2}>Present</Text>
               <Text style={styles.tableHeaderText2}>Absent</Text>
             </View>
-            {Object.entries(route.params.recordG2 || {}).map(
-              ([rollNumber, dayStat], index) => (
+            {route.params.recordDate.map(
+              ({date, presentCount, absentCount}, index) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell1}>{rollNumber}</Text>
-                  <Text style={styles.tableCell2}>{dayStat.presentCount}</Text>
-                  <Text style={styles.tableCell2}>
-                    {dayStat.totalDays - dayStat.presentCount}
-                  </Text>
+                  <Text style={styles.tableCell1}>{date}</Text>
+                  <Text style={styles.tableCell2}>{presentCount}</Text>
+                  <Text style={styles.tableCell3}>{absentCount}</Text>
                 </View>
               ),
             )}
@@ -411,6 +369,23 @@ Best regards,
       </ScrollView>
     </>
   );
+};
+
+Report.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      recordG: PropTypes.object,
+      recordG2: PropTypes.object,
+      recordDate: PropTypes.arrayOf(
+        PropTypes.shape({
+          date: PropTypes.string.isRequired,
+          presentCount: PropTypes.number.isRequired,
+          absentCount: PropTypes.number.isRequired,
+        }),
+      ),
+      totG: PropTypes.number.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
 export default Report;

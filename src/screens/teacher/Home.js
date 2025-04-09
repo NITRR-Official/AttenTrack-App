@@ -45,7 +45,6 @@ const Home = () => {
     axios
       .get(`${BASE_URL}/api/teacher/classes-info/${teacheridG}`)
       .then(response => {
-        console.log('Classes:', response.data);
         setClasses(response.data.classes);
       })
       .catch(error => {
@@ -66,7 +65,7 @@ const Home = () => {
 
   const deleteClass = async () => {
     try {
-      const response = await axios.delete(
+      await axios.delete(
         `${BASE_URL}/api/class/remove/${
           classes.find(cls => cls.classname === selectedClass).class_id
         }`,
@@ -78,7 +77,6 @@ const Home = () => {
         `${selectedClass} Deleted Successfully !`,
         ToastAndroid.LONG,
       );
-      console.log('Class Deleted Successfully:', response.data);
     } catch (error) {
       ToastAndroid.show(
         `Something went wrong and we couldn't remove the class.`,
@@ -92,7 +90,6 @@ const Home = () => {
     setLoading(true);
     try {
       const response = await axios.get(`${BASE_URL}/api/class/getList/${id}`);
-      console.log('tn', response.data);
       navigation.navigate('Sheet', {
         jsonGlobalData: response.data.students,
         id: id,
@@ -176,7 +173,6 @@ const Home = () => {
               disabled={loading}
               className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
               onPress={() => {
-                console.log(item);
                 getList(item.class_id, item.classname);
               }}>
               <CpuChipIcon size={wp(8)} color="#01808cb9" />
