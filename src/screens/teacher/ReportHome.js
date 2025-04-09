@@ -5,8 +5,8 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
+import PTRView from 'react-native-pull-to-refresh';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -15,7 +15,6 @@ import {theme} from '../../theme';
 import {CpuChipIcon} from 'react-native-heroicons/outline';
 
 import * as React from 'react';
-import {useState, useEffect} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../utils/auth';
@@ -25,7 +24,8 @@ import {BASE_URL} from '../../constants/constants';
 
 const ReportHome = () => {
   const navigation = useNavigation();
-  const {classes, setLoading, loading} = useAuth();
+
+  const {classes, setClasses, loading, setLoading, teacheridG} = useAuth();
 
   const getRecord = async id => {
     setLoading(true);
@@ -35,12 +35,17 @@ const ReportHome = () => {
         startDate: '2024-10-01',
         endDate: new Date().toDateString(),
       });
+      const responseDate = await axios.post(`${BASE_URL}/api/teacher/overall-records`, {
+        class_id: id,
+        startDate: '2024-10-01',
+        endDate: new Date().toDateString(),
+      });
       setLoading(false);
-      console.log(response.data);
       navigation.navigate('Report', {
         recordG: response.data.class_id,
         totG: response.data.totalDays,
         recordG2: response.data.report,
+        recordDate: responseDate.data
       });
     } catch (error) {
       ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
@@ -50,10 +55,31 @@ const ReportHome = () => {
       setLoading(false);
     }
   };
-  
+
+  const fetchData = async () => {
+    axios
+      .get(`${BASE_URL}/api/teacher/classes-info/${teacheridG}`)
+      .then(response => {
+        setClasses(response.data.classes);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const refresh = () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        fetchData();
+        resolve();
+      }, 2000);
+    });
+  };
 
   return (
-    
     <SafeAreaView className="relative">
       <StatusBar
         backgroundColor={theme.maincolor}
@@ -87,7 +113,8 @@ const ReportHome = () => {
         </View>
       )}
 
-      <ScrollView
+      <PTRView
+        onRefresh={refresh}
         scrollEventThrottle={1}
         contentContainerStyle={{flexGrow: 1}}
         style={{
@@ -95,7 +122,6 @@ const ReportHome = () => {
           height: hp(100),
           opacity: loading ? 0.5 : 1,
         }}>
-
         {classes.map((item, id) => {
           return (
             <TouchableOpacity
@@ -115,9 +141,9 @@ const ReportHome = () => {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </PTRView>
     </SafeAreaView>
-  )
+  );
 };
 
 export default ReportHome;
