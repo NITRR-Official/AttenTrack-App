@@ -8,7 +8,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {theme} from '../../theme';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
@@ -18,38 +18,50 @@ import {RadioButton, TextInput} from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
 import email from 'react-native-email';
+import {useAuth} from '../../utils/auth';
 
 const Report = ({route}) => {
   const navigation = useNavigation();
 
-  const [modalVisible1, setModalVisible1] = React.useState(false);
-  const [modalVisible2, setModalVisible2] = React.useState(false);
-  const [thresPerc, setThresPerc] = React.useState(100);
-  const [emailList, setEmailList] = React.useState([]);
-  const [studentsBelowThreshold, setStudentsBelowThreshold] = React.useState(
+  const [modalVisible1, setModalVisible1] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [thresPerc, setThresPerc] = useState(100);
+  const [subject, setSubject] = useState('Short Attendance Notice');
+  const [body, setBody] = useState('');
+  const [studentsBelowThreshold, setStudentsBelowThreshold] = useState(
     [],
   );
+  const {teacherNameG, telephone, departmentG} = useAuth();
 
   useEffect(() => {
-    setStudentsBelowThreshold(
-      Object.entries(route.params.recordG2 || {})?.filter(
-        ([, student]) =>
-          (student.presentCount * 100) / route.params.totG < thresPerc,
-      ),
-    );
+    const threshold = Object.entries(route.params.recordG2 || {})?.filter(
+      ([, student]) =>
+        (student.presentCount * 100) / route.params.totG < thresPerc,
+    )
 
-    setEmailList(studentsBelowThreshold);
-    console.log('Email List:', studentsBelowThreshold);
-  }, [thresPerc]);
+    
+    setStudentsBelowThreshold(threshold);
 
-  const [subject, setSubject] = React.useState('');
-  const [body, setBody] = React.useState(
-    `Dear Student,
+    setBody(`Dear Student,
 
-I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
+I hope this email finds you well. This is to inform you that your current attendance is below ${thresPerc}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
 
-Please take necessary steps to improve your attendance to meet the required threshold.`,
-  );
+Please take necessary steps to improve your attendance to meet the required threshold.
+
+Best regards,
+${teacherNameG}
+Department: ${departmentG === 'Not Set' ? 'Your Position/Role' : departmentG}
+Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
+`)
+    
+  }, [thresPerc]);  
+  
+  const emailList = useMemo(() => {
+    return studentsBelowThreshold.map(([, data], ) => (
+      data.email
+    ))
+  }, [studentsBelowThreshold]);
+
 
   const generateHTML = () => {
     if (!route.params.recordG) return '';
@@ -319,19 +331,8 @@ Please take necessary steps to improve your attendance to meet the required thre
                       className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl "
                       onPress={() => {
                         email(emailList, {
-                          // cc: ['kraniket123654@gmail.com', 'aniketedits123654@gmail.com'],
-                          // bcc: 'mee@mee.com',
-                          subject: 'Short Attendance Notice',
-                          body: `Dear Student,
-
-I hope this email finds you well. This is to inform you that your current attendance is below ${50}%. Regular attendance is crucial for your continued success, so we encourage you to prioritize attending your scheduled classes/activities.
-
-Please take necessary steps to improve your attendance to meet the required threshold.
-
-Best regards,
-[Your Name]
-[Your Position/Role]
-[Your Contact Information]`,
+                          subject: subject,
+                          body: body,
                           checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
                         }).catch(console.error);
                       }}>
@@ -374,7 +375,7 @@ Best regards,
 Report.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
-      recordG: PropTypes.object,
+      recordG: PropTypes.string,
       recordG2: PropTypes.object,
       recordDate: PropTypes.arrayOf(
         PropTypes.shape({

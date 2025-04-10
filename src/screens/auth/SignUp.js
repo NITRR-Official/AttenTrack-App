@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -21,14 +21,14 @@ const SignUp = props => {
   const {loading, setLoading} = useAuth();
   const navigation = useNavigation();
 
-  const [isStudent, setIsStudent] = React.useState(true);
-  const [email, setEmail] = React.useState('');
-  const [otp, setOtp] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [passwordConfirm, setPasswordConfirm] = React.useState('');
-  const [showOtpFields, setShowOtpFields] = React.useState(false);
-  const [otpSent, setOtpSent] = React.useState(false);
-  const [otpToken, setOtpToken] = React.useState(null); // State to store OTP token
+  const [isStudent, setIsStudent] = useState(true);
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [showOtpFields, setShowOtpFields] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpToken, setOtpToken] = useState(null); // State to store OTP token
 
   // Function to send OTP
   const handleSendOtp = async () => {

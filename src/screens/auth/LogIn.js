@@ -9,7 +9,7 @@ import {
   ToastAndroid,
   Image,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import SignUp from './SignUp';
 import {useAuth} from '../../utils/auth';
 import {theme} from '../../theme';
@@ -19,13 +19,13 @@ import SInfo from 'react-native-encrypted-storage';
 import ForgotPassword from '../../components/ForgotPassword';
 
 const LogIn = () => {
-  const [isStudent, setIsStudent] = React.useState(true);
-  const [email, setEmail] = React.useState('');
-  const [rollNumber, setRollNumber] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [isSignUp, setIsSignUp] = React.useState(false);
-  const [otpToken, setOtpToken] = React.useState(null);
-  const [dialog, setDialog] = React.useState(false);
+  const [isStudent, setIsStudent] = useState(true);
+  const [email, setEmail] = useState('');
+  const [rollNumber, setRollNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [otpToken, setOtpToken] = useState(null);
+  const [dialog, setDialog] = useState(false);
 
   const {
     setIndex,

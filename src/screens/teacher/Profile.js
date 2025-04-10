@@ -58,7 +58,7 @@ const Profile = () => {
     interest,
   } = useAuth();
   const [modalView, setModalView] = useState(false);
-  const [modalVisible1, setModalVisible1] = React.useState(false);
+  const [modalVisible1, setModalVisible1] = useState(false);
 
   const handleClose = close => {
     setModalView(close);
