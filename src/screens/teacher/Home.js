@@ -21,7 +21,7 @@ import {
 } from 'react-native-heroicons/outline';
 import PTRView from 'react-native-pull-to-refresh';
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../utils/auth';
@@ -29,7 +29,7 @@ import axios from 'axios';
 import {ActivityIndicator} from 'react-native-paper';
 import {BASE_URL} from '../../constants/constants';
 const Home = () => {
-  const [selectedClass, setSelectedClass] = React.useState(null);
+  const [selectedClass, setSelectedClass] = useState(null);
   const {
     classes,
     setClasses,
@@ -109,7 +109,7 @@ const Home = () => {
 
   const navigation = useNavigation();
 
-  const [modalVisible1, setModalVisible1] = React.useState(false);
+  const [modalVisible1, setModalVisible1] = useState(false);
 
   const refresh = () => {
     return new Promise(resolve => {
@@ -169,7 +169,7 @@ const Home = () => {
         {classes.map((item, id) => {
           return (
             <TouchableOpacity
-              key={item.classname}
+              key={id}
               disabled={loading}
               className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
               onPress={() => {

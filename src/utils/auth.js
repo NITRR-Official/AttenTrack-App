@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {createContext, useContext, useState, useEffect} from 'react';
+import {createContext, useContext, useState, useEffect, useMemo} from 'react';
 import SInfo from 'react-native-encrypted-storage';
 
 export const AuthContext = createContext();
@@ -93,7 +93,7 @@ export const AuthProvider = ({children}) => {
     directLogin();
   }, []);
 
-  const contextValue = React.useMemo(
+  const contextValue = useMemo(
     () => ({
       studentidG,
       setStudentidG,

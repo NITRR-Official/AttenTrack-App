@@ -13,7 +13,7 @@ import {
 import {theme} from '../../theme';
 import {CpuChipIcon} from 'react-native-heroicons/outline';
 
-import * as React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../utils/auth';
@@ -25,7 +25,7 @@ import PTRView from 'react-native-pull-to-refresh';
 const Home = () => {
   const navigation = useNavigation();
   const {rollNumberG, classes, loading, setLoading, studentidG} = useAuth();
-  const [selectedClass, setSelectedClass] = React.useState(null);
+  const [selectedClass, setSelectedClass] = useState(null);
 
   const getClassInfo = async () => {
     setLoading(true);
@@ -65,7 +65,7 @@ const Home = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getClassInfo();
   }, [studentidG]);
 
@@ -100,11 +100,6 @@ const Home = () => {
         <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
           Classes
         </Text>
-
-        {/* <TouchableOpacity
-          onPress={() => navigation.navigate('CreateClass')}>
-          <PlusCircleIcon size={wp(10)} color="#fff" />
-        </TouchableOpacity> */}
       </View>
 
       {loading && (
