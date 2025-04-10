@@ -66,7 +66,7 @@ const MarkAttendance = ({route}) => {
   );
 
   useEffect(() => {
-    console.log('Socket from student side connected!');
+    console.log('Socket from student side connected!', route.params);
 
     socket.onmessage = event => {
       const data = JSON.parse(event.data);
@@ -177,26 +177,6 @@ const MarkAttendance = ({route}) => {
       });
   };
 
-  useEffect(() => {
-    calculateAttendance();
-  }, []);
-
-  const calculateAttendance = () => {
-    let present = 0;
-    let absent = 0;
-
-    route.params.attDataG?.forEach(record => {
-      if (record.is_present) {
-        present++;
-      } else {
-        absent++;
-      }
-    });
-
-    setPresentDays(present);
-    setAbsentDays(absent);
-  };
-
   return (
     <SafeAreaView style={{alignItems: 'center'}}>
       <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
@@ -223,9 +203,6 @@ const MarkAttendance = ({route}) => {
                 : route.params.className}
             </Text>
           </View>
-          {/* <Text className="text-gray-600">
-            {route.params.teacherName.length > 25 ? route.params.teacherName.substring(0, 25) + "..." : route.params.teacherName}
-          </Text> */}
         </View>
         <TouchableOpacity
           onPress={() => {
@@ -333,14 +310,14 @@ const MarkAttendance = ({route}) => {
 
       <View className="w-full flex flex-row justify-between px-4 mb-2">
         <Text className="text-sm  text-gray-400 ">
-          Total Classes Attended : {route.params.totalClasses}
+          Total Classes Attended : {route.params.attDataG.totalClasses}
         </Text>
         <View>
           <Text className="text-sm text-right text-gray-400 ">
-            Present : {route.params.presentClasses}
+            Present : {route.params.attDataG.presentClasses}
           </Text>
           <Text className="text-sm  text-gray-400 text-right">
-            Absent : {route.params.totalClasses - route.params.presentClasses}
+            Absent : {route.params.attDataG.totalClasses - route.params.attDataG.presentClasses}
           </Text>
         </View>
       </View>
@@ -361,11 +338,11 @@ const MarkAttendance = ({route}) => {
         <View
           style={{width: wp(95)}}
           className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
-          {Object.entries(route.params.attendanceMap).map(([date, isPresent], index) => (
+          {route.params.attDataG.attendanceMap.map((data, index) => (
             <View className="flex flex-row justify-between" key={index}>
-              <Text className={`w-3/4 text-[${theme.maincolor}]`}>{date}</Text>
+              <Text className={`w-3/4 text-[${theme.maincolor}]`}>{data.date}</Text>
               <Text className={`w-1/4 text-[${theme.maincolor}] text-right`}>
-                {isPresent ? 'Present' : 'Absent'}
+                {data.status ? 'Present' : 'Absent'}
               </Text>
             </View>
           ))}
@@ -379,16 +356,12 @@ const MarkAttendance = ({route}) => {
 MarkAttendance.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
-      attDataG: PropTypes.arrayOf(
-        PropTypes.shape({
-          date: PropTypes.string.isRequired,
-          is_present: PropTypes.bool.isRequired,
-        }),
-      ),
+      attDataG: PropTypes.shape({
+        attendanceMap: PropTypes.objectOf(PropTypes.bool).isRequired,
+        totalClasses: PropTypes.number.isRequired,
+        presentClasses: PropTypes.number.isRequired,
+      }),
       className: PropTypes.string.isRequired,
-      attendanceMap: PropTypes.objectOf(PropTypes.bool).isRequired,
-      totalClasses: PropTypes.number.isRequired,
-      presentClasses: PropTypes.number.isRequired,
     }).isRequired,
   }).isRequired,
 };
