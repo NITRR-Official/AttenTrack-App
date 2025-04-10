@@ -52,9 +52,8 @@ const Home = () => {
         class_id: id,
         rollNumber: rollNumberG,
       });
-      console.log('Attendance:', response.data);
       navigation.navigate('MarkAttendance', {
-        attDataG: response.data.res,
+        attDataG: response.data,
         className: name,
       });
     } catch (error) {
@@ -127,7 +126,6 @@ const Home = () => {
               key={item.class_id}
               className="flex flex-row items-center p-4 bg-[#01808c2e] m-4 mb-0 rounded-2xl border-[#01808c7a] border-2"
               onPress={() => {
-                console.log('From button: ', item);
                 getAttendance(item.class_id, item.classname);
               }}
               disabled={loading}>
