@@ -25,7 +25,7 @@ const Report = ({route}) => {
 
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
-  const [thresPerc, setThresPerc] = useState(100);
+  const [thresPerc, setThresPerc] = useState(75);
   const [subject, setSubject] = useState('Short Attendance Notice');
   const [body, setBody] = useState('');
   const [studentsBelowThreshold, setStudentsBelowThreshold] = useState(
