@@ -1,19 +1,36 @@
-import { Modal, ScrollView, PermissionsAndroid, Platform, Pressable, SafeAreaView, Text, TextInput, ToastAndroid, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useEffect, useState, useMemo } from 'react';
+import {
+  Modal,
+  ScrollView,
+  PermissionsAndroid,
+  Platform,
+  Pressable,
+  SafeAreaView,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import React, {useEffect, useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { CpuChipIcon, PencilSquareIcon, XMarkIcon } from 'react-native-heroicons/outline';
-import { theme } from '../../theme';
-import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator, ProgressBar } from 'react-native-paper';
+import {
+  CpuChipIcon,
+  PencilSquareIcon,
+  XMarkIcon,
+} from 'react-native-heroicons/outline';
+import {theme} from '../../theme';
+import {useNavigation} from '@react-navigation/native';
+import {ActivityIndicator, ProgressBar} from 'react-native-paper';
 import axios from 'axios';
-import GetLocation from 'react-native-get-location'
-import { calculateDistance } from './locationTracker';
-import { useAuth } from '../../utils/auth';
-import { BASE_URL } from '../../constants/constants';
+import GetLocation from 'react-native-get-location';
+import {calculateDistance} from './locationTracker';
+import {useAuth} from '../../utils/auth';
+import {BASE_URL} from '../../constants/constants';
 
 const MarkAttendance = ({route}) => {
   const navigation = useNavigation();
@@ -28,7 +45,6 @@ const MarkAttendance = ({route}) => {
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
 
-
   const handleGetAttendance = async () => {
     try {
       const resp = await axios.get(`${BASE_URL}/getAttendance`);
@@ -37,37 +53,43 @@ const MarkAttendance = ({route}) => {
       setFinalTime(data2.finalTime);
     } catch (error) {
       console.error('Error sending OTP and time to server:', error);
-      ToastAndroid.show('Failed to set attendance. Please try again.', ToastAndroid.LONG);
+      ToastAndroid.show(
+        'Failed to set attendance. Please try again.',
+        ToastAndroid.LONG,
+      );
     }
-  }; 
+  };
 
-  const socket = useMemo(() => new WebSocket('wss://attendancetrackerbackend.onrender.com') , [])
+  const socket = useMemo(
+    () => new WebSocket('wss://attendancetrackerbackend.onrender.com'),
+    [],
+  );
 
   useEffect(() => {
     console.log('Socket from student side connected!');
 
-    socket.onmessage = (event) => {
+    socket.onmessage = event => {
       const data = JSON.parse(event.data);
 
       if (data.type === 'time_update2') {
         handleGetAttendance();
-        if(data.time<=0){
-            setModalVisible1(false);
+        if (data.time <= 0) {
+          setModalVisible1(false);
         }
         setTime(data.time);
       }
-      if(data.type === 'teacherLoc'){
+      if (data.type === 'teacherLoc') {
         setRange(data.range);
         setLat(data.location.latitude);
         setLong(data.location.longitude);
       }
-      if(data.type === 'first_call'){
+      if (data.type === 'first_call') {
         setOtp('');
         setModalVisible1(true);
       }
     };
 
-    socket.onerror = (error) => {
+    socket.onerror = error => {
       console.log('WebSocket Error:', error);
       ToastAndroid.show('Error With WebSocket Connection', ToastAndroid.LONG);
     };
@@ -88,62 +110,72 @@ const MarkAttendance = ({route}) => {
       ToastAndroid.show('OTP Verified !', ToastAndroid.LONG);
       setModalVisible1(false);
       setModalVisible2(true);
-        requestLocationPermission();
+      requestLocationPermission();
     } else {
       ToastAndroid.show('Incorrect OTP !', ToastAndroid.LONG);
     }
   };
 
   const requestLocationPermission = async () => {
-    if(Platform.OS === "android"){
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: "Location Permission",
-          message: "This app needs access to your location",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK"
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission',
+            message: 'This app needs access to your location',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          getCurrentLocation();
+        } else {
+          ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
+          setTimeout(() => {
+            setModalVisible2(false);
+          }, 2000);
         }
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        getCurrentLocation(); 
-      } else {
-        ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
-        setTimeout(()=>{setModalVisible2(false)},2000);
+      } catch (err) {
+        console.warn(err);
       }
-    } catch (err) {
-      console.warn(err);
-    }}
+    }
   };
 
   const getCurrentLocation = () => {
-
     GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
-    .then(location => {
-      const distance = calculateDistance(location.latitude, location.longitude,
-        lat, long);
-      
-      if (distance <= range) {
-        socket.send(JSON.stringify({type: 'attendance', rollNumber:rollNumberG }));
-        ToastAndroid.show('Location Matched ! Attendance Marked as Present !',
-          ToastAndroid.LONG);
-        setTimeout(()=>{setModalVisible2(false)},2000);
-      } else {
-        ToastAndroid.show('Location not within range', ToastAndroid.LONG);
-        setTimeout(()=>{setModalVisible2(false)},2000);
-      }
-    })
-    .catch(error => {
-      const { code, message } = error;
-      console.warn(code, message);
-    });
+      .then(location => {
+        const distance = calculateDistance(
+          location.latitude,
+          location.longitude,
+          lat,
+          long,
+        );
+
+        if (distance <= range) {
+          socket.send(
+            JSON.stringify({type: 'attendance', rollNumber: rollNumberG}),
+          );
+          ToastAndroid.show(
+            'Location Matched ! Attendance Marked as Present !',
+            ToastAndroid.LONG,
+          );
+          setTimeout(() => {
+            setModalVisible2(false);
+          }, 2000);
+        } else {
+          ToastAndroid.show('Location not within range', ToastAndroid.LONG);
+          setTimeout(() => {
+            setModalVisible2(false);
+          }, 2000);
+        }
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn(code, message);
+      });
   };
-
-
-  const [presentDays, setPresentDays] = useState(0);
-  const [absentDays, setAbsentDays] = useState(0);
 
   useEffect(() => {
     calculateAttendance();
@@ -153,7 +185,7 @@ const MarkAttendance = ({route}) => {
     let present = 0;
     let absent = 0;
 
-    route.params.attDataG?.forEach((record) => {
+    route.params.attDataG?.forEach(record => {
       if (record.is_present) {
         present++;
       } else {
@@ -166,35 +198,53 @@ const MarkAttendance = ({route}) => {
   };
 
   return (
-    <SafeAreaView style={{ alignItems: 'center' }} >
+    <SafeAreaView style={{alignItems: 'center'}}>
       <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
         <TouchableOpacity>
-          <XMarkIcon size={wp(8)} color={theme.maincolor} onPress={() => navigation.goBack()} />
+          <XMarkIcon
+            size={wp(8)}
+            color={theme.maincolor}
+            onPress={() => navigation.goBack()}
+          />
         </TouchableOpacity>
       </View>
 
       <View className="w-[95%] bg-[#01808c2e] p-2 px-3 rounded-md border-[#01808c7a] border-2 m-4 mb-3 flex flex-row justify-between items-end">
-      <View>
-          <View className="flex flex-row flex-wrap"><CpuChipIcon size={wp(8)} fill={theme.maincolor} color={theme.maincolor} />
-          <Text className="text-2xl text-[#01808cb9] font-medium ml-1">
-            {route.params.className.length > 10 ? route.params.className.substring(0, 10) + "..." : route.params.className}
-            </Text></View>
+        <View>
+          <View className="flex flex-row flex-wrap">
+            <CpuChipIcon
+              size={wp(8)}
+              fill={theme.maincolor}
+              color={theme.maincolor}
+            />
+            <Text className="text-2xl text-[#01808cb9] font-medium ml-1">
+              {route.params.className.length > 10
+                ? route.params.className.substring(0, 10) + '...'
+                : route.params.className}
+            </Text>
+          </View>
           {/* <Text className="text-gray-600">
             {route.params.teacherName.length > 25 ? route.params.teacherName.substring(0, 25) + "..." : route.params.teacherName}
           </Text> */}
         </View>
         <TouchableOpacity
           onPress={() => {
-            if(time==0){
-              ToastAndroid.show('Wait for the Teacher to Take Attendance..', ToastAndroid.LONG);
-            }else{
+            if (time == 0) {
+              ToastAndroid.show(
+                'Wait for the Teacher to Take Attendance..',
+                ToastAndroid.LONG,
+              );
+            } else {
               handleGetAttendance();
               setModalVisible1(true);
               setOtp('');
-            }}}
+            }
+          }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
-          <Text className="text-white text-[15px] font-medium">Mark Attendance</Text>
+          <Text className="text-white text-[15px] font-medium">
+            Mark Attendance
+          </Text>
         </TouchableOpacity>
 
         <Modal
@@ -207,17 +257,30 @@ const MarkAttendance = ({route}) => {
           <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
             <View className="w-full flex-1 bg-[#00000050] flex justify-center">
               <TouchableWithoutFeedback>
-
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
                   <Text className="text-gray-500">Enter OTP :</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 2, borderColor: 'gray', borderRadius: 10, paddingHorizontal: 10, width: '90%' }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderWidth: 2,
+                      borderColor: 'gray',
+                      borderRadius: 10,
+                      paddingHorizontal: 10,
+                      width: '90%',
+                    }}>
                     <TextInput
                       onChangeText={setOtp}
                       value={otp}
                       placeholder="Enter OTP..."
                       placeholderTextColor={'gray'}
-                      keyboardType='numeric'
-                      style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
+                      keyboardType="numeric"
+                      style={{
+                        flex: 1,
+                        paddingLeft: 10,
+                        height: 40,
+                        color: 'gray',
+                      }}
                     />
                   </View>
                   <Pressable
@@ -225,11 +288,19 @@ const MarkAttendance = ({route}) => {
                     onPress={() => {
                       handleOtpSubmit();
                     }}>
-                    <Text className="text-white text-center font-medium">Submit</Text>
+                    <Text className="text-white text-center font-medium">
+                      Submit
+                    </Text>
                   </Pressable>
                   <View className="w-full">
-                    <Text className="pb-3 text-gray-500">Time Remaining: {time} seconds</Text>
-                    <ProgressBar progress={time/finalTime} color={'#01818C'} backgroundColor={'black'}/>
+                    <Text className="pb-3 text-gray-500">
+                      Time Remaining: {time} seconds
+                    </Text>
+                    <ProgressBar
+                      progress={time / finalTime}
+                      color={'#01818C'}
+                      backgroundColor={'black'}
+                    />
                   </View>
                 </View>
               </TouchableWithoutFeedback>
@@ -247,10 +318,12 @@ const MarkAttendance = ({route}) => {
             <View className="w-full flex-1 bg-[#00000050] flex justify-center">
               <TouchableWithoutFeedback>
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-              <ActivityIndicator animating={true} color={'black'} />
-                <View >
-                <Text className="text-gray-400">Getting Your Current Location...</Text>
-                </View>
+                  <ActivityIndicator animating={true} color={'black'} />
+                  <View>
+                    <Text className="text-gray-400">
+                      Getting Your Current Location...
+                    </Text>
+                  </View>
                 </View>
               </TouchableWithoutFeedback>
             </View>
@@ -259,12 +332,22 @@ const MarkAttendance = ({route}) => {
       </View>
 
       <View className="w-full flex flex-row justify-between px-4 mb-2">
-        <Text className="text-sm  text-gray-400 ">Total Classes Attended : {presentDays + absentDays}</Text>
-        <View><Text className="text-sm text-right text-gray-400 ">Present : {presentDays}</Text>
-        <Text className="text-sm  text-gray-400 text-right">Absent : {absentDays}</Text></View>
+        <Text className="text-sm  text-gray-400 ">
+          Total Classes Attended : {route.params.totalClasses}
+        </Text>
+        <View>
+          <Text className="text-sm text-right text-gray-400 ">
+            Present : {route.params.presentClasses}
+          </Text>
+          <Text className="text-sm  text-gray-400 text-right">
+            Absent : {route.params.totalClasses - route.params.presentClasses}
+          </Text>
+        </View>
       </View>
 
-      <View style={{ width: wp(95) }} className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
+      <View
+        style={{width: wp(95)}}
+        className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
         <View className="flex flex-row justify-between">
           <Text className="w-3/4 text-gray-600 ">Date</Text>
           <Text className="w-1/4 text-gray-600 text-right">Attendance</Text>
@@ -273,25 +356,26 @@ const MarkAttendance = ({route}) => {
 
       <ScrollView
         scrollEventThrottle={1}
-        contentContainerStyle={{ flexGrow: 1 }}
-        style={{ backgroundColor: '#fff', height: hp(60) }}
-      >
-        <View style={{ width: wp(95) }} className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
-
-          {route.params.attDataG?.map((item, id) => (
-            <View className="flex flex-row justify-between" key={item}>
-              <Text className={`w-3/4 text-[${theme.maincolor}] `} >{new Date(item.date).toISOString().split('T')[0]}</Text>
-              <Text className={`w-1/4 text-[${theme.maincolor}]  text-right`}>{item.is_present?'Present':'Absent'}</Text>
+        contentContainerStyle={{flexGrow: 1}}
+        style={{backgroundColor: '#fff', height: hp(60)}}>
+        <View
+          style={{width: wp(95)}}
+          className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
+          {Object.entries(route.params.attendanceMap).map(([date, isPresent], index) => (
+            <View className="flex flex-row justify-between" key={index}>
+              <Text className={`w-3/4 text-[${theme.maincolor}]`}>{date}</Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}] text-right`}>
+                {isPresent ? 'Present' : 'Absent'}
+              </Text>
             </View>
           ))}
-
         </View>
-
       </ScrollView>
-
     </SafeAreaView>
-  )
-}
+  );
+};
+
+
 MarkAttendance.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
@@ -299,9 +383,12 @@ MarkAttendance.propTypes = {
         PropTypes.shape({
           date: PropTypes.string.isRequired,
           is_present: PropTypes.bool.isRequired,
-        })
+        }),
       ),
       className: PropTypes.string.isRequired,
+      attendanceMap: PropTypes.objectOf(PropTypes.bool).isRequired,
+      totalClasses: PropTypes.number.isRequired,
+      presentClasses: PropTypes.number.isRequired,
     }).isRequired,
   }).isRequired,
 };
