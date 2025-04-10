@@ -5,6 +5,7 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -24,7 +25,7 @@ import PTRView from 'react-native-pull-to-refresh';
 
 const Home = () => {
   const navigation = useNavigation();
-  const {rollNumberG, classes, loading, setLoading, studentidG} = useAuth();
+  const {rollNumberG, loading, setLoading, studentidG, setStudentClass} = useAuth();
   const [selectedClass, setSelectedClass] = useState(null);
 
   const getClassInfo = async () => {
@@ -34,9 +35,8 @@ const Home = () => {
       const response = await axios.get(
         `${BASE_URL}/api/student/classes-info/${studentidG}`,
       );
-      console.log('Classes:', classes);
+      setStudentClass(response.data.classes);
       setSelectedClass(response.data.classes);
-      console.log(selectedClass);
     } catch (error) {
       ToastAndroid.show(`Something went wrong.`, ToastAndroid.LONG);
       console.log(error);

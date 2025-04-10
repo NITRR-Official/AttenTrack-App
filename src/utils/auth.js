@@ -26,6 +26,8 @@ export const AuthProvider = ({children}) => {
   const [studentidG, setStudentidG] = useState('');
   const [studentNameG, setStudentNameG] = useState('');
   const [studentEmailG, setStudentEmailG] = useState('');
+  const [studentClass, setStudentClass] = useState([]);
+
   const [eduQualification, setEduQualification] = useState('Not Set');
   const [telephone, setTelephone] = useState('Not Set');
   const [interest, setInterest] = useState('Not Set');
@@ -136,7 +138,9 @@ export const AuthProvider = ({children}) => {
       enroll,
       setEnroll,
       phone,
-      setPhone
+      setPhone,
+      studentClass,
+      setStudentClass
     }),
     [
       studentidG,
@@ -180,7 +184,9 @@ export const AuthProvider = ({children}) => {
       enroll,
       setEnroll,
       phone,
-      setPhone
+      setPhone,
+      studentClass, 
+      setStudentClass
     ],
   );
   return (

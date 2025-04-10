@@ -1,15 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   Alert,
-  StatusBar,
-  ScrollView,
-  ProgressBar
+  StatusBar
 } from 'react-native';
-import {ActivityIndicator} from 'react-native-paper';
+import {ActivityIndicator, ProgressBar} from 'react-native-paper';
 import {theme} from '../../theme';
 import {ArrowDownTrayIcon} from 'react-native-heroicons/outline';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
@@ -21,49 +19,57 @@ import {
 import {useAuth} from '../../utils/auth';
 import axios from 'axios';
 import {BASE_URL} from '../../constants/constants';
+import PTRView from 'react-native-pull-to-refresh';
 
 const StudentReport = () => {
   const [lowAttendanceSubjects, setLowAttendanceSubjects] = useState([]);
-  const {rollNumberG, studentNameG, loading, setLoading} = useAuth();
+  const {rollNumberG, studentNameG, loading, setLoading, studentClass} =
+    useAuth();
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    const getStudentReport = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/api/student/attendance/${rollNumberG}`,
-        );
-        const finalData = Object.entries(response.data).map(([key, value]) => ({
-          id: key,
-          ...value,
-        }));
-        setData(finalData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const finalData = useMemo(() => {
+    return data;
+  }, [data]);
 
+  const getStudentReport = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/student/attendance/${rollNumberG}`,
+      );
+
+      setData(
+        Object.entries(response.data).map(([key, value]) => {
+          const meta = studentClass.find(cls => cls.class_id === key);
+          return {
+            id: key,
+            ...value,
+            classname: meta?.classname || 'Unknown',
+          };
+        }),
+      );
+
+      setLowAttendanceSubjects(
+        finalData?.filter(item => (item.attended * 100) / item.total_days < 75),
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     getStudentReport();
   }, []);
 
-  console.log(data);
-
-  useEffect(() => generateAttendanceReport(), [data]);
-
-  const generateAttendanceReport = () => {
-    // Find subjects with attendance less than 75%
-    const lowAttendance = data?.filter(
-      subject =>
-        (
-          (subject.numberOfDatesP * 100) /
-          (subject.numberOfDatesP + subject.numberOfDatesA)
-        )?.toFixed(2) < 75,
+  useEffect(() => {
+    setLowAttendanceSubjects(
+      finalData?.filter(item => (item.attended * 100) / item.total_days < 75),
     );
-    setLowAttendanceSubjects(lowAttendance);
-  };
+  }, [finalData]);
+
+  console.log('After memo service: ', finalData, lowAttendanceSubjects);
 
   const generateHTML = () => {
     // Build HTML content for the report
@@ -94,17 +100,17 @@ const StudentReport = () => {
           </thead>
           <tbody>`;
 
-    data?.forEach(subject => {
+    finalData?.forEach(subject => {
       const attendancePercentage = (
-        (subject.numberOfDatesP * 100) /
-        (subject.numberOfDatesP + subject.numberOfDatesA)
+        (subject.attended * 100) /
+        subject.total_days
       ).toFixed(2);
       html += `
         <tr>
-          <td>${subject.class_name}</td>
-          <td>${subject.numberOfDatesP + subject.numberOfDatesA}</td>
-          <td>${subject.numberOfDatesP}</td>
-          <td>${subject.numberOfDatesA}</td>
+          <td>${subject.classname}</td>
+          <td>${subject.total_days}</td>
+          <td>${subject.attended}</td>
+          <td>${subject.total_days - subject.attended}</td>
           <td>${attendancePercentage}%</td>
         </tr>`;
     });
@@ -126,12 +132,12 @@ const StudentReport = () => {
 
     lowAttendanceSubjects.forEach(subject => {
       const attendancePercentage = (
-        (subject.numberOfDatesP * 100) /
-        (subject.numberOfDatesP + subject.numberOfDatesA)
+        (subject.attended * 100) /
+        subject.total_days
       ).toFixed(2);
       html += `
         <tr>
-          <td>${subject.class_name}</td>
+          <td>${subject.classname}</td>
           <td>${attendancePercentage}%</td>
         </tr>`;
     });
@@ -144,6 +150,15 @@ const StudentReport = () => {
       </html>`;
 
     return html;
+  };
+
+  const refresh = () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        getStudentReport();
+        resolve();
+      }, 2000);
+    });
   };
 
   const downloadStudentReport = async () => {
@@ -220,45 +235,42 @@ const StudentReport = () => {
         </View>
       )}
 
-      <ScrollView
-        style={styles.container}
+      <PTRView
+        onRefresh={refresh}
         className={`opacity-${loading ? 50 : 100}`}>
         {data?.map((subject, index) => (
-          <View key={subject} style={styles.section}>
-            <Text style={styles.subHeader}>{subject.class_name}</Text>
+          <View key={index} style={styles.section}>
+            <Text style={styles.subHeader}>{subject.classname}</Text>
 
             <View style={styles.row}>
               <Text style={styles.label}>Total Classes:</Text>
-              <Text style={styles.value}>
-                {subject.numberOfDatesA + subject.numberOfDatesP}
-              </Text>
+              <Text style={styles.value}>{subject.total_days}</Text>
             </View>
 
             <View style={styles.row}>
               <Text style={styles.label}>Classes Attended:</Text>
-              <Text style={styles.value}>{subject.numberOfDatesP}</Text>
+              <Text style={styles.value}>{subject.attended}</Text>
             </View>
 
             <View style={styles.row}>
               <Text style={styles.label}>Classes Unattended:</Text>
-              <Text style={styles.value}>{subject.numberOfDatesA}</Text>
+              <Text style={styles.value}>
+                {subject.total_days - subject.attended}
+              </Text>
             </View>
 
             <View style={styles.row}>
               <Text style={styles.label}>Attendance Percentage:</Text>
               <Text style={styles.value}>
-                {(
-                  (subject.numberOfDatesP * 100) /
-                  (subject.numberOfDatesP + subject.numberOfDatesA)
-                )?.toFixed(2)}
-                %
+                {((subject.attended * 100) / subject.total_days).toFixed(2)}%
               </Text>
             </View>
 
             <ProgressBar
               progress={
-                subject.numberOfDatesP /
-                (subject.numberOfDatesP + subject.numberOfDatesA)
+                subject.total_days > 0
+                  ? subject.attended / subject.total_days
+                  : 0
               }
               color={theme.maincolor}
               style={styles.progressBar}
@@ -270,7 +282,7 @@ const StudentReport = () => {
         {data && (
           <View style={styles.lowAttendanceSection}>
             <Text style={styles.subHeader}>
-              Subjects with Attendance Less Than 75%
+              Classes with Attendance Less Than 75%
             </Text>
             {lowAttendanceSubjects?.length > 0 ? (
               <View style={styles.table}>
@@ -280,12 +292,11 @@ const StudentReport = () => {
                 </View>
                 {lowAttendanceSubjects?.map((subject, index) => (
                   <View key={subject} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{subject.class_name}</Text>
+                    <Text style={styles.tableCell}>{subject.classname}</Text>
                     <Text style={styles.tableCell}>
-                      {(
-                        (subject.numberOfDatesP * 100) /
-                        (subject.numberOfDatesP + subject.numberOfDatesA)
-                      )?.toFixed(2)}
+                      {((subject.attended * 100) / subject.total_days)?.toFixed(
+                        2,
+                      )}
                       %
                     </Text>
                   </View>
@@ -293,12 +304,12 @@ const StudentReport = () => {
               </View>
             ) : (
               <Text style={styles.noLowAttendanceText}>
-                All subjects have attendance above 75%.
+                All classes have attendance above 75%.
               </Text>
             )}
           </View>
         )}
-      </ScrollView>
+      </PTRView>
     </>
   );
 };
