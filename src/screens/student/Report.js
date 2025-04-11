@@ -71,8 +71,6 @@ const StudentReport = () => {
     );
   }, [finalData]);
 
-  console.log('After memo service: ', finalData, lowAttendanceSubjects);
-
   const generateHTML = () => {
     // Build HTML content for the report
     let html = `

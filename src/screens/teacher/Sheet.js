@@ -35,13 +35,15 @@ import PropTypes from 'prop-types';
 
 const Sheet = ({navigation, route}) => {
   const {loading, setLoading} = useAuth();
+  const [lag, setLag] = useState(false);
 
   const [student, setStudent] = useState();
-  const [range, setRange] = useState(3000);
-  const socket = useMemo(() => new WebSocket('wss://attendancetrackerbackend.onrender.com') , [])
+  const socket = useMemo(
+    () => new WebSocket('wss://attendancetrackerbackend.onrender.com'),
+    [],
+  );
 
   useEffect(() => setStudent(route.params.jsonGlobalData), []);
-  console.log(route.params);
   const [records, setRecords] = useState([]);
 
   useEffect(() => {
@@ -175,12 +177,6 @@ const Sheet = ({navigation, route}) => {
   const createAttendance = async () => {
     try {
       setLoading(true);
-      console.log(
-        'Creating attendance with records:',
-        route.params.id,
-        records,
-        new Date(),
-      );
       const response = await axios.post(
         `${BASE_URL}/api/attendance/createAttendance`,
         {
@@ -218,7 +214,7 @@ const Sheet = ({navigation, route}) => {
     );
   };
 
-  const requestLocationPermission = async () => {
+  const requestLocationPermission = async range => {
     if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
@@ -233,7 +229,7 @@ const Sheet = ({navigation, route}) => {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.log('You can access location');
-          getCurrentLocation(); // Call your function to get the location
+          getCurrentLocation(range); // Call your function to get the location
         } else {
           console.log('Location permission denied');
           ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
@@ -244,14 +240,14 @@ const Sheet = ({navigation, route}) => {
     }
   };
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = range => {
     GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
       .then(location => {
         socket.send(
           JSON.stringify({
             type: 'teacherLoc',
             location: location,
-            range: range,
+            range,
           }),
         );
         setModalVisible0(false);
@@ -260,6 +256,9 @@ const Sheet = ({navigation, route}) => {
       .catch(error => {
         const {code, message} = error;
         console.warn(code, message);
+      })
+      .finally(() => {
+        setLag(false);
       });
   };
 
@@ -389,6 +388,17 @@ const Sheet = ({navigation, route}) => {
           onRequestClose={() => {
             setModalVisible0(!modalVisible0);
           }}>
+
+          {lag && (
+            <View className="z-20 w-full p-2 top-[40%] absolute ">
+              <ActivityIndicator
+                animating={true}
+                color={'#01808c7a'}
+                size={wp(10)}
+              />
+            </View>
+          )}
+
           <TouchableWithoutFeedback onPress={() => setModalVisible0(false)}>
             <View className="w-full flex-1 bg-[#00000050] flex justify-center">
               <TouchableWithoutFeedback>
@@ -396,14 +406,9 @@ const Sheet = ({navigation, route}) => {
                   <Text className="text-black">Select Range :</Text>
                   <RadioButton.Group
                     onValueChange={value => {
-                      setRange(parseInt(value));
-                      requestLocationPermission();
+                      setLag(true);
+                      requestLocationPermission(parseInt(value));
                     }}>
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="5m"
-                      value="5"
-                    />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="10m"
@@ -433,6 +438,11 @@ const Sheet = ({navigation, route}) => {
                       labelStyle={{color: '#6a6a6a'}}
                       label="100m"
                       value="100"
+                    />
+                    <RadioButton.Item
+                      labelStyle={{color: '#6a6a6a'}}
+                      label="200m"
+                      value="200"
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
