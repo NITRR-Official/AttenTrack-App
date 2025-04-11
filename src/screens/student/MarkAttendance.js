@@ -40,10 +40,10 @@ const MarkAttendance = ({route}) => {
   const [receivedOtp, setReceivedOtp] = useState(null);
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
-  const {rollNumberG} = useAuth();
   const [range, setRange] = useState();
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
+  const {rollNumberG} = useAuth();
 
   const handleGetAttendance = async () => {
     try {
@@ -66,10 +66,9 @@ const MarkAttendance = ({route}) => {
   );
 
   useEffect(() => {
-    console.log('Socket from student side connected!', route.params);
-
     socket.onmessage = event => {
       const data = JSON.parse(event.data);
+      console.log('Socket from student side connected!', data);
 
       if (data.type === 'time_update2') {
         handleGetAttendance();
@@ -152,6 +151,7 @@ const MarkAttendance = ({route}) => {
           lat,
           long,
         );
+        console.log("Getting current location: ", location.longitude, location.latitude, long, lat, range, distance);
 
         if (distance <= range) {
           socket.send(
