@@ -357,7 +357,12 @@ MarkAttendance.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
       attDataG: PropTypes.shape({
-        attendanceMap: PropTypes.objectOf(PropTypes.bool).isRequired,
+        attendanceMap: PropTypes.arrayOf(
+          PropTypes.shape({
+            date: PropTypes.string.isRequired,
+            status: PropTypes.bool.isRequired,
+          })
+        ).isRequired,
         totalClasses: PropTypes.number.isRequired,
         presentClasses: PropTypes.number.isRequired,
       }),
