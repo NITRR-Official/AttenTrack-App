@@ -31,7 +31,6 @@ const Home = () => {
   const getClassInfo = async () => {
     setLoading(true);
     try {
-      console.log('Student ID:', studentidG);
       const response = await axios.get(
         `${BASE_URL}/api/student/classes-info/${studentidG}`,
       );
@@ -39,7 +38,7 @@ const Home = () => {
       setSelectedClass(response.data.classes);
     } catch (error) {
       ToastAndroid.show(`Something went wrong.`, ToastAndroid.LONG);
-      console.log(error);
+      console.log('From class infos: ',error, studentidG);
     } finally {
       setLoading(false);
     }

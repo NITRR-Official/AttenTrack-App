@@ -6,6 +6,7 @@ export const AuthContext = createContext();
 
 import PropTypes from 'prop-types';
 import {BASE_URL} from '../constants/constants';
+import { ToastAndroid } from 'react-native';
 
 export const AuthProvider = ({children}) => {
   const [index, setIndex] = useState(null);
@@ -39,8 +40,9 @@ export const AuthProvider = ({children}) => {
   const [phone, setPhone] = useState('Not Set');
 
   const directLogin = async () => {
+    let token = null;
     try {
-      const token = JSON.parse(await SInfo.getItem('token'));
+      token = JSON.parse(await SInfo.getItem('token'));
       const response = await fetch(
         `${BASE_URL}/api/${token.type}/token-login`,
         {
@@ -86,7 +88,16 @@ export const AuthProvider = ({children}) => {
         setIndex('1'); // Set index for teacher
       }
     } catch (error) {
-      setIndex('0');
+      if(token != null && (token.type === 'student' || token.type === 'teacher')){
+        ToastAndroid.show("Error fetching data", ToastAndroid.SHORT);
+      }
+      if (token == null) {
+        setIndex('0');
+      } else if (token.type === 'student') {
+        setIndex('2');
+      } else {
+        setIndex('1');
+      }
       console.log('Error fetching student data:', error);
     }
   };

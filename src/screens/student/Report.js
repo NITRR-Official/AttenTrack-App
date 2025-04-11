@@ -5,7 +5,8 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  StatusBar
+  StatusBar,
+  ToastAndroid
 } from 'react-native';
 import {ActivityIndicator, ProgressBar} from 'react-native-paper';
 import {theme} from '../../theme';
@@ -53,6 +54,7 @@ const StudentReport = () => {
         finalData?.filter(item => (item.attended * 100) / item.total_days < 75),
       );
     } catch (error) {
+      ToastAndroid.show("Error generating data", ToastAndroid.SHORT);
       console.error(error);
     } finally {
       setLoading(false);
