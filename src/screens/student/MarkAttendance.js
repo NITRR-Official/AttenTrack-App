@@ -170,6 +170,11 @@ const MarkAttendance = ({route}) => {
             setModalVisible2(false);
           }, 2000);
         }
+
+        //For experiment basis only
+        ToastAndroid.show(`R: ${range} m, D: ${distance} m`, ToastAndroid.LONG);
+        ToastAndroid.show(`LAT-S: ${location.latitude}, LONG-S: ${location.longitude}`, ToastAndroid.LONG)
+        ToastAndroid.show(`LAT-T: ${lat}, LONG-T: ${long}`, ToastAndroid.LONG)
       })
       .catch(error => {
         const {code, message} = error;
