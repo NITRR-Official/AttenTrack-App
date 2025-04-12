@@ -81,8 +81,6 @@ const LogIn = () => {
         `Login Successful. Welcome ${data.fullName} !`,
         ToastAndroid.LONG,
       );
-      console.log('Login Successful:', data);
-
       SInfo.setItem(
         'token',
         JSON.stringify({type: 'teacher', data: data.token}),
@@ -138,7 +136,6 @@ const LogIn = () => {
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
       ToastAndroid.show(
         `Login Successful. Welcome ${data.fullName} !`,
         ToastAndroid.LONG,

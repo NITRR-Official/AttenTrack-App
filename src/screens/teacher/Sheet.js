@@ -236,8 +236,8 @@ const Sheet = ({navigation, route}) => {
           ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
         }
       } catch (err) {
+        setLag(false);
         console.warn(err);
-        setLag(false)
       }
     }
   };
@@ -256,8 +256,7 @@ const Sheet = ({navigation, route}) => {
         setModalVisible1(true);
       })
       .catch(error => {
-        const {code, message} = error;
-        console.warn(code, message);
+        console.warn(error);
       })
       .finally(() => {
         setLag(false);
@@ -390,8 +389,7 @@ const Sheet = ({navigation, route}) => {
           onRequestClose={() => {
             setModalVisible0(!modalVisible0);
           }}>
-
-          {lag && (
+          {lag ? (
             <View className="z-20 w-full p-2 top-[40%] absolute ">
               <ActivityIndicator
                 animating={true}
@@ -399,9 +397,8 @@ const Sheet = ({navigation, route}) => {
                 size={wp(10)}
               />
             </View>
-          )}
-
-          <TouchableWithoutFeedback onPress={() => setModalVisible0(false)}>
+          ) : (
+            <TouchableWithoutFeedback onPress={() => setModalVisible0(false)}>
             <View className="w-full flex-1 bg-[#00000050] flex justify-center">
               <TouchableWithoutFeedback>
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
@@ -415,61 +412,55 @@ const Sheet = ({navigation, route}) => {
                       labelStyle={{color: '#6a6a6a'}}
                       label="10m"
                       value="10"
-                      disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="20m"
                       value="20"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="30m"
                       value="30"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="40m"
                       value="40"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="50m"
                       value="50"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="100m"
                       value="100"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="200m"
                       value="200"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="500m"
                       value="500"
-                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="1000m"
                       value="1000"
-                        disabled={lag}
                     />
                   </RadioButton.Group>
                 </View>
               </TouchableWithoutFeedback>
             </View>
           </TouchableWithoutFeedback>
+          )}
+
+          
         </Modal>
         <Modal
           animationType="fade"

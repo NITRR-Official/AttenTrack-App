@@ -24,7 +24,7 @@ export const AuthProvider = ({children}) => {
   const [loading, setLoading] = useState(false);
 
   const [rollNumberG, setRollNumberG] = useState('');
-  const [studentidG, setStudentidG] = useState('');
+  const [studentidG, setStudentidG] = useState(null);
   const [studentNameG, setStudentNameG] = useState('');
   const [studentEmailG, setStudentEmailG] = useState('');
   const [studentClass, setStudentClass] = useState([]);

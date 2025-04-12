@@ -64,7 +64,9 @@ const Home = () => {
   };
 
   useEffect(() => {
-    getClassInfo();
+    if(studentidG != null && studentidG != undefined) {
+      getClassInfo();
+    }
   }, [studentidG]);
 
   const refresh = () => {
