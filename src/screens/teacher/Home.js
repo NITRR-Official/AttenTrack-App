@@ -48,6 +48,7 @@ const Home = () => {
         setClasses(response.data.classes);
       })
       .catch(error => {
+        ToastAndroid.show("Something went wrong.",ToastAndroid.LONG)
         console.log(error);
       })
       .finally(() => {
