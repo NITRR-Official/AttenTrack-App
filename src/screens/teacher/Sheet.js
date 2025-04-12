@@ -415,46 +415,55 @@ const Sheet = ({navigation, route}) => {
                       labelStyle={{color: '#6a6a6a'}}
                       label="10m"
                       value="10"
+                      disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="20m"
                       value="20"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="30m"
                       value="30"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="40m"
                       value="40"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="50m"
                       value="50"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="100m"
                       value="100"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="200m"
                       value="200"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="500m"
                       value="500"
+                        disabled={lag}
                     />
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
                       label="1000m"
                       value="1000"
+                        disabled={lag}
                     />
                   </RadioButton.Group>
                 </View>
