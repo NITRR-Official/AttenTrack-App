@@ -232,10 +232,12 @@ const Sheet = ({navigation, route}) => {
           getCurrentLocation(range); // Call your function to get the location
         } else {
           console.log('Location permission denied');
+          setLag(false);
           ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
         }
       } catch (err) {
         console.warn(err);
+        setLag(false)
       }
     }
   };
