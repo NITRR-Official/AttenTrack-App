@@ -91,6 +91,7 @@ const Sheet = ({navigation, route}) => {
         : record,
     );
   };
+  const [locate, setLocate] = useState(null);
 
   useEffect(() => {
     console.log('Socket from teacher side connected!');
@@ -108,6 +109,11 @@ const Sheet = ({navigation, route}) => {
 
         // Increment the present count
         setPresentCount(prevCount => prevCount + 1);
+      }
+
+      //Listen for the re-request updates from receivers
+      if (data.type === 're_request') {
+        socket.send(locate)
       }
     };
 
@@ -223,7 +229,6 @@ const Sheet = ({navigation, route}) => {
             title: 'Location Permission',
             message: 'This app needs access to your location',
             buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
             buttonPositive: 'OK',
           },
         );
@@ -242,18 +247,19 @@ const Sheet = ({navigation, route}) => {
     }
   };
 
+
   const getCurrentLocation = range => {
     GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
       .then(location => {
-        socket.send(
-          JSON.stringify({
+        setModalVisible0(false);
+        setModalVisible1(true);
+        const datas = JSON.stringify({
             type: 'teacherLoc',
             location: location,
             range,
-          }),
-        );
-        setModalVisible0(false);
-        setModalVisible1(true);
+        })
+        setLocate(datas);
+        socket.send(datas);
       })
       .catch(error => {
         console.warn(error);

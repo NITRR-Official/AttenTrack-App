@@ -44,6 +44,8 @@ const MarkAttendance = ({route}) => {
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
   const {rollNumberG} = useAuth();
+  const [teacherReceived, setTeacherReceived] = useState(false);
+  
 
   const handleGetAttendance = async () => {
     try {
@@ -78,6 +80,8 @@ const MarkAttendance = ({route}) => {
         setTime(data.time);
       }
       if (data.type === 'teacherLoc') {
+        console.log('Teacher Location:', data.location.latitude, data.location.longitude, data.range);
+        setTeacherReceived(true);
         setRange(data.range);
         setLat(data.location.latitude);
         setLong(data.location.longitude);
@@ -85,6 +89,13 @@ const MarkAttendance = ({route}) => {
       if (data.type === 'first_call') {
         setOtp('');
         setModalVisible1(true);
+      }
+    };
+
+    socket.onopen = () => {
+      if(!teacherReceived) {
+        socket.send(JSON.stringify({ type: 're_request' }));
+        setTeacherReceived(true);
       }
     };
 
