@@ -29,7 +29,7 @@ import {useAuth} from '../../utils/auth';
 import GetLocation from 'react-native-get-location';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
-import {BASE_URL} from '../../constants/constants';
+import {API_URL, BASE_URL} from '../../constants/constants';
 
 import PropTypes from 'prop-types';
 
@@ -38,10 +38,7 @@ const Sheet = ({navigation, route}) => {
   const [lag, setLag] = useState(false);
 
   const [student, setStudent] = useState();
-  const socket = useMemo(
-    () => new WebSocket('wss://attendancetrackerbackend.onrender.com'),
-    [],
-  );
+  const socket = useMemo(() => new WebSocket(`wss://${API_URL}`), []);
 
   useEffect(() => setStudent(route.params.jsonGlobalData), []);
   const [records, setRecords] = useState([]);
@@ -91,7 +88,9 @@ const Sheet = ({navigation, route}) => {
         : record,
     );
   };
-  const [locate, setLocate] = useState(null);
+  const [locate, setLocate] = useState({
+    location: '',
+  });
 
   useEffect(() => {
     console.log('Socket from teacher side connected!');
@@ -152,13 +151,27 @@ const Sheet = ({navigation, route}) => {
 
             // Send final time update to WebSocket before closing
             // console.log('Sending final time update:', 0);
-            socket.send(JSON.stringify({type: 'time_update', time: 0}));
+            socket.send(
+              JSON.stringify({
+                type: 'time_update',
+                time: 0,
+                location: '',
+                range: '',
+              }),
+            );
             return 0;
           }
 
           // Send time updates in real-time via WebSocket
           // console.log('Sending real-time time update:', prev-1);
-          socket.send(JSON.stringify({type: 'time_update', time: prev - 1, location: locate}));
+          socket.send(
+            JSON.stringify({
+              type: 'time_update',
+              time: prev - 1,
+              location: locate.location,
+              range: locate.range,
+            }),
+          );
 
           return prev - 1;
         });
@@ -255,7 +268,7 @@ const Sheet = ({navigation, route}) => {
           location: location,
           range,
         });
-        setLocate(datas);
+        setLocate({location: location, range: range});
         socket.send(datas);
       })
       .catch(error => {
