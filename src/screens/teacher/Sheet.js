@@ -110,11 +110,6 @@ const Sheet = ({navigation, route}) => {
         // Increment the present count
         setPresentCount(prevCount => prevCount + 1);
       }
-
-      //Listen for the re-request updates from receivers
-      if (data.type === 're_request') {
-        socket.send(locate)
-      }
     };
 
     return () => {
@@ -144,40 +139,43 @@ const Sheet = ({navigation, route}) => {
 
   const handleSetAttendance2 = () => {
     let interval;
+    try {
+      socket.send(JSON.stringify({type: 'first_call'}));
 
-    socket.send(JSON.stringify({type: 'first_call'}));
+      interval = setInterval(() => {
+        setTime(prev => {
+          if (prev <= 0) {
+            setModalVisible2(false);
+            clearInterval(interval);
+            setTime(0);
+            setFinalTime(0);
 
-    interval = setInterval(() => {
-      setTime(prev => {
-        if (prev <= 0) {
-          setModalVisible2(false);
-          clearInterval(interval);
-          setTime(0);
-          setFinalTime(0);
+            // Send final time update to WebSocket before closing
+            // console.log('Sending final time update:', 0);
+            socket.send(JSON.stringify({type: 'time_update', time: 0}));
+            return 0;
+          }
 
-          // Send final time update to WebSocket before closing
-          // console.log('Sending final time update:', 0);
-          socket.send(JSON.stringify({type: 'time_update', time: 0}));
-          return 0;
-        }
+          // Send time updates in real-time via WebSocket
+          // console.log('Sending real-time time update:', prev-1);
+          socket.send(JSON.stringify({type: 'time_update', time: prev - 1, location: locate}));
 
-        // Send time updates in real-time via WebSocket
-        // console.log('Sending real-time time update:', prev-1);
-        socket.send(JSON.stringify({type: 'time_update', time: prev - 1}));
+          return prev - 1;
+        });
+      }, 1000);
 
-        return prev - 1;
-      });
-    }, 1000);
+      socket.onerror = error => {
+        console.log('WebSocket Error:', error);
+        ToastAndroid.show('Error with WebSocket connection', ToastAndroid.LONG);
+        clearInterval(interval);
+      };
 
-    socket.onerror = error => {
-      console.log('WebSocket Error:', error);
-      ToastAndroid.show('Error with WebSocket connection', ToastAndroid.LONG);
-      clearInterval(interval);
-    };
-
-    socket.onclose = () => {
-      console.log('WebSocket connection closed.');
-    };
+      socket.onclose = () => {
+        console.log('WebSocket connection closed.');
+      };
+    } catch (error) {
+      console.error('Error in WebSocket connection:', error);
+    }
   };
 
   const createAttendance = async () => {
@@ -247,17 +245,16 @@ const Sheet = ({navigation, route}) => {
     }
   };
 
-
   const getCurrentLocation = range => {
     GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
       .then(location => {
         setModalVisible0(false);
         setModalVisible1(true);
         const datas = JSON.stringify({
-            type: 'teacherLoc',
-            location: location,
-            range,
-        })
+          type: 'teacherLoc',
+          location: location,
+          range,
+        });
         setLocate(datas);
         socket.send(datas);
       })
@@ -405,68 +402,66 @@ const Sheet = ({navigation, route}) => {
             </View>
           ) : (
             <TouchableWithoutFeedback onPress={() => setModalVisible0(false)}>
-            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
-              <TouchableWithoutFeedback>
-                <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text className="text-black">Select Range :</Text>
-                  <RadioButton.Group
-                    onValueChange={value => {
-                      setLag(true);
-                      requestLocationPermission(parseInt(value));
-                    }}>
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="10m"
-                      value="10"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="20m"
-                      value="20"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="30m"
-                      value="30"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="40m"
-                      value="40"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="50m"
-                      value="50"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="100m"
-                      value="100"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="200m"
-                      value="200"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="500m"
-                      value="500"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="1000m"
-                      value="1000"
-                    />
-                  </RadioButton.Group>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
+              <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+                <TouchableWithoutFeedback>
+                  <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
+                    <Text className="text-black">Select Range :</Text>
+                    <RadioButton.Group
+                      onValueChange={value => {
+                        setLag(true);
+                        requestLocationPermission(parseInt(value));
+                      }}>
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="10m"
+                        value="10"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="20m"
+                        value="20"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="30m"
+                        value="30"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="40m"
+                        value="40"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="50m"
+                        value="50"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="100m"
+                        value="100"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="200m"
+                        value="200"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="500m"
+                        value="500"
+                      />
+                      <RadioButton.Item
+                        labelStyle={{color: '#6a6a6a'}}
+                        label="1000m"
+                        value="1000"
+                      />
+                    </RadioButton.Group>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
           )}
-
-          
         </Modal>
         <Modal
           animationType="fade"

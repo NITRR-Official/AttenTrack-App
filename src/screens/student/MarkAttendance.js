@@ -44,8 +44,6 @@ const MarkAttendance = ({route}) => {
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
   const {rollNumberG} = useAuth();
-  const [teacherReceived, setTeacherReceived] = useState(false);
-  
 
   const handleGetAttendance = async () => {
     try {
@@ -68,6 +66,13 @@ const MarkAttendance = ({route}) => {
   );
 
   useEffect(() => {
+
+    const handleTeacherInfo = (data) => {
+      setRange(data.range);
+      setLat(data.location.latitude);
+      setLong(data.location.longitude);
+    };
+
     socket.onmessage = event => {
       const data = JSON.parse(event.data);
       console.log('Socket from student side connected!', data);
@@ -78,10 +83,9 @@ const MarkAttendance = ({route}) => {
           setModalVisible1(false);
         }
         setTime(data.time);
+        handleTeacherInfo(data.location);
       }
       if (data.type === 'teacherLoc') {
-        console.log('Teacher Location:', data.location.latitude, data.location.longitude, data.range);
-        setTeacherReceived(true);
         setRange(data.range);
         setLat(data.location.latitude);
         setLong(data.location.longitude);
@@ -89,13 +93,6 @@ const MarkAttendance = ({route}) => {
       if (data.type === 'first_call') {
         setOtp('');
         setModalVisible1(true);
-      }
-    };
-
-    socket.onopen = () => {
-      if(!teacherReceived) {
-        socket.send(JSON.stringify({ type: 're_request' }));
-        setTeacherReceived(true);
       }
     };
 
@@ -162,7 +159,15 @@ const MarkAttendance = ({route}) => {
           lat,
           long,
         );
-        console.log("Getting current location: ", location.longitude, location.latitude, long, lat, range, distance);
+        console.log(
+          'Getting current location: ',
+          location.longitude,
+          location.latitude,
+          long,
+          lat,
+          range,
+          distance,
+        );
 
         if (distance <= range) {
           socket.send(
@@ -184,8 +189,11 @@ const MarkAttendance = ({route}) => {
 
         //For experiment basis only
         ToastAndroid.show(`R: ${range} m, D: ${distance} m`, ToastAndroid.LONG);
-        ToastAndroid.show(`LAT-S: ${location.latitude}, LONG-S: ${location.longitude}`, ToastAndroid.LONG)
-        ToastAndroid.show(`LAT-T: ${lat}, LONG-T: ${long}`, ToastAndroid.LONG)
+        ToastAndroid.show(
+          `LAT-S: ${location.latitude}, LONG-S: ${location.longitude}`,
+          ToastAndroid.LONG,
+        );
+        ToastAndroid.show(`LAT-T: ${lat}, LONG-T: ${long}`, ToastAndroid.LONG);
       })
       .catch(error => {
         const {code, message} = error;
@@ -333,7 +341,9 @@ const MarkAttendance = ({route}) => {
             Present : {route.params.attDataG.presentClasses}
           </Text>
           <Text className="text-sm  text-gray-400 text-right">
-            Absent : {route.params.attDataG.totalClasses - route.params.attDataG.presentClasses}
+            Absent :{' '}
+            {route.params.attDataG.totalClasses -
+              route.params.attDataG.presentClasses}
           </Text>
         </View>
       </View>
@@ -356,7 +366,9 @@ const MarkAttendance = ({route}) => {
           className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
           {route.params.attDataG.attendanceMap.map((data, index) => (
             <View className="flex flex-row justify-between" key={index}>
-              <Text className={`w-3/4 text-[${theme.maincolor}]`}>{data.date}</Text>
+              <Text className={`w-3/4 text-[${theme.maincolor}]`}>
+                {data.date}
+              </Text>
               <Text className={`w-1/4 text-[${theme.maincolor}] text-right`}>
                 {data.status ? 'Present' : 'Absent'}
               </Text>
@@ -368,7 +380,6 @@ const MarkAttendance = ({route}) => {
   );
 };
 
-
 MarkAttendance.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
@@ -377,7 +388,7 @@ MarkAttendance.propTypes = {
           PropTypes.shape({
             date: PropTypes.string.isRequired,
             status: PropTypes.bool.isRequired,
-          })
+          }),
         ).isRequired,
         totalClasses: PropTypes.number.isRequired,
         presentClasses: PropTypes.number.isRequired,
