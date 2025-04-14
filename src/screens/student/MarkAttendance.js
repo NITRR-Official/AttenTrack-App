@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState, useMemo, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {
   widthPercentageToDP as wp,
@@ -30,7 +30,7 @@ import axios from 'axios';
 import GetLocation from 'react-native-get-location';
 import {calculateDistance} from './locationTracker';
 import {useAuth} from '../../utils/auth';
-import {BASE_URL} from '../../constants/constants';
+import {API_URL, BASE_URL} from '../../constants/constants';
 
 const MarkAttendance = ({route}) => {
   const navigation = useNavigation();
@@ -61,13 +61,14 @@ const MarkAttendance = ({route}) => {
   };
 
   const socket = useMemo(
-    () => new WebSocket('wss://attendancetrackerbackend.onrender.com'),
+    () => new WebSocket(`wss://${API_URL}`),
     [],
   );
 
-  useEffect(() => {
+  const popupAutoShownRef = useRef(false);
 
-    const handleTeacherInfo = (data) => {
+  useEffect(() => {
+    const handleTeacherInfo = data => {
       setRange(data.range);
       setLat(data.location.latitude);
       setLong(data.location.longitude);
@@ -82,8 +83,18 @@ const MarkAttendance = ({route}) => {
         if (data.time <= 0) {
           setModalVisible1(false);
         }
+
+        if (!popupAutoShownRef.current) {
+          setModalVisible1(true);
+          popupAutoShownRef.current = true; // prevent it from showing again
+        }
+
         setTime(data.time);
-        handleTeacherInfo(data.location);
+
+        handleTeacherInfo({
+          location: data.location,
+          range: data.range,
+        });
       }
       if (data.type === 'teacherLoc') {
         setRange(data.range);
