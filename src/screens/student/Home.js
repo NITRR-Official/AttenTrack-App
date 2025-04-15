@@ -54,6 +54,7 @@ const Home = () => {
       navigation.navigate('MarkAttendance', {
         attDataG: response.data,
         className: name,
+        id: id,
       });
     } catch (error) {
       ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
