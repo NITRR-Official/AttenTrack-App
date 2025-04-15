@@ -498,16 +498,6 @@ const Sheet = ({navigation, route}) => {
                     }}>
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
-                      label="10 Seconds"
-                      value="10"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="20 Seconds"
-                      value="20"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
                       label="30 Seconds"
                       value="30"
                     />
@@ -520,6 +510,11 @@ const Sheet = ({navigation, route}) => {
                       labelStyle={{color: '#6a6a6a'}}
                       label="2 Minutes"
                       value="120"
+                    />
+                    <RadioButton.Item
+                      labelStyle={{color: '#6a6a6a'}}
+                      label="5 Minutes"
+                      value="300"
                     />
                   </RadioButton.Group>
                 </View>
