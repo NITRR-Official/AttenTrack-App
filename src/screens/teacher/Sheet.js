@@ -126,6 +126,7 @@ const Sheet = ({navigation, route}) => {
       await axios.post(`${BASE_URL}/setAttendance`, {
         otp: generatedOtp,
         time: val,
+        id: route.params.id,
       });
     } catch (error) {
       console.error('Error sending OTP and time to server:', error);
@@ -263,13 +264,12 @@ const Sheet = ({navigation, route}) => {
       .then(location => {
         setModalVisible0(false);
         setModalVisible1(true);
-        const datas = JSON.stringify({
+        setLocate({location: location, range: range});
+        socket.send(JSON.stringify({
           type: 'teacherLoc',
           location: location,
           range,
-        });
-        setLocate({location: location, range: range});
-        socket.send(datas);
+        }));
       })
       .catch(error => {
         console.warn(error);

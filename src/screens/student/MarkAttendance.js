@@ -40,6 +40,7 @@ const MarkAttendance = ({route}) => {
   const [receivedOtp, setReceivedOtp] = useState(null);
   const [time, setTime] = useState(0);
   const [finalTime, setFinalTime] = useState(1);
+  const [id, setId] = useState('');
   const [range, setRange] = useState();
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
@@ -51,6 +52,7 @@ const MarkAttendance = ({route}) => {
       const data2 = resp.data;
       setReceivedOtp(data2.currentOTP);
       setFinalTime(data2.finalTime);
+      setId(data2.currentId)
     } catch (error) {
       console.error('Error sending OTP and time to server:', error);
       ToastAndroid.show(
@@ -124,13 +126,13 @@ const MarkAttendance = ({route}) => {
   }, []);
 
   const handleOtpSubmit = () => {
-    if (receivedOtp == otp) {
+    if ((receivedOtp == otp) && (id == route.params.id)) {
       ToastAndroid.show('OTP Verified !', ToastAndroid.LONG);
       setModalVisible1(false);
       setModalVisible2(true);
       requestLocationPermission();
     } else {
-      ToastAndroid.show('Incorrect OTP !', ToastAndroid.LONG);
+      ToastAndroid.show('Incorrect OTP or invalid class !', ToastAndroid.LONG);
     }
   };
 
@@ -405,6 +407,7 @@ MarkAttendance.propTypes = {
         presentClasses: PropTypes.number.isRequired,
       }),
       className: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
     }).isRequired,
   }).isRequired,
 };
