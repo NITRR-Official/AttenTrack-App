@@ -105,6 +105,7 @@ export const AuthProvider = ({children}) => {
         setTeacherNameG(token.name);
         setTeacherEmailG(token.email);
         setDepartmentG(token.department);
+        setTeacheridG(token.id);
         setIndex('1');
       }
       console.log('Error fetching student data:', error);

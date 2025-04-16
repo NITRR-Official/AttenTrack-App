@@ -5,6 +5,7 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
 import PTRView from 'react-native-pull-to-refresh';
 import {
@@ -45,7 +46,8 @@ const ReportHome = () => {
         recordG: response.data.class_id,
         totG: response.data.totalDays,
         recordG2: response.data.report,
-        recordDate: responseDate.data
+        recordDate: responseDate.data,
+        id: id,
       });
     } catch (error) {
       ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);

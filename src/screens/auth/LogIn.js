@@ -83,7 +83,7 @@ const LogIn = () => {
       );
       SInfo.setItem(
         'token',
-        JSON.stringify({type: 'teacher', data: data.token, email: data.email, name: data.fullName, department: data.department}),
+        JSON.stringify({type: 'teacher', data: data.token, email: data.email, name: data.fullName, department: data.department, id: data.id}),
       );
       setClasses(
         data.coursesId.map(classItem => ({
