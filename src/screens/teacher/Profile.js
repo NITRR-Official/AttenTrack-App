@@ -25,7 +25,7 @@ import {theme} from '../../theme';
 import PieChart from 'react-native-pie-chart';
 import {useAuth} from '../../utils/auth';
 import SInfo from 'react-native-encrypted-storage';
-import {ScrollView} from 'react-native-gesture-handler';
+import PTRView from 'react-native-pull-to-refresh';
 import ChangePassword from '../../components/ChangePassword';
 
 const Profile = () => {
@@ -56,6 +56,7 @@ const Profile = () => {
     eduQualification,
     telephone,
     interest,
+    directLogin
   } = useAuth();
   const [modalView, setModalView] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
@@ -64,12 +65,23 @@ const Profile = () => {
     setModalView(close);
   };
 
+  const refresh = () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        directLogin();
+        resolve();
+      }, 2000);
+    });
+  };
+
   const alert = () => {
     ToastAndroid.show('This feature is not available yet!', ToastAndroid.SHORT);
   };
 
   return (
-    <ScrollView>
+    <PTRView
+     onRefresh={refresh}
+    >
       <SafeAreaView style={{alignItems: 'center', marginBottom: hp(10)}}>
         <StatusBar
           backgroundColor={theme.maincolor}
@@ -277,7 +289,7 @@ const Profile = () => {
           </TouchableWithoutFeedback>
         </Modal>
       </SafeAreaView>
-    </ScrollView>
+    </PTRView>
   );
 };
 

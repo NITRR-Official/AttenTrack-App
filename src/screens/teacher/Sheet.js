@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState, useMemo, useRef} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -76,6 +76,7 @@ const Sheet = ({navigation, route}) => {
   const [modalVisible0, setModalVisible0] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalVisible3, setModalVisible3] = useState(false);
 
   const [otp, setOtp] = useState('');
   const [time, setTime] = useState(0);
@@ -136,6 +137,19 @@ const Sheet = ({navigation, route}) => {
       );
     }
   };
+
+  const isSaved = useRef(false);
+
+  console.log("Back pressed", isSaved);
+  navigation.addListener('beforeRemove', e => {
+    if (!isSaved.current) {
+      // Prevent the default behavior of leaving the screen
+      e.preventDefault();
+      // Show alert or apply your logic
+      setModalVisible3(true);
+    } else {
+    }
+  });
 
   const handleSetAttendance2 = () => {
     let interval;
@@ -209,6 +223,7 @@ const Sheet = ({navigation, route}) => {
       ToastAndroid.show(`Attendance Added Successfully !`, ToastAndroid.LONG);
       console.log('Attendance Added Successful:', response.data);
       downloadReport();
+      isSaved.current = true;
       navigation.goBack();
       setLoading(false);
     } catch (error) {
@@ -265,11 +280,13 @@ const Sheet = ({navigation, route}) => {
         setModalVisible0(false);
         setModalVisible1(true);
         setLocate({location: location, range: range});
-        socket.send(JSON.stringify({
-          type: 'teacherLoc',
-          location: location,
-          range,
-        }));
+        socket.send(
+          JSON.stringify({
+            type: 'teacherLoc',
+            location: location,
+            range,
+          }),
+        );
       })
       .catch(error => {
         console.warn(error);
@@ -498,16 +515,6 @@ const Sheet = ({navigation, route}) => {
                     }}>
                     <RadioButton.Item
                       labelStyle={{color: '#6a6a6a'}}
-                      label="10 Seconds"
-                      value="10"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
-                      label="20 Seconds"
-                      value="20"
-                    />
-                    <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
                       label="30 Seconds"
                       value="30"
                     />
@@ -520,6 +527,11 @@ const Sheet = ({navigation, route}) => {
                       labelStyle={{color: '#6a6a6a'}}
                       label="2 Minutes"
                       value="120"
+                    />
+                    <RadioButton.Item
+                      labelStyle={{color: '#6a6a6a'}}
+                      label="5 Minutes"
+                      value="300"
                     />
                   </RadioButton.Group>
                 </View>
@@ -568,6 +580,57 @@ const Sheet = ({navigation, route}) => {
                       Cancel
                     </Text>
                   </Pressable>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible3}
+          onRequestClose={() => {
+            setModalVisible3(!modalVisible3);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible3(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Save before exit
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        setModalVisible3(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        setModalVisible3(false);
+                        isSaved.current = true; // Set isSaved to true
+                        navigation.goBack();
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        No
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        createAttendance();
+                        setModalVisible3(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Save
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </TouchableWithoutFeedback>
             </View>

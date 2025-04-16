@@ -20,26 +20,53 @@ import RNFS from 'react-native-fs';
 import email from 'react-native-email';
 import {useAuth} from '../../utils/auth';
 
+const Edit = ({close}) => {
+  console.log(close)
+  return (
+    <View
+      animationType="fade"
+      transparent={true}
+      visible={true}
+      style={{
+        height: '100%',
+        position: 'absolute',
+        zIndex: 50,
+        width: '100%',
+        backgroundColor: '#00000050',
+      }}>
+      <TouchableOpacity onPress={() => {}}>
+        <Text>Save</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          close(false);
+        }}>
+        <Text>Cancel</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const Report = ({route}) => {
   const navigation = useNavigation();
-
+  console.log('Report:', route.params.recordDate);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
+  const [modalVisible3, setModalVisible3] = useState(false);
+  const [modalVisible4, setModalVisible4] = useState(false);
+  const [edit, setEdit] = useState(false);
   const [thresPerc, setThresPerc] = useState(75);
   const [subject, setSubject] = useState('Short Attendance Notice');
   const [body, setBody] = useState('');
-  const [studentsBelowThreshold, setStudentsBelowThreshold] = useState(
-    [],
-  );
+  const [studentsBelowThreshold, setStudentsBelowThreshold] = useState([]);
   const {teacherNameG, telephone, departmentG} = useAuth();
 
   useEffect(() => {
     const threshold = Object.entries(route.params.recordG2 || {})?.filter(
       ([, student]) =>
-        (student.presentCount * 100) / route.params.totG < thresPerc,
-    )
+        (student.presentCount * 100) / route.params.totG <= thresPerc,
+    );
 
-    
     setStudentsBelowThreshold(threshold);
 
     setBody(`Dear Student,
@@ -52,16 +79,12 @@ Best regards,
 ${teacherNameG}
 Department: ${departmentG === 'Not Set' ? 'Your Position/Role' : departmentG}
 Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
-`)
-    
-  }, [thresPerc]);  
-  
-  const emailList = useMemo(() => {
-    return studentsBelowThreshold.map(([, data], ) => (
-      data.email
-    ))
-  }, [studentsBelowThreshold]);
+`);
+  }, [thresPerc]);
 
+  const emailList = useMemo(() => {
+    return studentsBelowThreshold.map(([, data]) => data.email);
+  }, [studentsBelowThreshold]);
 
   const generateHTML = () => {
     if (!route.params.recordG) return '';
@@ -100,13 +123,15 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
   <table>
     <tr>
       <th>Date</th>
+      <th>Time</th>
       <th>Present</th>
       <th>Absent</th>
     </tr>
       ${route.params.recordDate.map(
-        ({date, presentCount, absentCount}) =>
+        ({date, time, presentCount, absentCount}) =>
           `<tr>
                   <td>${date}</td>
+                  <td>${time}</td>
                   <td>${presentCount}</td>
                   <td>${absentCount}</td>
                 </tr>`,
@@ -117,6 +142,10 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
 `;
 
     return html;
+  };
+
+  const handleClose = close => {
+    setEdit(close);
   };
 
   // Function to generate and download the PDF
@@ -139,7 +168,7 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
         `The report has been moved to: ${newPath}`,
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to download the report.');
+      Alert.alert('Error', `Failed to download the report, ${error.message}`);
     }
   };
 
@@ -347,22 +376,119 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
           </TouchableWithoutFeedback>
         </Modal>
 
+        {edit && <Edit close={handleClose} />}
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible4}
+          onRequestClose={() => {
+            setModalVisible4(!modalVisible4);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible4(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Do You Really Want to delete the selected attendance record
+                    ?
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        setModalVisible4(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setModalVisible4(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible3}
+          onRequestClose={() => {
+            setModalVisible3(!modalVisible3);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible3(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Please select the attendance modification option:
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        setEdit(true);
+                        setModalVisible3(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Modify
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        setModalVisible3(false);
+                        setModalVisible4(true);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Delete
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setModalVisible3(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
         {/* Daily Statistics */}
         <View style={styles.section}>
           <Text style={styles.subHeader}>Daily Attendance Statistics:</Text>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
               <Text style={styles.tableHeaderText1}>Date</Text>
+              <Text style={styles.tableHeaderText1}>Time</Text>
               <Text style={styles.tableHeaderText2}>Present</Text>
               <Text style={styles.tableHeaderText2}>Absent</Text>
             </View>
             {route.params.recordDate.map(
-              ({date, presentCount, absentCount}, index) => (
-                <View key={index} style={styles.tableRow}>
+              ({date, time, presentCount, absentCount}, index) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible3(true);
+                  }}
+                  key={index}
+                  style={styles.tableRow}>
                   <Text style={styles.tableCell1}>{date}</Text>
+                  <Text style={styles.tableCell1}> {time} </Text>
                   <Text style={styles.tableCell2}>{presentCount}</Text>
                   <Text style={styles.tableCell3}>{absentCount}</Text>
-                </View>
+                </TouchableOpacity>
               ),
             )}
           </View>

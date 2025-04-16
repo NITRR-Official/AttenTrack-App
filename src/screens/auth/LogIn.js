@@ -83,7 +83,7 @@ const LogIn = () => {
       );
       SInfo.setItem(
         'token',
-        JSON.stringify({type: 'teacher', data: data.token}),
+        JSON.stringify({type: 'teacher', data: data.token, email: data.email, name: data.fullName, department: data.department, id: data.id}),
       );
       setClasses(
         data.coursesId.map(classItem => ({
@@ -143,7 +143,7 @@ const LogIn = () => {
 
       SInfo.setItem(
         'token',
-        JSON.stringify({type: 'student', data: data.token}),
+        JSON.stringify({type: 'student', data: data.token, roll: data.rollNumber, name: data.fullName, email: data.email, id: data.id}),
       );
       setRollNumberG(data.rollNumber);
       setIndex('2'); // Set index for student
