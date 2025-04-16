@@ -94,8 +94,17 @@ export const AuthProvider = ({children}) => {
       if (token == null) {
         setIndex('0');
       } else if (token.type === 'student') {
+        //Fallback for student
+        setRollNumberG(token.roll);
+        setStudentEmailG(token.email);
+        setStudentNameG(token.name);
+        setStudentidG(token.id);
         setIndex('2');
       } else {
+        //Fallback for teacher
+        setTeacherNameG(token.name);
+        setTeacherEmailG(token.email);
+        setDepartmentG(token.department);
         setIndex('1');
       }
       console.log('Error fetching student data:', error);
@@ -151,7 +160,8 @@ export const AuthProvider = ({children}) => {
       phone,
       setPhone,
       studentClass,
-      setStudentClass
+      setStudentClass,
+      directLogin,
     }),
     [
       studentidG,
@@ -197,7 +207,8 @@ export const AuthProvider = ({children}) => {
       phone,
       setPhone,
       studentClass, 
-      setStudentClass
+      setStudentClass,
+      directLogin
     ],
   );
   return (

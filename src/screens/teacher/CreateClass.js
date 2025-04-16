@@ -185,7 +185,7 @@ const CreateClass = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.formContainer}>
+      <View contentContainerStyle={styles.formContainer}>
         <TextInput
           placeholder="Class Name"
           placeholderTextColor='#909090'
@@ -247,7 +247,7 @@ const CreateClass = () => {
             </ScrollView>
           </>
         )}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

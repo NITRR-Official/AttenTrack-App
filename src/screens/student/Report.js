@@ -180,7 +180,8 @@ const StudentReport = () => {
         `The report has been moved to: ${newPath}`,
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to download the report.');
+      console.log(error)
+      Alert.alert('Error', `Failed to download the report, ${error.message}.`);
     }
   };
 

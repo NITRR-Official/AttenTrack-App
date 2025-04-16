@@ -139,7 +139,7 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
         `The report has been moved to: ${newPath}`,
       );
     } catch (error) {
-      Alert.alert('Error', 'Failed to download the report.');
+      Alert.alert('Error', `Failed to download the report, ${error.message}`);
     }
   };
 
@@ -282,7 +282,7 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
                       <RadioButton.Item
                         labelStyle={{color: '#6a6a6a'}}
                         label="<= 100%"
-                        value="100"
+                        value="101"
                       />
                     </RadioButton.Group>
                   </View>
