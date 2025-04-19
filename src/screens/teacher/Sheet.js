@@ -147,7 +147,6 @@ const Sheet = ({navigation, route}) => {
       e.preventDefault();
       // Show alert or apply your logic
       setModalVisible3(true);
-    } else {
     }
   });
 

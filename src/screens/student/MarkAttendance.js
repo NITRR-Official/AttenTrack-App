@@ -365,7 +365,8 @@ const MarkAttendance = ({route}) => {
         style={{width: wp(95)}}
         className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
         <View className="flex flex-row justify-between">
-          <Text className="w-3/4 text-gray-600 ">Date</Text>
+          <Text className="w-2/4 text-gray-600">Date</Text>
+          <Text className="w-1/4 text-gray-600">Time</Text>
           <Text className="w-1/4 text-gray-600 text-right">Attendance</Text>
         </View>
       </View>
@@ -379,8 +380,11 @@ const MarkAttendance = ({route}) => {
           className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
           {route.params.attDataG.attendanceMap.map((data, index) => (
             <View className="flex flex-row justify-between" key={index}>
-              <Text className={`w-3/4 text-[${theme.maincolor}]`}>
+              <Text className={`w-2/4 text-[${theme.maincolor}]`}>
                 {data.date}
+              </Text>
+              <Text className={`w-1/4 text-[${theme.maincolor}]`}>
+                {data.time}
               </Text>
               <Text className={`w-1/4 text-[${theme.maincolor}] text-right`}>
                 {data.status ? 'Present' : 'Absent'}
