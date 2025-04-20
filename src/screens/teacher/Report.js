@@ -135,29 +135,6 @@ const Edit = ({close, id, date}) => {
     );
   };
 
-console.log(data);
-const data2 = [
-  {"present": false, "rollNumber": "21116001"},
-  {"present": true, "rollNumber": "21116002"},
-  {"present": true, "rollNumber": "21116003"},
-  {"present": false, "rollNumber": "21116004"},
-  {"present": false, "rollNumber": "21116005"},
-  {"present": false, "rollNumber": "21116006"},
-  {"present": false, "rollNumber": "21116007"},
-  {"present": false, "rollNumber": "21116008"},
-  {"present": false, "rollNumber": "21116009"},
-  {"present": false, "rollNumber": "21116010"},
-  {"present": false, "rollNumber": "21116011"},
-  {"present": false, "rollNumber": "21116012"},
-  {"present": false, "rollNumber": "21116013"},
-  {"present": false, "rollNumber": "21116014"},
-  {"present": false, "rollNumber": "21116015"},
-  {"present": false, "rollNumber": "21116016"},
-  {"present": false, "rollNumber": "21116017"},
-  {"present": false, "rollNumber": "21116018"},
-  {"present": false, "rollNumber": "21116019"},
-]
-
   return (
     <View
       style={{
@@ -296,9 +273,8 @@ const data2 = [
             style={{
               backgroundColor: '#fff',
             }}>
-              {data2 && data2.length > 0 ? (
-                data2.map((item, id) => (
-                  <>
+              {data && data.length > 0 ? (
+                data.map((item, id) => (
                     <View
                       key={item.rollNumber}
                       style={{
@@ -330,12 +306,8 @@ const data2 = [
                           trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
                           onValueChange={() => {
                             toggleAttendance(item.rollNumber);
-                            console.log(item.rollNumber);
                           }}
                           value={item.present}
-                          onTouchStart={() => {
-                            console.log(item.rollNumber);
-                          }}
                         />
                         <Text
                           style={{
@@ -347,7 +319,6 @@ const data2 = [
                         </Text>
                       </View>
                     </View>
-                  </>
                 ))
               ) : (
                 <Text style={{textAlign: 'center', color: '#777'}}>
