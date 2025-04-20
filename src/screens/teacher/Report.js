@@ -135,6 +135,29 @@ const Edit = ({close, id, date}) => {
     );
   };
 
+console.log(data);
+const data2 = [
+  {"present": false, "rollNumber": "21116001"},
+  {"present": true, "rollNumber": "21116002"},
+  {"present": true, "rollNumber": "21116003"},
+  {"present": false, "rollNumber": "21116004"},
+  {"present": false, "rollNumber": "21116005"},
+  {"present": false, "rollNumber": "21116006"},
+  {"present": false, "rollNumber": "21116007"},
+  {"present": false, "rollNumber": "21116008"},
+  {"present": false, "rollNumber": "21116009"},
+  {"present": false, "rollNumber": "21116010"},
+  {"present": false, "rollNumber": "21116011"},
+  {"present": false, "rollNumber": "21116012"},
+  {"present": false, "rollNumber": "21116013"},
+  {"present": false, "rollNumber": "21116014"},
+  {"present": false, "rollNumber": "21116015"},
+  {"present": false, "rollNumber": "21116016"},
+  {"present": false, "rollNumber": "21116017"},
+  {"present": false, "rollNumber": "21116018"},
+  {"present": false, "rollNumber": "21116019"},
+]
+
   return (
     <View
       style={{
@@ -255,13 +278,7 @@ const Edit = ({close, id, date}) => {
           </View>
 
           {/* Scrollable Attendance List */}
-          <ScrollView
-            scrollEventThrottle={1}
-            contentContainerStyle={{flexGrow: 1}}
-            style={{
-              backgroundColor: '#fff',
-            }}>
-            <View
+          <View
               style={{
                 paddingVertical: 12,
                 paddingHorizontal: 12,
@@ -272,153 +289,16 @@ const Edit = ({close, id, date}) => {
                 borderWidth: 2,
                 borderColor: '#01808c7a',
               }}>
-              {data && data.length > 0 ? (
-                data.map((item, id) => (
+
+          <ScrollView
+            scrollEventThrottle={1}
+            contentContainerStyle={{flexGrow: 1}}
+            style={{
+              backgroundColor: '#fff',
+            }}>
+              {data2 && data2.length > 0 ? (
+                data2.map((item, id) => (
                   <>
-                    <View
-                      key={item.rollNumber}
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingVertical: 6,
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#e0e0e0',
-                      }}>
-                      <Text
-                        style={{
-                          width: '75%',
-                          color: theme.maincolor || '#01808c',
-                          fontSize: 16,
-                        }}>
-                        {item.rollNumber}
-                      </Text>
-
-                      <View
-                        style={{
-                          width: '25%',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                          alignItems: 'center',
-                        }}>
-                        <Switch
-                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
-                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
-                          onValueChange={() => {
-                            toggleAttendance(item.rollNumber);
-                            console.log(item.rollNumber);
-                          }}
-                          value={item.present}
-                          onTouchStart={() => {
-                            console.log(item.rollNumber);
-                          }}
-                        />
-                        <Text
-                          style={{
-                            color: '#555',
-                            fontWeight: '600',
-                            marginLeft: 6,
-                          }}>
-                          {item.present ? 'P' : 'A'}
-                        </Text>
-                      </View>
-                    </View>
-                    <View
-                      key={item.rollNumber}
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingVertical: 6,
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#e0e0e0',
-                      }}>
-                      <Text
-                        style={{
-                          width: '75%',
-                          color: theme.maincolor || '#01808c',
-                          fontSize: 16,
-                        }}>
-                        {item.rollNumber}
-                      </Text>
-
-                      <View
-                        style={{
-                          width: '25%',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                          alignItems: 'center',
-                        }}>
-                        <Switch
-                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
-                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
-                          onValueChange={() => {
-                            toggleAttendance(item.rollNumber);
-                            console.log(item.rollNumber);
-                          }}
-                          value={item.present}
-                          onTouchStart={() => {
-                            console.log(item.rollNumber);
-                          }}
-                        />
-                        <Text
-                          style={{
-                            color: '#555',
-                            fontWeight: '600',
-                            marginLeft: 6,
-                          }}>
-                          {item.present ? 'P' : 'A'}
-                        </Text>
-                      </View>
-                    </View>
-                    <View
-                      key={item.rollNumber}
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingVertical: 6,
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#e0e0e0',
-                      }}>
-                      <Text
-                        style={{
-                          width: '75%',
-                          color: theme.maincolor || '#01808c',
-                          fontSize: 16,
-                        }}>
-                        {item.rollNumber}
-                      </Text>
-
-                      <View
-                        style={{
-                          width: '25%',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                          alignItems: 'center',
-                        }}>
-                        <Switch
-                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
-                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
-                          onValueChange={() => {
-                            toggleAttendance(item.rollNumber);
-                            console.log(item.rollNumber);
-                          }}
-                          value={item.present}
-                          onTouchStart={() => {
-                            console.log(item.rollNumber);
-                          }}
-                        />
-                        <Text
-                          style={{
-                            color: '#555',
-                            fontWeight: '600',
-                            marginLeft: 6,
-                          }}>
-                          {item.present ? 'P' : 'A'}
-                        </Text>
-                      </View>
-                    </View>
                     <View
                       key={item.rollNumber}
                       style={{
@@ -474,9 +354,8 @@ const Edit = ({close, id, date}) => {
                   No attendance found!
                 </Text>
               )}
-            </View>
           </ScrollView>
-
+          </View>
           <View
             style={{
               flexDirection: 'row',
