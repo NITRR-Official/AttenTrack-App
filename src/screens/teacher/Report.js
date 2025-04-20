@@ -148,6 +148,7 @@ const Edit = ({close, id, date}) => {
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 100,
+        elevation: 10
       }}>
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
