@@ -140,7 +140,6 @@ const Sheet = ({navigation, route}) => {
 
   const isSaved = useRef(false);
 
-  console.log("Back pressed", isSaved);
   navigation.addListener('beforeRemove', e => {
     if (!isSaved.current) {
       // Prevent the default behavior of leaving the screen
@@ -246,7 +245,7 @@ const Sheet = ({navigation, route}) => {
     );
   };
 
-  const requestLocationPermission = async range => {
+  const requestLocationPermission = async (range, direct) => {
     if (Platform.OS === 'android') {
       try {
         const granted = await PermissionsAndroid.request(
@@ -260,7 +259,7 @@ const Sheet = ({navigation, route}) => {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.log('You can access location');
-          getCurrentLocation(range); // Call your function to get the location
+          getCurrentLocation(range, direct); // Call your function to get the location
         } else {
           console.log('Location permission denied');
           setLag(false);
@@ -273,11 +272,11 @@ const Sheet = ({navigation, route}) => {
     }
   };
 
-  const getCurrentLocation = range => {
+  const getCurrentLocation = (range, direct) => {
     GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
       .then(location => {
         setModalVisible0(false);
-        setModalVisible1(true);
+        if (!direct) setModalVisible1(true);
         setLocate({location: location, range: range});
         socket.send(
           JSON.stringify({
@@ -406,13 +405,26 @@ const Sheet = ({navigation, route}) => {
         </View>
         <TouchableOpacity
           onPress={() => {
-            setModalVisible0(true);
+            setLag(true);
+            setFinalTime(60);
+            setTime(60);
+            handleSetAttendance(60);
+            handleSetAttendance2();
+            setModalVisible2(true);
+            requestLocationPermission(100, true);
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 rounded-md border-[#01808c7a] border-2">
-          <PencilSquareIcon size={wp(6)} color="white" />
-          <Text className="text-white text-[15px] font-medium">
-            Take Attendance
-          </Text>
+          
+          {lag ? (
+            <ActivityIndicator animating={true} color={'white'} />
+          ) : (
+            <>
+            <PencilSquareIcon size={wp(6)} color="white" />
+            <Text className="text-white text-[15px] font-medium">
+              Take Attendance
+            </Text>
+            </>
+          )}
         </TouchableOpacity>
         <Modal
           animationType="fade"
@@ -438,7 +450,7 @@ const Sheet = ({navigation, route}) => {
                     <RadioButton.Group
                       onValueChange={value => {
                         setLag(true);
-                        requestLocationPermission(parseInt(value));
+                        requestLocationPermission(parseInt(value), false);
                       }}>
                       <RadioButton.Item
                         labelStyle={{color: '#6a6a6a'}}
@@ -641,13 +653,18 @@ const Sheet = ({navigation, route}) => {
       <View className="flex flex-row justify-between w-full mb-3 px-3">
         <TouchableOpacity
           onPress={markAllPresent}
-          className="flex-1 bg-[#258a4ac4] py-2 rounded-md mr-4 items-center">
-          <Text className="text-white font-semibold">Mark All Present</Text>
+          className="flex-1 bg-[#258a4ac4] py-2 w-1/4 rounded-md mr-2 items-center justify-center">
+          <Text className="text-white text-base font-bold">Mark All Present</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={markAllAbsent}
-          className="flex-1 bg-[#c41111c4] py-2 rounded-md ml-4 items-center">
-          <Text className="text-white font-semibold">Mark All Absent</Text>
+          className="flex-1 bg-[#c41111c4] py-2 w-1/4 rounded-md mr-2 items-center justify-center">
+          <Text className="text-white text-base font-bold">Mark All Absent</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setModalVisible0(true)}
+          className="flex-1 bg-[#01808cb9] py-0.5 w-2/4 rounded-md items-center justify-center">
+          <Text className="text-white text-base font-semibold">Customized Attendance</Text>
         </TouchableOpacity>
       </View>
 

@@ -55,11 +55,11 @@ const Edit = ({close, id, date}) => {
       const response = await axios.patch(
         `${BASE_URL}/api/attendance/change-specific-record`,
         {
-          id: id,
+          attendance_id: id,
           datas: roll,
         },
       );
-      if (response.ok) {
+      if (response.status === 200) {
         ToastAndroid.show('Attendance updated successfully', ToastAndroid.LONG);
         close(false, true);
       } else {
@@ -70,8 +70,7 @@ const Edit = ({close, id, date}) => {
       console.error('Error updating attendance:', error);
       Alert.alert(
         'Error',
-        'Failed to update attendance record.',
-        error.message,
+        `Failed to update attendance record ${error.message}`,
       );
       close(false, false);
     } finally {
@@ -100,7 +99,7 @@ const Edit = ({close, id, date}) => {
       }
     } catch (error) {
       console.error('Error fetching attendance:', error);
-      Alert.alert('Error', 'Failed to fetch attendance data.', error.message);
+      Alert.alert('Error', `Failed to fetch attendance data ${error.message}.`);
     } finally {
       setShowing(false);
     }
@@ -116,7 +115,7 @@ const Edit = ({close, id, date}) => {
     });
     console.log('Roll: ', roll);
     if (toSave) {
-      // modifyAttendance(id, roll);
+      modifyAttendance(id, roll);
     }
     return roll.length > 0;
   };
@@ -148,7 +147,6 @@ const Edit = ({close, id, date}) => {
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 100,
-        elevation: 10
       }}>
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
@@ -209,10 +207,10 @@ const Edit = ({close, id, date}) => {
             borderRadius: 16,
             padding: 16,
             shadowColor: '#000',
-            shadowOffset: {width: 0, height: 4},
+            shadowOffset: {width: 4, height: 4},
             shadowOpacity: 0.3,
             shadowRadius: 6,
-            elevation: 10,
+            elevation: 5,
           }}>
           {/* Header Buttons */}
           <View style={{flexDirection: 'row', justifyContent: 'center'}}>
@@ -276,54 +274,200 @@ const Edit = ({close, id, date}) => {
               }}>
               {data && data.length > 0 ? (
                 data.map((item, id) => (
-                  <View
-                    key={item.rollNumber}
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingVertical: 6,
-                      borderBottomWidth: 1,
-                      borderBottomColor: '#e0e0e0',
-                    }}>
-                    <Text
-                      style={{
-                        width: '75%',
-                        color: theme.maincolor || '#01808c',
-                        fontSize: 16,
-                      }}>
-                      {item.rollNumber}
-                    </Text>
-
+                  <>
                     <View
+                      key={item.rollNumber}
                       style={{
-                        width: '25%',
                         flexDirection: 'row',
-                        justifyContent: 'flex-end',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
+                        paddingVertical: 6,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#e0e0e0',
                       }}>
-                      <Switch
-                        thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
-                        trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
-                        onValueChange={() => {
-                          toggleAttendance(item.rollNumber);
-                          console.log(item.rollNumber);
-                        }}
-                        value={item.present}
-                        onTouchStart={() => {
-                          console.log(item.rollNumber);
-                        }}
-                      />
                       <Text
                         style={{
-                          color: '#555',
-                          fontWeight: '600',
-                          marginLeft: 6,
+                          width: '75%',
+                          color: theme.maincolor || '#01808c',
+                          fontSize: 16,
                         }}>
-                        {item.present ? 'P' : 'A'}
+                        {item.rollNumber}
                       </Text>
+
+                      <View
+                        style={{
+                          width: '25%',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                        }}>
+                        <Switch
+                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
+                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
+                          onValueChange={() => {
+                            toggleAttendance(item.rollNumber);
+                            console.log(item.rollNumber);
+                          }}
+                          value={item.present}
+                          onTouchStart={() => {
+                            console.log(item.rollNumber);
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: '#555',
+                            fontWeight: '600',
+                            marginLeft: 6,
+                          }}>
+                          {item.present ? 'P' : 'A'}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
+                    <View
+                      key={item.rollNumber}
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 6,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#e0e0e0',
+                      }}>
+                      <Text
+                        style={{
+                          width: '75%',
+                          color: theme.maincolor || '#01808c',
+                          fontSize: 16,
+                        }}>
+                        {item.rollNumber}
+                      </Text>
+
+                      <View
+                        style={{
+                          width: '25%',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                        }}>
+                        <Switch
+                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
+                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
+                          onValueChange={() => {
+                            toggleAttendance(item.rollNumber);
+                            console.log(item.rollNumber);
+                          }}
+                          value={item.present}
+                          onTouchStart={() => {
+                            console.log(item.rollNumber);
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: '#555',
+                            fontWeight: '600',
+                            marginLeft: 6,
+                          }}>
+                          {item.present ? 'P' : 'A'}
+                        </Text>
+                      </View>
+                    </View>
+                    <View
+                      key={item.rollNumber}
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 6,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#e0e0e0',
+                      }}>
+                      <Text
+                        style={{
+                          width: '75%',
+                          color: theme.maincolor || '#01808c',
+                          fontSize: 16,
+                        }}>
+                        {item.rollNumber}
+                      </Text>
+
+                      <View
+                        style={{
+                          width: '25%',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                        }}>
+                        <Switch
+                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
+                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
+                          onValueChange={() => {
+                            toggleAttendance(item.rollNumber);
+                            console.log(item.rollNumber);
+                          }}
+                          value={item.present}
+                          onTouchStart={() => {
+                            console.log(item.rollNumber);
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: '#555',
+                            fontWeight: '600',
+                            marginLeft: 6,
+                          }}>
+                          {item.present ? 'P' : 'A'}
+                        </Text>
+                      </View>
+                    </View>
+                    <View
+                      key={item.rollNumber}
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 6,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#e0e0e0',
+                      }}>
+                      <Text
+                        style={{
+                          width: '75%',
+                          color: theme.maincolor || '#01808c',
+                          fontSize: 16,
+                        }}>
+                        {item.rollNumber}
+                      </Text>
+
+                      <View
+                        style={{
+                          width: '25%',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                          alignItems: 'center',
+                        }}>
+                        <Switch
+                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
+                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
+                          onValueChange={() => {
+                            toggleAttendance(item.rollNumber);
+                            console.log(item.rollNumber);
+                          }}
+                          value={item.present}
+                          onTouchStart={() => {
+                            console.log(item.rollNumber);
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: '#555',
+                            fontWeight: '600',
+                            marginLeft: 6,
+                          }}>
+                          {item.present ? 'P' : 'A'}
+                        </Text>
+                      </View>
+                    </View>
+                  </>
                 ))
               ) : (
                 <Text style={{textAlign: 'center', color: '#777'}}>
@@ -403,8 +547,7 @@ const Delete = ({close, id}) => {
       console.error('Error deleting attendance:', error);
       Alert.alert(
         'Error',
-        'Failed to delete attendance record.',
-        error.message,
+        `Failed to delete attendance record ${error.message}.`,
       );
       close(false, false);
     } finally {
@@ -488,7 +631,7 @@ ${teacherNameG}
 Department: ${departmentG === 'Not Set' ? 'Your Position/Role' : departmentG}
 Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
 `);
-  }, [thresPerc]);
+  }, [thresPerc, datas]);
 
   const emailList = useMemo(() => {
     return studentsBelowThreshold.map(([, data]) => data.email);
@@ -640,6 +783,14 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
 
   return (
     <>
+      {edit && (
+        <Edit
+          close={handleClose}
+          id={attendance_id.current}
+          date={curr_date.current}
+        />
+      )}
+
       <View className="w-full flex flex-row justify-between items-center p-4">
         <TouchableOpacity>
           <XMarkIcon
@@ -844,13 +995,6 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
             </TouchableWithoutFeedback>
           </Modal>
 
-          {edit && (
-            <Edit
-              close={handleClose}
-              id={attendance_id.current}
-              date={curr_date.current}
-            />
-          )}
           {modalVisible4 && (
             <Delete close={handleDeleteClose} id={attendance_id.current} />
           )}
