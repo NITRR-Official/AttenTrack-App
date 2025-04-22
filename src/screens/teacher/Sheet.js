@@ -34,7 +34,7 @@ import {API_URL, BASE_URL} from '../../constants/constants';
 import PropTypes from 'prop-types';
 
 const Sheet = ({navigation, route}) => {
-  const {loading, setLoading} = useAuth();
+  const {loading, setLoading, turnONGPS} = useAuth();
   const [lag, setLag] = useState(false);
 
   const [student, setStudent] = useState();
@@ -77,6 +77,13 @@ const Sheet = ({navigation, route}) => {
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
+  const [warning, setWarning] = useState(false);
+  const [retry, setRetry] = useState(false);
+
+  const initialSettings = useRef({
+    time: 60,
+    range: 100,
+  });
 
   const [otp, setOtp] = useState('');
   const [time, setTime] = useState(0);
@@ -135,6 +142,9 @@ const Sheet = ({navigation, route}) => {
         'Failed to set attendance. Please try again.',
         ToastAndroid.LONG,
       );
+      //Retry modal box and give two options either gps is turned off or network not available
+      setRetry(true);
+      endAttendance();
     }
   };
 
@@ -192,6 +202,8 @@ const Sheet = ({navigation, route}) => {
 
       socket.onerror = error => {
         console.log('WebSocket Error:', error);
+        setRetry(true);
+        endAttendance();
         ToastAndroid.show('Error with WebSocket connection', ToastAndroid.LONG);
         clearInterval(interval);
       };
@@ -200,6 +212,8 @@ const Sheet = ({navigation, route}) => {
         console.log('WebSocket connection closed.');
       };
     } catch (error) {
+      setRetry(true);
+      endAttendance();
       console.error('Error in WebSocket connection:', error);
     }
   };
@@ -245,6 +259,23 @@ const Sheet = ({navigation, route}) => {
     );
   };
 
+  const endAttendance = () => {
+    setModalVisible2(false);
+    setTime(0);
+    setFinalTime(0);
+    setWarning(false);
+  };
+
+  const retryAttendance = () => {
+    setLag(true);
+    setFinalTime(initialSettings.current.time);
+    setTime(initialSettings.current.time);
+    handleSetAttendance(initialSettings.current.time);
+    handleSetAttendance2();
+    setModalVisible2(true);
+    requestLocationPermission(initialSettings.current.range, true);
+  };
+
   const requestLocationPermission = async (range, direct) => {
     if (Platform.OS === 'android') {
       try {
@@ -263,10 +294,13 @@ const Sheet = ({navigation, route}) => {
         } else {
           console.log('Location permission denied');
           setLag(false);
+          endAttendance()
           ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
         }
       } catch (err) {
         setLag(false);
+        setRetry(true);
+        endAttendance();
         console.warn(err);
       }
     }
@@ -285,9 +319,12 @@ const Sheet = ({navigation, route}) => {
             range,
           }),
         );
+        console.log(initialSettings.current);
       })
       .catch(error => {
         console.warn(error);
+        endAttendance();
+        setRetry(true);
       })
       .finally(() => {
         setLag(false);
@@ -403,8 +440,11 @@ const Sheet = ({navigation, route}) => {
               : route.params.teacherName}
           </Text>
         </View>
+
         <TouchableOpacity
           onPress={() => {
+            initialSettings.current.range = 100;
+            initialSettings.current.time = 60;
             setLag(true);
             setFinalTime(60);
             setTime(60);
@@ -414,18 +454,108 @@ const Sheet = ({navigation, route}) => {
             requestLocationPermission(100, true);
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 rounded-md border-[#01808c7a] border-2">
-          
           {lag ? (
             <ActivityIndicator animating={true} color={'white'} />
           ) : (
             <>
-            <PencilSquareIcon size={wp(6)} color="white" />
-            <Text className="text-white text-[15px] font-medium">
-              Take Attendance
-            </Text>
+              <PencilSquareIcon size={wp(6)} color="white" />
+              <Text className="text-white text-[15px] font-medium">
+                Take Attendance
+              </Text>
             </>
           )}
         </TouchableOpacity>
+
+        {/* Retry dialog box */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={retry}
+          onRequestClose={() => {
+            setRetry(!retry);
+          }}>
+          <TouchableWithoutFeedback>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Network not available or GPS not turned ON
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        retryAttendance();
+                        setRetry(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Retry
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        // Go to GPS settings
+                        turnONGPS();
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Settings
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setRetry(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+        
+        {/* Warning dialog box */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={warning}
+          onRequestClose={() => {
+            setWarning(!warning);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setWarning(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Do You Really Want to end this attendance session ?
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        endAttendance();
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setWarning(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* Modal for selecting range */}
         <Modal
           animationType="fade"
           transparent={true}
@@ -450,6 +580,7 @@ const Sheet = ({navigation, route}) => {
                     <RadioButton.Group
                       onValueChange={value => {
                         setLag(true);
+                        initialSettings.current.range = parseInt(value);
                         requestLocationPermission(parseInt(value), false);
                       }}>
                       <RadioButton.Item
@@ -504,6 +635,8 @@ const Sheet = ({navigation, route}) => {
             </TouchableWithoutFeedback>
           )}
         </Modal>
+
+        {/* Modal for selecting time */}
         <Modal
           animationType="fade"
           transparent={true}
@@ -517,6 +650,7 @@ const Sheet = ({navigation, route}) => {
                 <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
                   <RadioButton.Group
                     onValueChange={value => {
+                      initialSettings.current.time = parseInt(value);
                       setFinalTime(parseInt(value));
                       setTime(parseInt(value));
                       setModalVisible2(true);
@@ -550,52 +684,41 @@ const Sheet = ({navigation, route}) => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
+
+        {/* Modal for OTP and time remaining */}
         <Modal
           animationType="fade"
           transparent={true}
           visible={modalVisible2}
           onRequestClose={() => {
-            setModalVisible2(!modalVisible2);
-            setTime(0);
-            setFinalTime(0);
+            setWarning(true);
           }}>
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setModalVisible2(false);
-              setTime(0);
-              setFinalTime(0);
-            }}>
-            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
-              <TouchableWithoutFeedback>
-                <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text className="text-lg font-bold text-gray-400">
-                    OTP : {otp}
-                  </Text>
-                  <View className="w-full">
-                    <Text className="pb-3 text-gray-500">
-                      Time Remaining: {time} seconds
-                    </Text>
-                    <ProgressBar
-                      progress={time / finalTime}
-                      color={'#01818C'}
-                    />
-                  </View>
-                  <Pressable
-                    className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
-                    onPress={() => {
-                      setModalVisible2(false);
-                      setTime(0);
-                      setFinalTime(0);
-                    }}>
-                    <Text className="text-white text-center font-medium">
-                      Cancel
-                    </Text>
-                  </Pressable>
-                </View>
-              </TouchableWithoutFeedback>
+          <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+            <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
+              <Text className="text-lg font-bold text-gray-400">
+                OTP : {otp}
+              </Text>
+              <View className="w-full">
+                <Text className="pb-3 text-gray-500">
+                  Time Remaining: {time} seconds
+                </Text>
+                <ProgressBar progress={time / finalTime} color={'#01818C'} />
+              </View>
+              <Pressable
+                className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
+                onPress={() => {
+                  // Warning before stopping the attendance
+                  setWarning(true);
+                }}>
+                <Text className="text-white text-center font-medium">
+                  Cancel
+                </Text>
+              </Pressable>
             </View>
-          </TouchableWithoutFeedback>
+          </View>
         </Modal>
+
+        {/* Modal for confirming exit without saving */}
         <Modal
           animationType="fade"
           transparent={true}
@@ -647,6 +770,7 @@ const Sheet = ({navigation, route}) => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
+        
       </View>
 
       {/* Add buttons for marking all present/absent */}
@@ -654,17 +778,23 @@ const Sheet = ({navigation, route}) => {
         <TouchableOpacity
           onPress={markAllPresent}
           className="flex-1 bg-[#258a4ac4] py-2 w-1/4 rounded-md mr-2 items-center justify-center">
-          <Text className="text-white text-base font-bold">Mark All Present</Text>
+          <Text className="text-white text-base font-bold">
+            Mark All Present
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={markAllAbsent}
           className="flex-1 bg-[#c41111c4] py-2 w-1/4 rounded-md mr-2 items-center justify-center">
-          <Text className="text-white text-base font-bold">Mark All Absent</Text>
+          <Text className="text-white text-base font-bold">
+            Mark All Absent
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setModalVisible0(true)}
           className="flex-1 bg-[#01808cb9] py-0.5 w-2/4 rounded-md items-center justify-center">
-          <Text className="text-white text-base font-semibold">Customized Attendance</Text>
+          <Text className="text-white text-base font-semibold">
+            Customized Attendance
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -692,6 +822,7 @@ const Sheet = ({navigation, route}) => {
           <Text className="w-1/4 text-[#7c7c7c] text-right">Attendance</Text>
         </View>
       </View>
+
       <ScrollView
         scrollEventThrottle={1}
         contentContainerStyle={{flexGrow: 1}}

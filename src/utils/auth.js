@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 
 import PropTypes from 'prop-types';
 import {BASE_URL} from '../constants/constants';
-import { ToastAndroid } from 'react-native';
+import {ToastAndroid, PermissionsAndroid, Linking} from 'react-native';
 
 export const AuthProvider = ({children}) => {
   const [index, setIndex] = useState(null);
@@ -88,8 +88,11 @@ export const AuthProvider = ({children}) => {
         setIndex('1'); // Set index for teacher
       }
     } catch (error) {
-      if(token != null && (token.type === 'student' || token.type === 'teacher')){
-        ToastAndroid.show("Error fetching data", ToastAndroid.SHORT);
+      if (
+        token != null &&
+        (token.type === 'student' || token.type === 'teacher')
+      ) {
+        ToastAndroid.show('Error fetching data', ToastAndroid.SHORT);
       }
       if (token == null) {
         setIndex('0');
@@ -112,8 +115,40 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission',
+            message: 'This app needs access to your location',
+            buttonNeutral: 'Ask Me Later',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          ToastAndroid.show('Location permission denied !', ToastAndroid.LONG);
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  };
+
+  const turnONGPS = async () => {
+    Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS')
+      .then(() => {
+        console.log('Settings opened');
+      })
+      .catch(err => {
+        console.error('Failed to open settings:', err);
+      });
+  };
+
   useEffect(() => {
     directLogin();
+    requestLocationPermission();
   }, []);
 
   const contextValue = useMemo(
@@ -163,6 +198,7 @@ export const AuthProvider = ({children}) => {
       studentClass,
       setStudentClass,
       directLogin,
+      turnONGPS
     }),
     [
       studentidG,
@@ -207,9 +243,10 @@ export const AuthProvider = ({children}) => {
       setEnroll,
       phone,
       setPhone,
-      studentClass, 
+      studentClass,
       setStudentClass,
-      directLogin
+      directLogin,
+      turnONGPS
     ],
   );
   return (

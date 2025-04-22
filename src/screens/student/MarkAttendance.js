@@ -35,6 +35,7 @@ import {API_URL, BASE_URL} from '../../constants/constants';
 const MarkAttendance = ({route}) => {
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
+  const [modalVisible0, setModalVisible0] = useState(false);
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [receivedOtp, setReceivedOtp] = useState(null);
@@ -44,7 +45,8 @@ const MarkAttendance = ({route}) => {
   const [range, setRange] = useState();
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
-  const {rollNumberG} = useAuth();
+  const [retry, setRetry] = useState(false);
+  const {rollNumberG, turnONGPS} = useAuth();
 
   const handleGetAttendance = async () => {
     try {
@@ -52,20 +54,19 @@ const MarkAttendance = ({route}) => {
       const data2 = resp.data;
       setReceivedOtp(data2.currentOTP);
       setFinalTime(data2.finalTime);
-      setId(data2.currentId)
+      setId(data2.currentId);
     } catch (error) {
       console.error('Error sending OTP and time to server:', error);
       ToastAndroid.show(
         'Failed to set attendance. Please try again.',
         ToastAndroid.LONG,
       );
+      cancelMarking()
+      setRetry(true);
     }
   };
 
-  const socket = useMemo(
-    () => new WebSocket(`wss://${API_URL}`),
-    [],
-  );
+  const socket = useMemo(() => new WebSocket(`wss://${API_URL}`), []);
 
   const popupAutoShownRef = useRef(false);
 
@@ -78,8 +79,6 @@ const MarkAttendance = ({route}) => {
 
     socket.onmessage = event => {
       const data = JSON.parse(event.data);
-      console.log('Socket from student side connected!', data);
-
       if (data.type === 'time_update2') {
         handleGetAttendance();
         if (data.time <= 0) {
@@ -111,6 +110,8 @@ const MarkAttendance = ({route}) => {
 
     socket.onerror = error => {
       console.log('WebSocket Error:', error);
+      cancelMarking()
+      setRetry(true);
       ToastAndroid.show('Error With WebSocket Connection', ToastAndroid.LONG);
     };
 
@@ -126,7 +127,7 @@ const MarkAttendance = ({route}) => {
   }, []);
 
   const handleOtpSubmit = () => {
-    if ((receivedOtp == otp) && (id == route.params.id)) {
+    if (receivedOtp == otp && id == route.params.id) {
       ToastAndroid.show('OTP Verified !', ToastAndroid.LONG);
       setModalVisible1(false);
       setModalVisible2(true);
@@ -134,6 +135,12 @@ const MarkAttendance = ({route}) => {
     } else {
       ToastAndroid.show('Incorrect OTP or invalid class !', ToastAndroid.LONG);
     }
+  };
+
+  const cancelMarking = () => {
+    setModalVisible1(false);
+    setModalVisible0(false);
+    setModalVisible2(false);
   };
 
   const requestLocationPermission = async () => {
@@ -156,8 +163,11 @@ const MarkAttendance = ({route}) => {
           setTimeout(() => {
             setModalVisible2(false);
           }, 2000);
+          cancelMarking()
         }
       } catch (err) {
+        cancelMarking()
+        setRetry(true);
         console.warn(err);
       }
     }
@@ -172,16 +182,6 @@ const MarkAttendance = ({route}) => {
           lat,
           long,
         );
-        console.log(
-          'Getting current location: ',
-          location.longitude,
-          location.latitude,
-          long,
-          lat,
-          range,
-          distance,
-        );
-
         if (distance <= range) {
           socket.send(
             JSON.stringify({type: 'attendance', rollNumber: rollNumberG}),
@@ -210,9 +210,25 @@ const MarkAttendance = ({route}) => {
       })
       .catch(error => {
         const {code, message} = error;
+        cancelMarking()
+        setRetry(true);
         console.warn(code, message);
       });
   };
+
+  const givePresent = () => {
+    console.log("Give present: ", time);
+    if (time == 0) {
+      ToastAndroid.show(
+        'Wait for the Teacher to Take Attendance..',
+        ToastAndroid.LONG,
+      );
+    } else {
+      handleGetAttendance();
+      setModalVisible1(true);
+      setOtp('');
+    }
+  }
 
   return (
     <SafeAreaView style={{alignItems: 'center'}}>
@@ -242,17 +258,8 @@ const MarkAttendance = ({route}) => {
           </View>
         </View>
         <TouchableOpacity
-          onPress={() => {
-            if (time == 0) {
-              ToastAndroid.show(
-                'Wait for the Teacher to Take Attendance..',
-                ToastAndroid.LONG,
-              );
-            } else {
-              handleGetAttendance();
-              setModalVisible1(true);
-              setOtp('');
-            }
+          onPress={()=>{
+            givePresent()
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 rounded-md border-[#01808c7a] border-2">
           <PencilSquareIcon size={wp(6)} color="white" />
@@ -261,44 +268,134 @@ const MarkAttendance = ({route}) => {
           </Text>
         </TouchableOpacity>
 
+        {/* Warning dialog box */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisible0}
+          onRequestClose={() => {
+            setModalVisible0(!modalVisible0);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setModalVisible0(false)}>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Do You Really Want to end this attendance session ?
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        cancelMarking();
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Yes
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setModalVisible0(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* Retry dialog box */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={retry}
+          onRequestClose={() => {
+            setRetry(!retry);
+          }}>
+          <TouchableWithoutFeedback>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                    Network not available or GPS not turned ON
+                  </Text>
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        givePresent();
+                        setRetry(false);
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Retry
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        // Go to GPS settings
+                        turnONGPS();
+                      }}>
+                      <Text className="text-white font-bold text-center">
+                        Settings
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setRetry(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* OTP dialog box */}
         <Modal
           animationType="fade"
           transparent={true}
           visible={modalVisible1}
           onRequestClose={() => {
-            setModalVisible1(!modalVisible1);
+            setModalVisible0(true);
           }}>
-          <TouchableWithoutFeedback onPress={() => setModalVisible1(false)}>
-            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
-              <TouchableWithoutFeedback>
-                <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
-                  <Text className="text-gray-500">Enter OTP :</Text>
-                  <View
+          <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+            <TouchableWithoutFeedback>
+              <View className="bg-white m-[20px] rounded-lg p-[35px] shadow-2xl shadow-black flex items-center gap-y-3">
+                <Text className="text-gray-500">Enter OTP :</Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderWidth: 2,
+                    borderColor: 'gray',
+                    borderRadius: 10,
+                    paddingHorizontal: 10,
+                    width: '90%',
+                  }}>
+                  <TextInput
+                    onChangeText={setOtp}
+                    value={otp}
+                    placeholder="Enter OTP..."
+                    placeholderTextColor={'gray'}
+                    keyboardType="numeric"
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      borderWidth: 2,
-                      borderColor: 'gray',
-                      borderRadius: 10,
-                      paddingHorizontal: 10,
-                      width: '90%',
-                    }}>
-                    <TextInput
-                      onChangeText={setOtp}
-                      value={otp}
-                      placeholder="Enter OTP..."
-                      placeholderTextColor={'gray'}
-                      keyboardType="numeric"
-                      style={{
-                        flex: 1,
-                        paddingLeft: 10,
-                        height: 40,
-                        color: 'gray',
-                      }}
-                    />
-                  </View>
+                      flex: 1,
+                      paddingLeft: 10,
+                      height: 40,
+                      color: 'gray',
+                    }}
+                  />
+                </View>
+                <View className="flex flex-row justify-center w-full mt-5">
                   <Pressable
-                    className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
+                    className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl mr-2"
                     onPress={() => {
                       handleOtpSubmit();
                     }}>
@@ -306,21 +403,33 @@ const MarkAttendance = ({route}) => {
                       Submit
                     </Text>
                   </Pressable>
-                  <View className="w-full">
-                    <Text className="pb-3 text-gray-500">
-                      Time Remaining: {time} seconds
+                  <Pressable
+                    className="bg-[#01818C] px-2 py-3 w-[100px] rounded-2xl"
+                    onPress={() => {
+                      setModalVisible0(true);
+                    }}>
+                    <Text className="text-white text-center font-medium">
+                      Cancel
                     </Text>
-                    <ProgressBar
-                      progress={time / finalTime}
-                      color={'#01818C'}
-                      backgroundColor={'black'}
-                    />
-                  </View>
+                  </Pressable>
                 </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
+
+                <View className="w-full">
+                  <Text className="pb-3 text-gray-500">
+                    Time Remaining: {time} seconds
+                  </Text>
+                  <ProgressBar
+                    progress={time / finalTime}
+                    color={'#01818C'}
+                    backgroundColor={'black'}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
         </Modal>
+
+        {/* Getting location dialog box */}
         <Modal
           animationType="fade"
           transparent={true}
@@ -343,6 +452,8 @@ const MarkAttendance = ({route}) => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
+
+
       </View>
 
       <View className="w-full flex flex-row justify-between px-4 mb-2">
