@@ -82,7 +82,7 @@ const MarkAttendance = ({route}) => {
       if (data.type === 'time_update2') {
         handleGetAttendance();
         if (data.time <= 0) {
-          setModalVisible1(false);
+          cancelMarking();
         }
 
         if (!popupAutoShownRef.current) {
