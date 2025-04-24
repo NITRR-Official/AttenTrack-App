@@ -386,7 +386,7 @@ const LogIn = () => {
               </View>
             </View>
             <View className="flex flex-row justify-between w-[70%]">
-              <Text className="text-sm">Remember me</Text>
+              <Text></Text>
               <TouchableOpacity
                 onPress={() => {
                   isStudent
