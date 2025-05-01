@@ -11,6 +11,7 @@ import {
 import PropTypes from 'prop-types';
 import {BASE_URL} from '../constants/constants';
 import {useAuth} from '../utils/auth';
+import OTPVerification from './OTPVerification';
 
 const ChangePassword = ({closeDialog, type, id}) => {
   const {
@@ -28,6 +29,7 @@ const ChangePassword = ({closeDialog, type, id}) => {
     setSemester,
     setEnroll,
     setPhone,
+    tokenVerified,
   } = useAuth();
   const [selectedTab, setSelectedTab] = useState('info');
 
@@ -43,6 +45,7 @@ const ChangePassword = ({closeDialog, type, id}) => {
   const [_semester, _setSemester] = useState(semester);
   const [_enroll, _setEnroll] = useState(enroll);
   const [_phone, _setPhone] = useState(phone);
+  const [tokenDialog, setTokenDialog] = useState(false);
 
   const handleSavePassword = async () => {
     if (newPassword !== confirmPassword) {
@@ -98,7 +101,9 @@ const ChangePassword = ({closeDialog, type, id}) => {
         setEnroll(_enroll === '' ? 'Not Set' : _enroll);
         setPhone(_phone === '' ? 'Not Set' : _phone);
       } else {
-        setEduQualification(_eduQualification === '' ? 'Not Set' : _eduQualification);
+        setEduQualification(
+          _eduQualification === '' ? 'Not Set' : _eduQualification,
+        );
         setTelephone(_telephone === '' ? 'Not Set' : _telephone);
         setInterest(_interest === '' ? 'Not Set' : _interest);
       }
@@ -111,6 +116,9 @@ const ChangePassword = ({closeDialog, type, id}) => {
 
   return (
     <Modal transparent visible animationType="slide">
+      {tokenDialog && (
+        <OTPVerification closeDialog={setTokenDialog} id={id} type={type} />
+      )}
       <View style={styles.overlay}>
         <View style={styles.dialogBox}>
           <View style={styles.tabContainer}>
@@ -269,6 +277,14 @@ const ChangePassword = ({closeDialog, type, id}) => {
                 style={styles.button}
                 onPress={handleSavePassword}>
                 <Text style={styles.buttonText}>Change</Text>
+              </TouchableOpacity>
+            ) : !tokenVerified ? (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  setTokenDialog(true);
+                }}>
+                <Text style={styles.buttonText}>Verify OTP</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={handleUpdate} style={styles.button}>

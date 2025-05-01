@@ -105,11 +105,11 @@ const SignUp = props => {
   }, [counter]);
 
   // Function to verify OTP and register
-  const handleVerifyOtpAndRegister = async () => {
+  const handleVerifyOtpAndRegister = async (unverified) => {
     try {
       setLoading(true);
       console.log(typeof parse);
-      if (!email || !otp || !password || !passwordConfirm) {
+      if (!email || (!unverified && !otp) || !password || !passwordConfirm) {
         ToastAndroid.show('All fields are required', ToastAndroid.LONG);
         setLoading(false);
         return;
@@ -128,7 +128,7 @@ const SignUp = props => {
         `${BASE_URL}${endpoint}`,
         {
           email,
-          otp: otp2, // Send the parsed integer OTP
+          otp: unverified ? null : otp2, // Send the parsed integer OTP or if unverified, send null
           password,
         },
         {
@@ -361,12 +361,25 @@ const SignUp = props => {
           <></>
         )}
 
+        {mul > 2 && (
+          <TouchableOpacity
+            disabled={counter > 0}
+            onPress={() => {
+              //Registration without OTP will be carried out here
+              handleVerifyOtpAndRegister(true);
+            }}>
+            <Text className="text-sm text-[#01818C] underline">
+              Continue without OTP
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           onPress={() => {
             if (!showOtpFields) {
               handleSendOtp();
             } else {
-              handleVerifyOtpAndRegister();
+              handleVerifyOtpAndRegister(false);
             }
           }}
           className="bg-[#01818C] w-[70%] py-3 flex justify-center items-center rounded-lg">

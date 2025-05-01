@@ -86,7 +86,7 @@ const MarkAttendance = ({route}) => {
         }
 
         if (!popupAutoShownRef.current) {
-          setModalVisible1(true);
+          givePresent()
           popupAutoShownRef.current = true; // prevent it from showing again
         }
 
@@ -103,8 +103,7 @@ const MarkAttendance = ({route}) => {
         setLong(data.location.longitude);
       }
       if (data.type === 'first_call') {
-        setOtp('');
-        setModalVisible1(true);
+        givePresent()
       }
     };
 
@@ -218,6 +217,13 @@ const MarkAttendance = ({route}) => {
 
   const givePresent = () => {
     console.log("Give present: ", time);
+    if (!route.params.allowed) {
+      ToastAndroid.show(
+        'Non-verified student cannot mark more than 10 attendance',
+        ToastAndroid.LONG,
+      );
+      return;
+    }
     if (time == 0) {
       ToastAndroid.show(
         'Wait for the Teacher to Take Attendance..',
@@ -523,6 +529,7 @@ MarkAttendance.propTypes = {
       }),
       className: PropTypes.string.isRequired,
       id: PropTypes.string.isRequired,
+      allowed: PropTypes.bool.isRequired,
     }).isRequired,
   }).isRequired,
 };

@@ -48,7 +48,8 @@ const LogIn = () => {
     setSemester,
     setPass,
     setEnroll,
-    setPhone
+    setPhone,
+    setTokenVerified
   } = useAuth();
 
   const handleTeacherLogin = async () => {
@@ -83,7 +84,7 @@ const LogIn = () => {
       );
       SInfo.setItem(
         'token',
-        JSON.stringify({type: 'teacher', data: data.token, email: data.email, name: data.fullName, department: data.department, id: data.id}),
+        JSON.stringify({type: 'teacher', data: data.token, email: data.email, name: data.fullName, department: data.department, id: data.id, auth: data.auth}),
       );
       setClasses(
         data.coursesId.map(classItem => ({
@@ -99,6 +100,7 @@ const LogIn = () => {
       setTelephone(data.telephone);
       setIndex('1'); // Set index for teacher
       setRefreshing(true);
+      setTokenVerified(data.auth);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -132,6 +134,7 @@ const LogIn = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Error data:', errorData);
         throw new Error(errorData.error || 'Login failed');
       }
 
@@ -143,7 +146,7 @@ const LogIn = () => {
 
       SInfo.setItem(
         'token',
-        JSON.stringify({type: 'student', data: data.token, roll: data.rollNumber, name: data.fullName, email: data.email, id: data.id}),
+        JSON.stringify({type: 'student', data: data.token, roll: data.rollNumber, name: data.fullName, email: data.email, id: data.id, auth: data.auth}),
       );
       setRollNumberG(data.rollNumber);
       setIndex('2'); // Set index for student
@@ -155,6 +158,7 @@ const LogIn = () => {
       setPass(data.batch);
       setEnroll(data.enroll);
       setPhone(data.phone);
+      setTokenVerified(data.auth);
       setLoading(false);
     } catch (error) {
       console.log(error);

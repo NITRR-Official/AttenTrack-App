@@ -25,7 +25,7 @@ import PTRView from 'react-native-pull-to-refresh';
 
 const Home = () => {
   const navigation = useNavigation();
-  const {rollNumberG, loading, setLoading, studentidG, setStudentClass} = useAuth();
+  const {rollNumberG, loading, setLoading, studentidG, setStudentClass, tokenVerified} = useAuth();
   const [selectedClass, setSelectedClass] = useState(null);
 
   const getClassInfo = async () => {
@@ -50,11 +50,13 @@ const Home = () => {
       const response = await axios.post(`${BASE_URL}/api/student/attendance`, {
         class_id: id,
         rollNumber: rollNumberG,
+        auth: tokenVerified,
       });
       navigation.navigate('MarkAttendance', {
         attDataG: response.data,
         className: name,
         id: id,
+        allowed: response.data.not_allowed
       });
     } catch (error) {
       ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
