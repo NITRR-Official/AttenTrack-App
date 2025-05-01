@@ -1,6 +1,7 @@
 // @This is For Teachers
 
 import * as React from 'react';
+import {useState, useEffect} from 'react';
 import {View, Text, Dimensions} from 'react-native';
 import {
   widthPercentageToDP as wp
@@ -19,6 +20,8 @@ import HomeIcon from '../components/HomeIcon.js';
 import ProfileIcon from '../components/ProfileIcon.js';
 import ReportIcon from '../components/ReportIcon.js';
 import ReportHome from '../screens/teacher/ReportHome.js';
+import {useAuth} from '../utils/auth.js';
+import OTPVerification from '../components/OTPVerification.js';
 
 // size
 const {width, height} = Dimensions.get('window');
@@ -26,6 +29,13 @@ const {width, height} = Dimensions.get('window');
 export default function BottomTabs() {
   const Tab = createBottomTabNavigator();
   const insets = useSafeAreaInsets();
+  const {tokenVerified, teacherEmailG} = useAuth();
+  const [tokenDialog, setTokenDialog] = useState(false);
+
+  useEffect(() => {
+    console.log('Token Verified:', tokenVerified);
+    tokenVerified ? setTokenDialog(false) : setTokenDialog(true);
+  }, [tokenVerified]);
   
 
   return (
@@ -34,6 +44,7 @@ export default function BottomTabs() {
         width,
         height,
       }}>
+      {tokenDialog && (<OTPVerification closeDialog={setTokenDialog} id={teacherEmailG} type={'teacher'} />)}
       <Tab.Navigator
         initialRouteName="Home_Teacher"
         screenOptions={{

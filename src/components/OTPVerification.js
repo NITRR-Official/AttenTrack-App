@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Modal,
   View,
@@ -7,23 +7,37 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import PropTypes from 'prop-types';
+import {useAuth} from '../utils/auth';
 import {BASE_URL} from '../constants/constants';
 
-const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
+const OTPVerification = ({closeDialog, type, id}) => {
   const [otp, setOTP] = useState('');
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [counter, setCounter] = useState(30);
+  const [mul, setMul] = useState(1);
 
-  const forgotPassword = async (type, id) => {
-    if (!id) {
-      ToastAndroid.show(
-        'Roll Number or Email Should Not Be Empty',
-        ToastAndroid.LONG,
-      );
+  const {handleSendOtp, setTokenVerified} = useAuth();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (counter == 0) clearInterval(interval);
+      else setCounter(counter - 1);
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [counter]);
+
+  const verifyUser = async (type, id, token, otp) => {
+    if (!id || !otp || !token) {
+      ToastAndroid.show('Fill all the fields', ToastAndroid.LONG);
       return;
     }
     try {
-      console.log('Forgot password request:', type, id);
       const response = await fetch(`${BASE_URL}/api/${type}/forgot`, {
         method: 'POST',
         headers: {
@@ -31,12 +45,10 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
           Authorization: `Bearer ${otpToken}`,
         },
         body: JSON.stringify({
-            otp: Number.parseInt(otp, 10),
-            ...(type === 'student'
-              ? { rollNumber: id }
-              : { email: id }),
-            verify: false,
-          })
+          otp: Number.parseInt(otp, 10),
+          ...(type === 'student' ? {rollNumber: id} : {email: id}),
+          verify: true,
+        }),
       });
 
       if (!response.ok) {
@@ -45,11 +57,9 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
       }
 
       const data = await response.json();
-      console.log('Password resetted:', data);
-      ToastAndroid.show(
-        `Password reset please register again using your registered ${id}`,
-        ToastAndroid.LONG,
-      );
+      console.log('User verified:', data);
+      ToastAndroid.show(`User verified ${id}`, ToastAndroid.LONG);
+      setTokenVerified(true);
       closeDialog(false);
     } catch (error) {
       console.log(error);
@@ -60,11 +70,33 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
     }
   };
 
+  //OTP generation and sending logic can be added here
+  const OTPGeneration = async () => {
+    handleSendOtp(type, id)
+      .then(result => {
+        setToken(result);
+        if (result) {
+          setMul(mul + 1);
+          setCounter(mul * 30);
+        }
+      })
+      .catch(err => {
+        console.log('From OTP Verification system: ', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    OTPGeneration();
+  }, []);
+
   return (
     <Modal transparent={true} visible={true} animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.dialogBox}>
-          <Text style={styles.title}>Reset Password</Text>
+          <Text style={styles.title}>OTP Verification</Text>
           <TextInput
             style={styles.input}
             value={id}
@@ -79,10 +111,42 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
             value={otp}
             onChangeText={setOTP}
           />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={()=>{forgotPassword(type, id)}}>
-              <Text style={styles.buttonText}>Reset Password</Text>
+
+          {counter > 0 ? (
+            <Text className="text-sm text-[#01818C]">
+              Resend OTP in{' '}
+              {Math.floor(counter / 60)
+                .toString()
+                .padStart(2, '0')}
+              :{(counter % 60).toString().padStart(2, '0')} seconds
+            </Text>
+          ) : (
+            <TouchableOpacity
+              disabled={counter > 0}
+              onPress={() => {
+                // Reset seconds to 30 when resent OTP is clicked
+                setLoading(true);
+                OTPGeneration();
+              }}>
+              <Text className="text-sm text-[#01818C] underline">
+                Resend OTP
+              </Text>
             </TouchableOpacity>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                verifyUser(type, id, token, otp);
+              }}>
+              {loading ? (
+                <ActivityIndicator animating={true} color={'white'} />
+              ) : (
+                <Text style={styles.buttonText}>Verify OTP</Text>
+              )}
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
               onPress={() => closeDialog(false)}>
@@ -95,14 +159,13 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
   );
 };
 
-ForgotPassword.propTypes = {
+OTPVerification.propTypes = {
   closeDialog: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  otpToken: PropTypes.string.isRequired,
 };
 
-export default ForgotPassword;
+export default OTPVerification;
 
 const styles = StyleSheet.create({
   overlay: {

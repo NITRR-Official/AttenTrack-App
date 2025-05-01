@@ -34,7 +34,7 @@ import {API_URL, BASE_URL} from '../../constants/constants';
 import PropTypes from 'prop-types';
 
 const Sheet = ({navigation, route}) => {
-  const {loading, setLoading, turnONGPS} = useAuth();
+  const {loading, setLoading, turnONGPS, tokenVerified} = useAuth();
   const [lag, setLag] = useState(false);
 
   const [student, setStudent] = useState();
@@ -229,6 +229,7 @@ const Sheet = ({navigation, route}) => {
           records: Object.fromEntries(
             records.map(item => [item.rollNumber, item.is_present]),
           ),
+          auth: tokenVerified,
         },
       );
 
@@ -239,7 +240,7 @@ const Sheet = ({navigation, route}) => {
       navigation.goBack();
       setLoading(false);
     } catch (error) {
-      ToastAndroid.show(`Something went wrong`, ToastAndroid.LONG);
+      ToastAndroid.show(`Something went wrong or OTP not verified`, ToastAndroid.LONG);
       console.error(error);
       setLoading(false);
     }

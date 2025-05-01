@@ -13,6 +13,7 @@ export const AuthProvider = ({children}) => {
   const [classes, setClasses] = useState([]);
 
   const [refreshing, setRefreshing] = useState(true);
+  const [tokenVerified, setTokenVerified] = useState(true);
 
   const [teacheridG, setTeacheridG] = useState('');
   const [teacherNameG, setTeacherNameG] = useState('');
@@ -87,6 +88,7 @@ export const AuthProvider = ({children}) => {
         setRefreshing(true);
         setIndex('1'); // Set index for teacher
       }
+      setTokenVerified(data.auth);
     } catch (error) {
       if (
         token != null &&
@@ -102,6 +104,7 @@ export const AuthProvider = ({children}) => {
         setStudentEmailG(token.email);
         setStudentNameG(token.name);
         setStudentidG(token.id);
+        setTokenVerified(token.auth);
         setIndex('2');
       } else {
         //Fallback for teacher
@@ -109,6 +112,7 @@ export const AuthProvider = ({children}) => {
         setTeacherEmailG(token.email);
         setDepartmentG(token.department);
         setTeacheridG(token.id);
+        setTokenVerified(token.auth)
         setIndex('1');
       }
       console.log('Error fetching student data:', error);
@@ -150,6 +154,64 @@ export const AuthProvider = ({children}) => {
     directLogin();
     requestLocationPermission();
   }, []);
+
+  const handleSendOtp = async (type, id) => {
+    console.log('Sending OTP:', type, id);
+    try {
+      if (!id) {
+        ToastAndroid.show('Email or Rollnumber is required', ToastAndroid.LONG);
+        return;
+      }
+
+      const response = await fetch(`${BASE_URL}/api/${type}/otp-generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body:
+          type == 'student'
+            ? JSON.stringify({
+                rollNumber: id,
+              })
+            : JSON.stringify({
+                email: id,
+              }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        ToastAndroid.show('OTP sent to your email', ToastAndroid.LONG);
+        if (data.otpToken) {
+          return data.otpToken;
+        }
+      } else {
+        ToastAndroid.show(
+          data.error || 'Failed to send OTP',
+          ToastAndroid.LONG,
+        );
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      if (
+        error.name === 'TypeError' &&
+        error.message.includes('Network request failed')
+      ) {
+        ToastAndroid.show(
+          'Network error. Please check your connection.',
+          ToastAndroid.LONG,
+        );
+      } else {
+        ToastAndroid.show(
+          'Failed to send OTP. Please try again.',
+          ToastAndroid.LONG,
+        );
+      }
+
+      return null;
+    }
+  };
 
   const contextValue = useMemo(
     () => ({
@@ -198,7 +260,10 @@ export const AuthProvider = ({children}) => {
       studentClass,
       setStudentClass,
       directLogin,
-      turnONGPS
+      turnONGPS,
+      tokenVerified,
+      setTokenVerified,
+      handleSendOtp,
     }),
     [
       studentidG,
@@ -246,7 +311,10 @@ export const AuthProvider = ({children}) => {
       studentClass,
       setStudentClass,
       directLogin,
-      turnONGPS
+      turnONGPS,
+      tokenVerified,
+      setTokenVerified,
+      handleSendOtp,
     ],
   );
   return (
