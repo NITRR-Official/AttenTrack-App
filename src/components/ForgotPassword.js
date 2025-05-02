@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {BASE_URL} from '../constants/constants';
 
 const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
   const [otp, setOTP] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const forgotPassword = async (type, id) => {
     if (!id) {
@@ -22,6 +24,7 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
       );
       return;
     }
+    setLoading(true);
     try {
       console.log('Forgot password request:', type, id);
       const response = await fetch(`${BASE_URL}/api/${type}/forgot`, {
@@ -57,6 +60,8 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
         `Request failed: ${error.message || 'Unknown error'}`,
         ToastAndroid.LONG,
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,7 +86,11 @@ const ForgotPassword = ({closeDialog, type, id, otpToken}) => {
           />
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={()=>{forgotPassword(type, id)}}>
-              <Text style={styles.buttonText}>Reset Password</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Reset Password</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}

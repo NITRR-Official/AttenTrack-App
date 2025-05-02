@@ -37,12 +37,13 @@ const OTPVerification = ({closeDialog, type, id}) => {
       ToastAndroid.show('Fill all the fields', ToastAndroid.LONG);
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/api/${type}/forgot`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${otpToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           otp: Number.parseInt(otp, 10),
@@ -67,7 +68,9 @@ const OTPVerification = ({closeDialog, type, id}) => {
         `Request failed: ${error.message || 'Unknown error'}`,
         ToastAndroid.LONG,
       );
-    }
+    } finally {
+      setLoading(false);
+    };
   };
 
   //OTP generation and sending logic can be added here

@@ -105,12 +105,19 @@ const SignUp = props => {
   }, [counter]);
 
   // Function to verify OTP and register
-  const handleVerifyOtpAndRegister = async (unverified) => {
+  const handleVerifyOtpAndRegister = async unverified => {
     try {
       setLoading(true);
       console.log(typeof parse);
       if (!email || (!unverified && !otp) || !password || !passwordConfirm) {
-        ToastAndroid.show('All fields are required', ToastAndroid.LONG);
+        if (unverified) {
+          ToastAndroid.show(
+            'All fields are required except the OTP',
+            ToastAndroid.LONG,
+          );
+        } else {
+          ToastAndroid.show('All fields are required', ToastAndroid.LONG);
+        }
         setLoading(false);
         return;
       }
@@ -363,10 +370,10 @@ const SignUp = props => {
 
         {mul > 2 && (
           <TouchableOpacity
-            disabled={counter > 0}
             onPress={() => {
               //Registration without OTP will be carried out here
               handleVerifyOtpAndRegister(true);
+              console.log('Unverified Registration');
             }}>
             <Text className="text-sm text-[#01818C] underline">
               Continue without OTP

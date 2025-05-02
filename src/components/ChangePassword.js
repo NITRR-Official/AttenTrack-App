@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ToastAndroid,
+  ActivityIndicator
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {BASE_URL} from '../constants/constants';
@@ -36,6 +37,7 @@ const ChangePassword = ({closeDialog, type, id}) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [_eduQualification, _setEduQualification] = useState(eduQualification);
   const [_telephone, _setTelephone] = useState(telephone);
@@ -52,6 +54,7 @@ const ChangePassword = ({closeDialog, type, id}) => {
       alert('New password and confirm password do not match');
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/api/${type}/change`, {
         method: 'POST',
@@ -70,11 +73,14 @@ const ChangePassword = ({closeDialog, type, id}) => {
       closeDialog(false);
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdate = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${BASE_URL}/api/${type}/update`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
@@ -111,6 +117,8 @@ const ChangePassword = ({closeDialog, type, id}) => {
       closeDialog(false);
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.LONG);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -276,7 +284,11 @@ const ChangePassword = ({closeDialog, type, id}) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleSavePassword}>
-                <Text style={styles.buttonText}>Change</Text>
+                {loading ? (
+                  <ActivityIndicator animating={true} color={'white'} />
+                ) : (
+                  <Text style={styles.buttonText}>Change</Text>
+                )}
               </TouchableOpacity>
             ) : !tokenVerified ? (
               <TouchableOpacity
@@ -288,7 +300,11 @@ const ChangePassword = ({closeDialog, type, id}) => {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={handleUpdate} style={styles.button}>
-                <Text style={styles.buttonText}>Update</Text>
+                {loading ? (
+                  <ActivityIndicator animating={true} color={'white'} />
+                ) : (
+                  <Text style={styles.buttonText}>Update</Text>
+                )}
               </TouchableOpacity>
             )}
             <TouchableOpacity
