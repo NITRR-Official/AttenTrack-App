@@ -8,6 +8,8 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {ActivityIndicator} from 'react-native-paper';
 import axios from 'axios';
@@ -30,6 +32,7 @@ const SignUp = props => {
   const [showOtpFields, setShowOtpFields] = useState(false);
   const [otpToken, setOtpToken] = useState(null); // State to store OTP token
   const [counter, setCounter] = useState(30); // State to manage countdown timer
+  const [warning, setWarning] = useState(false); // State to manage warning message
 
   // Function to send OTP
   const handleSendOtp = async () => {
@@ -368,12 +371,79 @@ const SignUp = props => {
           <></>
         )}
 
+        {/* Continue without OTP limitations view */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={warning}
+          onRequestClose={() => {
+            setWarning(!warning);
+          }}>
+          <TouchableWithoutFeedback>
+            <View className="w-full flex-1 bg-[#00000050] flex justify-center">
+              <TouchableWithoutFeedback>
+                <View className="bg-white p-4 m-4 rounded-3xl">
+                  {isStudent ? (
+                    <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                      Following measures will be taken if you continue without
+                      OTP:
+                      {'\n'}1. You will not be able to update your profile.
+                      {'\n'}2. You will not be able to mark your attendance
+                      after 10 times for a particular subject.
+                      {'\n'}3. You can verify your email later in the profile
+                      section then update your profile.
+                      {'\n'}4. You will be notified to verify your email each
+                      time you open the app.
+                    </Text>
+                  ) : (
+                    <Text className="ml-2 text-[15px] font-medium text-gray-600 flex-shrink">
+                      Following measures will be taken if you continue without
+                      OTP:
+                      {'\n'}1. You will not be able to update your profile.
+                      {'\n'}2. You will not be able to take the attendance more
+                      than 10 times for a particular subject.
+                      {'\n'}3. You can verify your email later in the profile
+                      section then update your profile.
+                      {'\n'}4. You will be notified to verify your email each
+                      time you open the app.
+                    </Text>
+                  )}
+
+                  <View className="flex flex-row justify-between mt-5">
+                    <TouchableOpacity
+                      className="bg-red-400 p-3 w-[100px] rounded-2xl"
+                      onPress={() => {
+                        handleVerifyOtpAndRegister(true);
+                        setWarning(false);
+                      }}>
+                      {loading ? (
+                        <ActivityIndicator animating={true} color={'white'} />
+                      ) : (
+                        <Text className="text-white font-bold text-center">
+                          Continue without OTP
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      className="bg-[#01808cc5] p-3 w-[100px] rounded-2xl"
+                      onPress={() => setWarning(false)}>
+                      <Text className="text-white font-bold text-center">
+                        Verify with OTP
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
         {mul > 2 && (
           <TouchableOpacity
             onPress={() => {
               //Registration without OTP will be carried out here
-              handleVerifyOtpAndRegister(true);
-              console.log('Unverified Registration');
+              setWarning(true);
             }}>
             <Text className="text-sm text-[#01818C] underline">
               Continue without OTP
