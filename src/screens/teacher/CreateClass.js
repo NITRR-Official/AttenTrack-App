@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -9,18 +9,21 @@ import {
   ToastAndroid,
   ActivityIndicator,
   StyleSheet,
-  Platform
+  Platform,
 } from 'react-native';
-import { ArrowUpTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
-import { useNavigation } from "@react-navigation/native";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { theme } from '../../theme';
+import {ArrowUpTrayIcon, XMarkIcon} from 'react-native-heroicons/outline';
+import {useNavigation} from '@react-navigation/native';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import {theme} from '../../theme';
 import Papa from 'papaparse';
-import DocumentPicker from 'react-native-document-picker';
+import DocumentPicker from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
-import { useAuth } from '../../utils/auth';
+import {useAuth} from '../../utils/auth';
 import axios from 'axios';
-import { BASE_URL } from '../../constants/constants';
+import {BASE_URL} from '../../constants/constants';
 const CreateClass = () => {
   const navigation = useNavigation();
 
@@ -29,7 +32,14 @@ const CreateClass = () => {
   const [semester, setSemester] = useState('');
   const [jsonLocalData, setJsonLocalData] = useState([]);
   const [students, setStudents] = useState([]);
-  const { setClasses, departmentG, teacheridG, loading, setLoading, setRefreshing } = useAuth();
+  const {
+    setClasses,
+    departmentG,
+    teacheridG,
+    loading,
+    setLoading,
+    setRefreshing,
+  } = useAuth();
 
   const handleOnFileLoad = async () => {
     try {
@@ -50,14 +60,12 @@ const CreateClass = () => {
 
       parseCSV(fileContent);
     } catch (err) {
-      if (!DocumentPicker.isCancel(err)) {
-        ToastAndroid.show('Error reading file', ToastAndroid.LONG);
-        console.error('File error:', err);
-      }
+      ToastAndroid.show('Error reading file', ToastAndroid.LONG);
+      console.error('File error:', err);
     }
   };
 
-  const parseCSV = (csvData) => {
+  const parseCSV = csvData => {
     try {
       const result = Papa.parse(csvData, {
         header: true,
@@ -68,15 +76,18 @@ const CreateClass = () => {
         throw new Error('Error parsing CSV');
       }
 
-      const transformedData = result.data.map((item) => ({
+      const transformedData = result.data.map(item => ({
         rollNumber: item.ROLLNO?.toString() || '',
         fullName: item.STUDNAME?.toString() || '',
-        email: item.EMAIL?.toString() || ''
+        email: item.EMAIL?.toString() || '',
       }));
 
       setStudents(transformedData);
       setJsonLocalData(result.data);
-      ToastAndroid.show(`${transformedData.length} students loaded`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `${transformedData.length} students loaded`,
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
       ToastAndroid.show('Invalid CSV format', ToastAndroid.LONG);
       console.error('Parse error:', error, jsonLocalData);
@@ -109,12 +120,18 @@ const CreateClass = () => {
       return false;
     }
 
-    const invalidStudents = students.some(student => 
-      !student.email.trim() || !student.fullName.trim() || !student.rollNumber.trim()
+    const invalidStudents = students.some(
+      student =>
+        !student.email.trim() ||
+        !student.fullName.trim() ||
+        !student.rollNumber.trim(),
     );
 
     if (invalidStudents) {
-      ToastAndroid.show('All students must have valid email, name and roll number', ToastAndroid.LONG);
+      ToastAndroid.show(
+        'All students must have valid email, name and roll number',
+        ToastAndroid.LONG,
+      );
       return false;
     }
 
@@ -129,7 +146,7 @@ const CreateClass = () => {
 
     try {
       setLoading(true);
-      
+
       const payload = {
         classname: classname.trim(),
         batch: batch.trim(),
@@ -139,27 +156,35 @@ const CreateClass = () => {
         students: students.map(student => ({
           email: student.email.trim(),
           fullName: student.fullName.trim(),
-          rollNumber: student.rollNumber.trim()
-        }))
+          rollNumber: student.rollNumber.trim(),
+        })),
       };
 
       console.log('Sending payload:', payload);
 
-      const response = await axios.post(`${BASE_URL}/api/class/create-class`, payload, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axios.post(
+        `${BASE_URL}/api/class/create-class`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
       ToastAndroid.show('Class Added Successfully!', ToastAndroid.LONG);
-      setClasses(prevClasses => [...prevClasses, { id: response.data._id, classname }]);
+      setClasses(prevClasses => [
+        ...prevClasses,
+        {id: response.data._id, classname},
+      ]);
       setRefreshing(true);
       navigation.goBack();
     } catch (error) {
       console.error('Error creating class:', error);
-      const errorMessage = error.response?.data?.error || 
-                         error.response?.data?.message || 
-                         'Failed to create class';
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Failed to create class';
       ToastAndroid.show(`Error: ${errorMessage}`, ToastAndroid.LONG);
     } finally {
       setLoading(false);
@@ -172,11 +197,12 @@ const CreateClass = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <XMarkIcon size={wp(8)} color={theme.maincolor} />
         </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={()=>{createClass();}}
+        <TouchableOpacity
+          onPress={() => {
+            createClass();
+          }}
           style={styles.saveButton}
-          disabled={loading}
-        >
+          disabled={loading}>
           {loading ? (
             <ActivityIndicator animating={true} color={'white'} />
           ) : (
@@ -188,7 +214,7 @@ const CreateClass = () => {
       <View contentContainerStyle={styles.formContainer}>
         <TextInput
           placeholder="Class Name"
-          placeholderTextColor='#909090'
+          placeholderTextColor="#909090"
           onChangeText={setClassname}
           value={classname}
           style={styles.input}
@@ -196,25 +222,25 @@ const CreateClass = () => {
 
         <TextInput
           placeholder="Semester"
-          placeholderTextColor='#909090'
+          placeholderTextColor="#909090"
           onChangeText={setSemester}
           value={semester}
-          keyboardType='numeric'
+          keyboardType="numeric"
           style={styles.input}
         />
 
         <TextInput
           placeholder="Batch"
-          placeholderTextColor='#909090'
+          placeholderTextColor="#909090"
           onChangeText={setBatch}
           value={batch}
-          keyboardType='numeric'
+          keyboardType="numeric"
           style={styles.input}
         />
 
         <TextInput
           placeholder="Department"
-          placeholderTextColor='#909090'
+          placeholderTextColor="#909090"
           value={departmentG}
           editable={false}
           style={styles.input}
@@ -222,8 +248,7 @@ const CreateClass = () => {
 
         <TouchableOpacity
           onPress={handleOnFileLoad}
-          style={styles.uploadButton}
-        >
+          style={styles.uploadButton}>
           <Text style={styles.uploadButtonText}>Upload Student List</Text>
           <ArrowUpTrayIcon size={wp(8)} color="#fff" />
         </TouchableOpacity>
@@ -241,7 +266,9 @@ const CreateClass = () => {
                 <View key={student} style={styles.studentRow}>
                   <Text style={styles.studentText}>{student.rollNumber}</Text>
                   <Text style={styles.studentText}>{student.fullName}</Text>
-                  <Text style={styles.studentText} numberOfLines={1}>{student.email}</Text>
+                  <Text style={styles.studentText} numberOfLines={1}>
+                    {student.email}
+                  </Text>
                 </View>
               ))}
             </ScrollView>
@@ -309,7 +336,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
   },
   uploadButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: wp(4),
     fontWeight: '400',
   },
