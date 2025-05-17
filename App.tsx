@@ -5,7 +5,7 @@ import AppNavigation from './src/navigation';
 import AppNavigation2 from './src/navigation/index2';
 import AppNavigation3 from './src/navigation/index3';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-
+import './global.css'
 const AppContent = () => {
   const {index} = useAuth();
 
