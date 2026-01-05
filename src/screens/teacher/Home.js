@@ -13,7 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {theme} from '../../theme';
+import { theme } from '../../theme';
 import {
   CpuChipIcon,
   PlusCircleIcon,
@@ -21,13 +21,13 @@ import {
 } from 'react-native-heroicons/outline';
 import PTRView from 'react-native-pull-to-refresh';
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {useNavigation} from '@react-navigation/native';
-import {useAuth} from '../../utils/auth';
-import axios from 'axios';
-import {ActivityIndicator} from 'react-native-paper';
-import {BASE_URL} from '../../constants/constants';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../utils/auth';
+import axios from 'react-native-axios';
+import { ActivityIndicator } from 'react-native-paper';
+import { BASE_URL } from '../../constants/constants';
 const Home = () => {
   const [selectedClass, setSelectedClass] = useState(null);
   const {
@@ -48,7 +48,7 @@ const Home = () => {
         setClasses(response.data.classes);
       })
       .catch(error => {
-        ToastAndroid.show("Something went wrong.",ToastAndroid.LONG)
+        ToastAndroid.show("Something went wrong.", ToastAndroid.LONG)
         console.log(error);
       })
       .finally(() => {
@@ -67,8 +67,7 @@ const Home = () => {
   const deleteClass = async () => {
     try {
       await axios.delete(
-        `${BASE_URL}/api/class/remove/${
-          classes.find(cls => cls.classname === selectedClass).class_id
+        `${BASE_URL}/api/class/remove/${classes.find(cls => cls.classname === selectedClass).class_id
         }`,
       );
       setClasses(prevClasses =>
@@ -140,7 +139,7 @@ const Home = () => {
           flexDirection: 'row',
           paddingHorizontal: wp(8),
         }}>
-        <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
+        <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }}>
           Classes
         </Text>
 
@@ -161,7 +160,7 @@ const Home = () => {
       <PTRView
         onRefresh={refresh}
         scrollEventThrottle={1}
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
         style={{
           backgroundColor: '#fff',
           height: hp(100),
@@ -189,7 +188,7 @@ const Home = () => {
                   setModalVisible1(true);
                   setSelectedClass(item.classname);
                 }}
-                style={{marginLeft: 'auto'}}>
+                style={{ marginLeft: 'auto' }}>
                 <TrashIcon size={wp(6)} color="red" />
               </TouchableOpacity>
             </TouchableOpacity>

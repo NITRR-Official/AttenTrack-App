@@ -11,25 +11,25 @@ import {
   Switch,
   ScrollView,
 } from 'react-native';
-import React, {useEffect, useState, useMemo, useRef} from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import {theme} from '../../theme';
-import {ArrowDownTrayIcon, XMarkIcon} from 'react-native-heroicons/outline';
-import {useNavigation} from '@react-navigation/native';
-import {RadioButton, TextInput} from 'react-native-paper';
+import { theme } from '../../theme';
+import { ArrowDownTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
+import { useNavigation } from '@react-navigation/native';
+import { RadioButton, TextInput } from 'react-native-paper';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
 import email from 'react-native-email';
-import {useAuth} from '../../utils/auth';
-import axios from 'axios';
-import {BASE_URL} from '../../constants/constants';
+import { useAuth } from '../../utils/auth';
+import axios from 'react-native-axios';
+import { BASE_URL } from '../../constants/constants';
 import PTRView from 'react-native-pull-to-refresh';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-const Edit = ({close, id, date}) => {
+const Edit = ({ close, id, date }) => {
   Edit.propTypes = {
     close: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
@@ -129,7 +129,7 @@ const Edit = ({close, id, date}) => {
     setData(prevData =>
       prevData.map(item =>
         item.rollNumber === rollNumber
-          ? {...item, present: !item.present}
+          ? { ...item, present: !item.present }
           : item,
       ),
     );
@@ -207,13 +207,13 @@ const Edit = ({close, id, date}) => {
             borderRadius: 16,
             padding: 16,
             shadowColor: '#000',
-            shadowOffset: {width: 4, height: 4},
+            shadowOffset: { width: 4, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 6,
             elevation: 5,
           }}>
           {/* Header Buttons */}
-          <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Text style={styles.subHeader} className="mr-1">
               Date and Time :
             </Text>
@@ -238,8 +238,8 @@ const Edit = ({close, id, date}) => {
               borderTopRightRadius: 8,
             }}>
             <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text style={{width: '75%', color: '#7c7c7c', fontWeight: '500'}}>
+              style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ width: '75%', color: '#7c7c7c', fontWeight: '500' }}>
                 Roll Number
               </Text>
               <Text
@@ -256,76 +256,76 @@ const Edit = ({close, id, date}) => {
 
           {/* Scrollable Attendance List */}
           <View
-              style={{
-                paddingVertical: 12,
-                paddingHorizontal: 12,
-                borderBottomLeftRadius: 8,
-                borderBottomRightRadius: 8,
-                height: hp(60),
-                gap: 12,
-                borderWidth: 2,
-                borderColor: '#01808c7a',
-              }}>
-
-          <ScrollView
-            scrollEventThrottle={1}
-            contentContainerStyle={{flexGrow: 1}}
             style={{
-              backgroundColor: '#fff',
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+              borderBottomLeftRadius: 8,
+              borderBottomRightRadius: 8,
+              height: hp(60),
+              gap: 12,
+              borderWidth: 2,
+              borderColor: '#01808c7a',
             }}>
+
+            <ScrollView
+              scrollEventThrottle={1}
+              contentContainerStyle={{ flexGrow: 1 }}
+              style={{
+                backgroundColor: '#fff',
+              }}>
               {data && data.length > 0 ? (
                 data.map((item, id) => (
-                    <View
-                      key={item.rollNumber}
+                  <View
+                    key={item.rollNumber}
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingVertical: 6,
+                      borderBottomWidth: 1,
+                      borderBottomColor: '#e0e0e0',
+                    }}>
+                    <Text
                       style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        paddingVertical: 6,
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#e0e0e0',
+                        width: '75%',
+                        color: theme.maincolor || '#01808c',
+                        fontSize: 16,
                       }}>
+                      {item.rollNumber}
+                    </Text>
+
+                    <View
+                      style={{
+                        width: '25%',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                      }}>
+                      <Switch
+                        thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
+                        trackColor={{ false: '#ffaaaac4', true: '#8bdca8c4' }}
+                        onValueChange={() => {
+                          toggleAttendance(item.rollNumber);
+                        }}
+                        value={item.present}
+                      />
                       <Text
                         style={{
-                          width: '75%',
-                          color: theme.maincolor || '#01808c',
-                          fontSize: 16,
+                          color: '#555',
+                          fontWeight: '600',
+                          marginLeft: 6,
                         }}>
-                        {item.rollNumber}
+                        {item.present ? 'P' : 'A'}
                       </Text>
-
-                      <View
-                        style={{
-                          width: '25%',
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                          alignItems: 'center',
-                        }}>
-                        <Switch
-                          thumbColor={item.present ? '#258a4ac4' : '#c41111c4'}
-                          trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
-                          onValueChange={() => {
-                            toggleAttendance(item.rollNumber);
-                          }}
-                          value={item.present}
-                        />
-                        <Text
-                          style={{
-                            color: '#555',
-                            fontWeight: '600',
-                            marginLeft: 6,
-                          }}>
-                          {item.present ? 'P' : 'A'}
-                        </Text>
-                      </View>
                     </View>
+                  </View>
                 ))
               ) : (
-                <Text style={{textAlign: 'center', color: '#777'}}>
+                <Text style={{ textAlign: 'center', color: '#777' }}>
                   No attendance found!
                 </Text>
               )}
-          </ScrollView>
+            </ScrollView>
           </View>
           <View
             style={{
@@ -347,7 +347,7 @@ const Edit = ({close, id, date}) => {
               {loading ? (
                 <ActivityIndicator animating={true} color={'white'} />
               ) : (
-                <Text style={{color: 'white', fontWeight: '600'}}>Save</Text>
+                <Text style={{ color: 'white', fontWeight: '600' }}>Save</Text>
               )}
             </TouchableOpacity>
 
@@ -363,7 +363,7 @@ const Edit = ({close, id, date}) => {
                 paddingHorizontal: 16,
                 borderRadius: 8,
               }}>
-              <Text style={{color: '#333', fontWeight: '600'}}>Cancel</Text>
+              <Text style={{ color: '#333', fontWeight: '600' }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -372,7 +372,7 @@ const Edit = ({close, id, date}) => {
   );
 };
 
-const Delete = ({close, id}) => {
+const Delete = ({ close, id }) => {
   Delete.propTypes = {
     close: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
@@ -446,7 +446,7 @@ const Delete = ({close, id}) => {
   );
 };
 
-const Report = ({route}) => {
+const Report = ({ route }) => {
   const navigation = useNavigation();
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
@@ -459,9 +459,9 @@ const Report = ({route}) => {
   const [subject, setSubject] = useState('Short Attendance Notice');
   const [body, setBody] = useState('');
   const [studentsBelowThreshold, setStudentsBelowThreshold] = useState([]);
-  const {teacherNameG, telephone, departmentG} = useAuth();
+  const { teacherNameG, telephone, departmentG } = useAuth();
   const attendance_id = useRef('');
-  const curr_date = useRef({date: '', time: ''});
+  const curr_date = useRef({ date: '', time: '' });
 
   useEffect(() => {
     const threshold = Object.entries(datas.recordG2 || {})?.filter(
@@ -512,13 +512,13 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
       <th>Attendance (%)</th>
     </tr>
       ${studentsBelowThreshold.map(
-        ([rollNumber, item]) => `
+      ([rollNumber, item]) => `
       <tr>
         <td>${rollNumber}</td>
         <td>${item.name || 'Unknown'}</td>
         <td>${((item.presentCount * 100) / datas.totG).toFixed(2)}%</td>
       </tr>`,
-      )}
+    )}
   </table>
   <h3>Daily Attendance Statistics</h3>
   <table>
@@ -529,14 +529,14 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
       <th>Absent</th>
     </tr>
       ${datas.recordDate.map(
-        ({date, time, presentCount, absentCount}) =>
-          `<tr>
+      ({ date, time, presentCount, absentCount }) =>
+        `<tr>
                   <td>${date}</td>
                   <td>${time}</td>
                   <td>${presentCount}</td>
                   <td>${absentCount}</td>
                 </tr>`,
-      )}
+    )}
   </table>
 </body>
 </html>
@@ -651,7 +651,7 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={downloadReport}
-          style={{backgroundColor: theme.maincolor}}
+          style={{ backgroundColor: theme.maincolor }}
           className="flex justify-center items-center rounded-lg p-3 px-4">
           <View className="flex flex-row justify-center items-center">
             <ArrowDownTrayIcon color={'white'} size={20} />
@@ -738,47 +738,47 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
                           setThresPerc(parseInt(value));
                         }}>
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 10%"
                           value="10"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 20%"
                           value="20"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 30%"
                           value="30"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 40%"
                           value="40"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 50%"
                           value="50"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 60%"
                           value="60"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 70%"
                           value="70"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 75%"
                           value="75"
                         />
                         <RadioButton.Item
-                          labelStyle={{color: '#6a6a6a'}}
+                          labelStyle={{ color: '#6a6a6a' }}
                           label="<= 100%"
                           value="100"
                         />
@@ -815,7 +815,7 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
                       placeholder="Enter Body Here"
                       multiline={true}
                       numberOfLines={6} // Adjust this value to control the height of the text area
-                      style={{textAlignVertical: 'top'}} // Ensures the text starts at the top
+                      style={{ textAlignVertical: 'top' }} // Ensures the text starts at the top
                     />
                     <View className="flex flex-row justify-between mt-5">
                       <TouchableOpacity
@@ -909,11 +909,11 @@ Contact: ${telephone === 'Not Set' ? 'Your Contact Information' : telephone}
                 <Text style={styles.tableHeaderText2}>Absent</Text>
               </View>
               {datas.recordDate.map(
-                ({date, time, id, presentCount, absentCount}, index) => (
+                ({ date, time, id, presentCount, absentCount }, index) => (
                   <TouchableOpacity
                     onPress={() => {
                       attendance_id.current = id;
-                      curr_date.current = {date, time};
+                      curr_date.current = { date, time };
                       setModalVisible3(true);
                     }}
                     key={index}

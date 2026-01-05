@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,23 +8,23 @@ import {
   StatusBar,
   ToastAndroid
 } from 'react-native';
-import {ActivityIndicator, ProgressBar} from 'react-native-paper';
-import {theme} from '../../theme';
-import {ArrowDownTrayIcon} from 'react-native-heroicons/outline';
+import { ActivityIndicator, ProgressBar } from 'react-native-paper';
+import { theme } from '../../theme';
+import { ArrowDownTrayIcon } from 'react-native-heroicons/outline';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {useAuth} from '../../utils/auth';
-import axios from 'axios';
-import {BASE_URL} from '../../constants/constants';
+import { useAuth } from '../../utils/auth';
+import axios from 'react-native-axios';
+import { BASE_URL } from '../../constants/constants';
 import PTRView from 'react-native-pull-to-refresh';
 
 const StudentReport = () => {
   const [lowAttendanceSubjects, setLowAttendanceSubjects] = useState([]);
-  const {rollNumberG, studentNameG, loading, setLoading, studentClass} =
+  const { rollNumberG, studentNameG, loading, setLoading, studentClass } =
     useAuth();
   const [data, setData] = useState([]);
 
@@ -204,12 +204,12 @@ const StudentReport = () => {
           flexDirection: 'row',
           paddingHorizontal: wp(8),
         }}>
-        <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
+        <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }}>
           Student's Report
         </Text>
         <TouchableOpacity
           onPress={downloadStudentReport}
-          style={{backgroundColor: 'white'}}
+          style={{ backgroundColor: 'white' }}
           className="flex justify-center items-center rounded-lg p-3 px-3">
           <View className="flex flex-row justify-center items-center">
             <ArrowDownTrayIcon color={'#01818C'} size={20} />

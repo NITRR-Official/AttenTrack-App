@@ -12,21 +12,21 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {theme} from '../../theme';
-import {CpuChipIcon} from 'react-native-heroicons/outline';
+import { theme } from '../../theme';
+import { CpuChipIcon } from 'react-native-heroicons/outline';
 
 import * as React from 'react';
 
-import {useNavigation} from '@react-navigation/native';
-import {useAuth} from '../../utils/auth';
-import axios from 'axios';
-import {ActivityIndicator} from 'react-native-paper';
-import {BASE_URL} from '../../constants/constants';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../utils/auth';
+import axios from 'react-native-axios';
+import { ActivityIndicator } from 'react-native-paper';
+import { BASE_URL } from '../../constants/constants';
 
 const ReportHome = () => {
   const navigation = useNavigation();
 
-  const {classes, setClasses, loading, setLoading, teacheridG} = useAuth();
+  const { classes, setClasses, loading, setLoading, teacheridG } = useAuth();
 
   const getRecord = async id => {
     setLoading(true);
@@ -100,7 +100,7 @@ const ReportHome = () => {
           flexDirection: 'row',
           paddingHorizontal: wp(8),
         }}>
-        <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
+        <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }}>
           Monthly Attendance Report
         </Text>
       </View>
@@ -118,7 +118,7 @@ const ReportHome = () => {
       <PTRView
         onRefresh={refresh}
         scrollEventThrottle={1}
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
         style={{
           backgroundColor: '#fff',
           height: hp(100),

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,19 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
-import {ArrowUpTrayIcon, XMarkIcon} from 'react-native-heroicons/outline';
-import {useNavigation} from '@react-navigation/native';
+import { ArrowUpTrayIcon, XMarkIcon } from 'react-native-heroicons/outline';
+import { useNavigation } from '@react-navigation/native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {theme} from '../../theme';
+import { theme } from '../../theme';
 import Papa from 'papaparse';
 import DocumentPicker from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
-import {useAuth} from '../../utils/auth';
-import axios from 'axios';
-import {BASE_URL} from '../../constants/constants';
+import { useAuth } from '../../utils/auth';
+import axios from 'react-native-axios';
+import { BASE_URL } from '../../constants/constants';
 const CreateClass = () => {
   const navigation = useNavigation();
 
@@ -175,7 +175,7 @@ const CreateClass = () => {
       ToastAndroid.show('Class Added Successfully!', ToastAndroid.LONG);
       setClasses(prevClasses => [
         ...prevClasses,
-        {id: response.data._id, classname},
+        { id: response.data._id, classname },
       ]);
       setRefreshing(true);
       navigation.goBack();

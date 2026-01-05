@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -11,16 +11,16 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {ActivityIndicator} from 'react-native-paper';
-import axios from 'axios';
-import {theme} from '../../theme';
-import {useAuth} from '../../utils/auth';
-import {useNavigation} from '@react-navigation/native';
-import {BASE_URL} from '../../constants/constants';
+import { ActivityIndicator } from 'react-native-paper';
+import axios from 'react-native-axios';
+import { theme } from '../../theme';
+import { useAuth } from '../../utils/auth';
+import { useNavigation } from '@react-navigation/native';
+import { BASE_URL } from '../../constants/constants';
 import PropTypes from 'prop-types';
 
 const SignUp = props => {
-  const {loading, setLoading} = useAuth();
+  const { loading, setLoading } = useAuth();
   const navigation = useNavigation();
 
   const [isStudent, setIsStudent] = useState(true);
@@ -53,7 +53,7 @@ const SignUp = props => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({email}),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -192,7 +192,7 @@ const SignUp = props => {
         <View className="h-20 w-20 bg-[#01808c87] absolute bottom-0 right-0 rounded-tl-full"></View>
 
         <Image
-          style={{width: 100, height: 100}}
+          style={{ width: 100, height: 100 }}
           source={{
             uri: isStudent
               ? 'https://icons.veryicon.com/png/o/avatar/character-series/student-10.png'
@@ -220,26 +220,22 @@ const SignUp = props => {
         <View className="flex flex-row justify-around w-[80%]">
           <TouchableOpacity
             onPress={() => setIsStudent(true)}
-            className={`${
-              isStudent ? 'bg-[#01818C]' : 'bg-white'
-            } border-[#01818C] border-2 w-[50%] py-2 flex justify-center items-center rounded-l-lg`}>
+            className={`${isStudent ? 'bg-[#01818C]' : 'bg-white'
+              } border-[#01818C] border-2 w-[50%] py-2 flex justify-center items-center rounded-l-lg`}>
             <Text
-              className={`${
-                isStudent ? 'text-white' : 'text-[#01818C]'
-              } text-[13px] font-medium`}>
+              className={`${isStudent ? 'text-white' : 'text-[#01818C]'
+                } text-[13px] font-medium`}>
               Student
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => setIsStudent(false)}
-            className={`${
-              isStudent ? 'bg-white' : 'bg-[#01818C]'
-            } border-[#01818C] border-2 w-[50%] py-2 flex justify-center items-center rounded-r-lg`}>
+            className={`${isStudent ? 'bg-white' : 'bg-[#01818C]'
+              } border-[#01818C] border-2 w-[50%] py-2 flex justify-center items-center rounded-r-lg`}>
             <Text
-              className={`${
-                isStudent ? 'text-[#01818C]' : 'text-white'
-              } text-[13px] font-medium`}>
+              className={`${isStudent ? 'text-[#01818C]' : 'text-white'
+                } text-[13px] font-medium`}>
               Teacher
             </Text>
           </TouchableOpacity>
@@ -262,7 +258,7 @@ const SignUp = props => {
               onChangeText={setEmail}
               value={email}
               placeholder="Enter Email ID..."
-              style={{flex: 1, paddingLeft: 10, height: 40, color: 'gray'}}
+              style={{ flex: 1, paddingLeft: 10, height: 40, color: 'gray' }}
             />
           </View>
 

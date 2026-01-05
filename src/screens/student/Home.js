@@ -11,21 +11,21 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {theme} from '../../theme';
-import {CpuChipIcon} from 'react-native-heroicons/outline';
+import { theme } from '../../theme';
+import { CpuChipIcon } from 'react-native-heroicons/outline';
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {useNavigation} from '@react-navigation/native';
-import {useAuth} from '../../utils/auth';
-import axios from 'axios';
-import {ActivityIndicator} from 'react-native-paper';
-import {BASE_URL} from '../../constants/constants';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../utils/auth';
+import axios from 'react-native-axios';
+import { ActivityIndicator } from 'react-native-paper';
+import { BASE_URL } from '../../constants/constants';
 import PTRView from 'react-native-pull-to-refresh';
 
 const Home = () => {
   const navigation = useNavigation();
-  const {rollNumberG, loading, setLoading, studentidG, setStudentClass, tokenVerified} = useAuth();
+  const { rollNumberG, loading, setLoading, studentidG, setStudentClass, tokenVerified } = useAuth();
   const [selectedClass, setSelectedClass] = useState(null);
 
   const getClassInfo = async () => {
@@ -38,7 +38,7 @@ const Home = () => {
       setSelectedClass(response.data.classes);
     } catch (error) {
       ToastAndroid.show(`Something went wrong.`, ToastAndroid.LONG);
-      console.log('From class infos: ',error, studentidG);
+      console.log('From class infos: ', error, studentidG);
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if(studentidG != null && studentidG != undefined) {
+    if (studentidG != null && studentidG != undefined) {
       getClassInfo();
     }
   }, [studentidG]);
@@ -82,7 +82,7 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView classItem="relative" style={{marginBottom: hp(10)}}>
+    <SafeAreaView classItem="relative" style={{ marginBottom: hp(10) }}>
       <StatusBar
         backgroundColor={theme.maincolor}
         barStyle={'light-content'}
@@ -100,7 +100,7 @@ const Home = () => {
           flexDirection: 'row',
           paddingHorizontal: wp(8),
         }}>
-        <Text style={{color: 'white', fontSize: wp(5), fontWeight: 500}}>
+        <Text style={{ color: 'white', fontSize: wp(5), fontWeight: 500 }}>
           Classes
         </Text>
       </View>
@@ -118,7 +118,7 @@ const Home = () => {
       <PTRView
         onRefresh={refresh}
         scrollEventThrottle={1}
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
         style={{
           backgroundColor: '#fff',
           height: hp(100),

@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useEffect, useState, useMemo, useRef} from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -22,19 +22,19 @@ import {
   PencilSquareIcon,
   XMarkIcon,
 } from 'react-native-heroicons/outline';
-import {theme} from '../../theme';
-import {ActivityIndicator, ProgressBar, RadioButton} from 'react-native-paper';
-import axios from 'axios';
-import {useAuth} from '../../utils/auth';
+import { theme } from '../../theme';
+import { ActivityIndicator, ProgressBar, RadioButton } from 'react-native-paper';
+import axios from 'react-native-axios';
+import { useAuth } from '../../utils/auth';
 import GetLocation from 'react-native-get-location';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import RNFS from 'react-native-fs';
-import {API_URL, BASE_URL} from '../../constants/constants';
+import { API_URL, BASE_URL } from '../../constants/constants';
 
 import PropTypes from 'prop-types';
 
-const Sheet = ({navigation, route}) => {
-  const {loading, setLoading, turnONGPS, tokenVerified} = useAuth();
+const Sheet = ({ navigation, route }) => {
+  const { loading, setLoading, turnONGPS, tokenVerified } = useAuth();
   const [lag, setLag] = useState(false);
 
   const [student, setStudent] = useState();
@@ -46,7 +46,7 @@ const Sheet = ({navigation, route}) => {
   useEffect(() => {
     if (student) {
       setRecords(
-        student.map(s => ({rollNumber: s.rollNumber, is_present: false})),
+        student.map(s => ({ rollNumber: s.rollNumber, is_present: false })),
       );
     }
   }, [student]);
@@ -92,7 +92,7 @@ const Sheet = ({navigation, route}) => {
   const updateRecordAttendance = (prevRecords, updatedRollNumber) => {
     return prevRecords.map(record =>
       record.rollNumber === updatedRollNumber
-        ? {...record, is_present: true}
+        ? { ...record, is_present: true }
         : record,
     );
   };
@@ -162,7 +162,7 @@ const Sheet = ({navigation, route}) => {
   const handleSetAttendance2 = () => {
     let interval;
     try {
-      socket.send(JSON.stringify({type: 'first_call'}));
+      socket.send(JSON.stringify({ type: 'first_call' }));
 
       interval = setInterval(() => {
         setTime(prev => {
@@ -249,14 +249,14 @@ const Sheet = ({navigation, route}) => {
   // Function to mark all students as present
   const markAllPresent = () => {
     setRecords(prevRecords =>
-      prevRecords.map(record => ({...record, is_present: true})),
+      prevRecords.map(record => ({ ...record, is_present: true })),
     );
   };
 
   // Function to mark all students as absent
   const markAllAbsent = () => {
     setRecords(prevRecords =>
-      prevRecords.map(record => ({...record, is_present: false})),
+      prevRecords.map(record => ({ ...record, is_present: false })),
     );
   };
 
@@ -308,11 +308,11 @@ const Sheet = ({navigation, route}) => {
   };
 
   const getCurrentLocation = (range, direct) => {
-    GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
+    GetLocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 60000 })
       .then(location => {
         setModalVisible0(false);
         if (!direct) setModalVisible1(true);
-        setLocate({location: location, range: range});
+        setLocate({ location: location, range: range });
         socket.send(
           JSON.stringify({
             type: 'teacherLoc',
@@ -348,21 +348,19 @@ const Sheet = ({navigation, route}) => {
       </thead>
       <tbody>
         ${records
-          .map(
-            record => `
+        .map(
+          record => `
           <tr>
             <td style="padding: 8px;">${record.rollNumber}</td>
-            <td style="padding: 8px;">${
-              student?.find(s => s.rollNumber === record.rollNumber)?.name ||
-              'N/A'
+            <td style="padding: 8px;">${student?.find(s => s.rollNumber === record.rollNumber)?.name ||
+            'N/A'
             }</td>
-            <td style="padding: 8px;">${
-              record.is_present ? 'Present' : 'Absent'
+            <td style="padding: 8px;">${record.is_present ? 'Present' : 'Absent'
             }</td>
           </tr>
         `,
-          )
-          .join('')}
+        )
+        .join('')}
       </tbody>
     </table>
   `;
@@ -380,9 +378,8 @@ const Sheet = ({navigation, route}) => {
 
     try {
       const file = await RNHTMLtoPDF.convert(options);
-      const newPath = `${RNFS.DownloadDirectoryPath}/${
-        new Date().toISOString().split('T')[0]
-      }_Attendance_Report.pdf`;
+      const newPath = `${RNFS.DownloadDirectoryPath}/${new Date().toISOString().split('T')[0]
+        }_Attendance_Report.pdf`;
 
       // Move file to download directory
       await RNFS.moveFile(file.filePath, newPath);
@@ -398,7 +395,7 @@ const Sheet = ({navigation, route}) => {
   };
 
   return (
-    <SafeAreaView style={{alignItems: 'center'}}>
+    <SafeAreaView style={{ alignItems: 'center' }}>
       <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
         <TouchableOpacity>
           <XMarkIcon
@@ -409,9 +406,9 @@ const Sheet = ({navigation, route}) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => createAttendance()}
-          style={{backgroundColor: theme.maincolor}}
+          style={{ backgroundColor: theme.maincolor }}
           className="flex justify-center items-center rounded-lg p-3 px-5">
-          <Text style={{color: '#fff', fontSize: wp(3.5), fontWeight: '700'}}>
+          <Text style={{ color: '#fff', fontSize: wp(3.5), fontWeight: '700' }}>
             {loading ? (
               <ActivityIndicator animating={true} color={'white'} />
             ) : (
@@ -516,7 +513,7 @@ const Sheet = ({navigation, route}) => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
-        
+
         {/* Warning dialog box */}
         <Modal
           animationType="fade"
@@ -585,47 +582,47 @@ const Sheet = ({navigation, route}) => {
                         requestLocationPermission(parseInt(value), false);
                       }}>
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="10m"
                         value="10"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="20m"
                         value="20"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="30m"
                         value="30"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="40m"
                         value="40"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="50m"
                         value="50"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="100m"
                         value="100"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="200m"
                         value="200"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="500m"
                         value="500"
                       />
                       <RadioButton.Item
-                        labelStyle={{color: '#6a6a6a'}}
+                        labelStyle={{ color: '#6a6a6a' }}
                         label="1000m"
                         value="1000"
                       />
@@ -660,22 +657,22 @@ const Sheet = ({navigation, route}) => {
                       handleSetAttendance2();
                     }}>
                     <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
+                      labelStyle={{ color: '#6a6a6a' }}
                       label="30 Seconds"
                       value="30"
                     />
                     <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
+                      labelStyle={{ color: '#6a6a6a' }}
                       label="1 Minute"
                       value="60"
                     />
                     <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
+                      labelStyle={{ color: '#6a6a6a' }}
                       label="2 Minutes"
                       value="120"
                     />
                     <RadioButton.Item
-                      labelStyle={{color: '#6a6a6a'}}
+                      labelStyle={{ color: '#6a6a6a' }}
                       label="5 Minutes"
                       value="300"
                     />
@@ -771,7 +768,7 @@ const Sheet = ({navigation, route}) => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
-        
+
       </View>
 
       {/* Add buttons for marking all present/absent */}
@@ -815,7 +812,7 @@ const Sheet = ({navigation, route}) => {
       </View>
 
       <View
-        style={{width: wp(95)}}
+        style={{ width: wp(95) }}
         className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
         <View className="flex flex-row justify-between">
           <Text className="w-1/4  text-[#7c7c7c] ">Roll Number</Text>
@@ -826,11 +823,11 @@ const Sheet = ({navigation, route}) => {
 
       <ScrollView
         scrollEventThrottle={1}
-        contentContainerStyle={{flexGrow: 1}}
-        style={{backgroundColor: '#fff', height: hp(60)}}
+        contentContainerStyle={{ flexGrow: 1 }}
+        style={{ backgroundColor: '#fff', height: hp(60) }}
         className="border-b-2 border-[#01808c7a] rounded-b-md">
         <View
-          style={{width: wp(95)}}
+          style={{ width: wp(95) }}
           className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
           {student && records ? (
             student.map((item, id) => (
@@ -848,7 +845,7 @@ const Sheet = ({navigation, route}) => {
                     thumbColor={
                       records[id]?.is_present ? '#258a4ac4' : '#c41111c4'
                     }
-                    trackColor={{false: '#ffaaaac4', true: '#8bdca8c4'}}
+                    trackColor={{ false: '#ffaaaac4', true: '#8bdca8c4' }}
                     onValueChange={() => {
                       setRecords(prevRecords => {
                         if (id >= prevRecords.length) return prevRecords; // Prevents out-of-range access

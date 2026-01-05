@@ -12,7 +12,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useEffect, useState, useMemo, useRef} from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import {
   widthPercentageToDP as wp,
@@ -23,16 +23,16 @@ import {
   PencilSquareIcon,
   XMarkIcon,
 } from 'react-native-heroicons/outline';
-import {theme} from '../../theme';
-import {useNavigation} from '@react-navigation/native';
-import {ActivityIndicator, ProgressBar} from 'react-native-paper';
-import axios from 'axios';
+import { theme } from '../../theme';
+import { useNavigation } from '@react-navigation/native';
+import { ActivityIndicator, ProgressBar } from 'react-native-paper';
+import axios from 'react-native-axios';
 import GetLocation from 'react-native-get-location';
-import {calculateDistance} from './locationTracker';
-import {useAuth} from '../../utils/auth';
-import {API_URL, BASE_URL} from '../../constants/constants';
+import { calculateDistance } from './locationTracker';
+import { useAuth } from '../../utils/auth';
+import { API_URL, BASE_URL } from '../../constants/constants';
 
-const MarkAttendance = ({route}) => {
+const MarkAttendance = ({ route }) => {
   const navigation = useNavigation();
   const [otp, setOtp] = useState('');
   const [modalVisible0, setModalVisible0] = useState(false);
@@ -46,7 +46,7 @@ const MarkAttendance = ({route}) => {
   const [lat, setLat] = useState();
   const [long, setLong] = useState();
   const [retry, setRetry] = useState(false);
-  const {rollNumberG, turnONGPS} = useAuth();
+  const { rollNumberG, turnONGPS } = useAuth();
 
   const handleGetAttendance = async () => {
     try {
@@ -173,7 +173,7 @@ const MarkAttendance = ({route}) => {
   };
 
   const getCurrentLocation = () => {
-    GetLocation.getCurrentPosition({enableHighAccuracy: true, timeout: 60000})
+    GetLocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 60000 })
       .then(location => {
         const distance = calculateDistance(
           location.latitude,
@@ -183,7 +183,7 @@ const MarkAttendance = ({route}) => {
         );
         if (distance <= range) {
           socket.send(
-            JSON.stringify({type: 'attendance', rollNumber: rollNumberG}),
+            JSON.stringify({ type: 'attendance', rollNumber: rollNumberG }),
           );
           ToastAndroid.show(
             'Location Matched ! Attendance Marked as Present !',
@@ -208,7 +208,7 @@ const MarkAttendance = ({route}) => {
         ToastAndroid.show(`LAT-T: ${lat}, LONG-T: ${long}`, ToastAndroid.LONG);
       })
       .catch(error => {
-        const {code, message} = error;
+        const { code, message } = error;
         cancelMarking()
         setRetry(true);
         console.warn(code, message);
@@ -237,7 +237,7 @@ const MarkAttendance = ({route}) => {
   }
 
   return (
-    <SafeAreaView style={{alignItems: 'center'}}>
+    <SafeAreaView style={{ alignItems: 'center' }}>
       <View className="w-full flex flex-row justify-between items-center p-4 pb-0">
         <TouchableOpacity>
           <XMarkIcon
@@ -264,7 +264,7 @@ const MarkAttendance = ({route}) => {
           </View>
         </View>
         <TouchableOpacity
-          onPress={()=>{
+          onPress={() => {
             givePresent()
           }}
           className="flex flex-col justify-center items-center bg-[#01808cb9] p-2 rounded-md border-[#01808c7a] border-2">
@@ -479,7 +479,7 @@ const MarkAttendance = ({route}) => {
       </View>
 
       <View
-        style={{width: wp(95)}}
+        style={{ width: wp(95) }}
         className="bg-[#01808c2e] p-2 rounded-t-md border-[#01808c7a] border-t-2 border-r-2 border-l-2 ">
         <View className="flex flex-row justify-between">
           <Text className="w-2/4 text-gray-600">Date</Text>
@@ -490,10 +490,10 @@ const MarkAttendance = ({route}) => {
 
       <ScrollView
         scrollEventThrottle={1}
-        contentContainerStyle={{flexGrow: 1}}
-        style={{backgroundColor: '#fff', height: hp(60)}}>
+        contentContainerStyle={{ flexGrow: 1 }}
+        style={{ backgroundColor: '#fff', height: hp(60) }}>
         <View
-          style={{width: wp(95)}}
+          style={{ width: wp(95) }}
           className="p-2 rounded-b-md border-[#01808c7a] border-b-2 border-r-2 border-l-2 flex gap-y-3">
           {route.params.attDataG.attendanceMap.map((data, index) => (
             <View className="flex flex-row justify-between" key={index}>
