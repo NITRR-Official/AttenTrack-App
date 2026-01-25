@@ -1,79 +1,173 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Attendance Tracker App
 
-# Getting Started
+A React Native application for tracking attendance, built with React Native CLI.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Prerequisites
 
-## Step 1: Start the Metro Server
+Before you begin, ensure you have the following installed on your machine:
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+- Node.js (LTS)
+- npm package manager
+- Android Studio (for Android development)
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Local Setup Instructions
+
+### Step 1: Setup React Native CLI Environment
+
+Follow the official React Native environment setup guide for your operating system:
+
+**[React Native - Environment Setup](https://reactnative.dev/docs/environment-setup)**
+
+- Select **"React Native CLI Quickstart"** (not Expo Go)
+- Choose your **Development OS** (Windows/macOS/Linux)
+- Choose your **Target OS** (Android/iOS)
+- Complete all installation steps including Java, Android Studio, and SDK setup
+
+### Step 2: Verify Your Development Environment
+
+Before proceeding, verify that your environment is configured correctly:
+
+#### For Android Development:
+
+1. **Check ADB Connection:**
+   ```bash
+   adb devices
+   ```
+   This should list your connected Android device or emulator.
+
+2. **Verify Android SDK Installation:**
+   - Open Android Studio
+   - Go to **Settings/Preferences** → **Appearance & Behavior** → **System Settings** → **Android SDK**
+   - Ensure you have Android SDK Platform 33 (or newer) installed
+   - Verify **Android SDK Build-Tools** and **Android Emulator** are installed
+
+3. **Check NDK Version:**
+   - In Android Studio, navigate to **SDK Manager** → **SDK Tools** tab
+   - Ensure **NDK (Side by side)** is installed
+   - Verify NDK version matches: **27.1.12297006**
+   - You can also check in your project's `android/app/build.gradle` file
+
+4. **Configure Environment Variables:**
+   - Ensure `ANDROID_HOME` is set correctly
+   - Verify `PATH` includes Android SDK platform-tools and tools
+
+#### For iOS Development (macOS only):
+
+1. **Check Xcode Installation:**
+   ```bash
+   xcode-select --print-path
+   ```
+
+2. **Install CocoaPods:**
+   ```bash
+   sudo gem install cocoapods
+   ```
+
+### Step 3: Clone and Navigate to Project
 
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
+git clone <your-repository-url>
+cd attendance-tracker-app
 ```
 
-## Step 2: Start your Application
+### Step 4: Install Dependencies
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+Install all required npm packages using the legacy peer dependencies flag to avoid conflicts:
 
 ```bash
-# using npm
-npm run android
+npm install --legacy-peer-deps
+```
 
-# OR using Yarn
+> **Note:** The `--legacy-peer-deps` flag is used to handle peer dependency conflicts that may arise with certain packages.
+
+### Step 5: Install iOS Dependencies (macOS only)
+
+If you're developing for iOS, install the CocoaPods dependencies:
+
+```bash
+cd ios
+pod install
+cd ..
+```
+
+### Step 6: Start Metro Bundler
+
+Metro is the JavaScript bundler for React Native. Start it in a dedicated terminal:
+
+```bash
+npm start
+```
+
+Keep this terminal window open and running.
+
+### Step 7: Run the Application
+
+Open a **new terminal** window in the project root directory and run:
+
+#### For Android:
+
+```bash
+npm run android
+```
+
+Or using Yarn:
+```bash
 yarn android
 ```
 
-### For iOS
+#### For iOS (macOS only):
 
 ```bash
-# using npm
 npm run ios
+```
 
-# OR using Yarn
+Or using Yarn:
+```bash
 yarn ios
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+The app should now launch on your Android emulator/device or iOS simulator.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+## Common Troubleshooting
 
-## Step 3: Modifying your App
+### Android Issues:
 
-Now that you have successfully run the app, let's modify it.
+- **"SDK location not found"**: Ensure `ANDROID_HOME` environment variable is set correctly
+- **"Unable to connect to ADB"**: Restart ADB with `adb kill-server` then `adb start-server`
+- **Build failures**: Try cleaning the build with `cd android && ./gradlew clean && cd ..`
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+### Metro Bundler Issues:
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+- **Port already in use**: Kill the process using port 8081 or run `npm start -- --port=8082`
+- **Cache issues**: Clear Metro cache with `npm start -- --reset-cache`
 
-## Congratulations! :tada:
+### General Issues:
 
-You've successfully run and modified your React Native App. :partying_face:
+- **Dependency conflicts**: Delete `node_modules` and `package-lock.json`, then run `npm install --legacy-peer-deps` again
+- **iOS build issues**: Delete `ios/Pods` and `ios/Podfile.lock`, then run `pod install` again
 
-### Now what?
+## Development Workflow
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+1. Make changes to your code in your preferred editor
+2. **For Android**: Press `R` twice or `Cmd/Ctrl + M` → "Reload" to see changes
+3. **For iOS**: Press `Cmd + R` in the simulator to reload
+4. Enable **Fast Refresh** for automatic reloading (usually enabled by default)
 
-# Troubleshooting
+## Additional Resources
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+- [React Native Documentation](https://reactnative.dev/docs/getting-started)
+- [React Native Troubleshooting Guide](https://reactnative.dev/docs/troubleshooting)
+- [Android Developer Documentation](https://developer.android.com/)
+- [iOS Developer Documentation](https://developer.apple.com/documentation/)
 
-# Learn More
+## Contributing
 
-To learn more about React Native, take a look at the following resources:
+Please read our contributing guidelines before submitting pull requests.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## License
+
+[Your License Here]
+
+---
+
+**Happy Coding! 🚀**
